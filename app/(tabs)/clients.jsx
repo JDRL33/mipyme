@@ -1,0 +1,54 @@
+import { FlatList, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import TextInfoDelete from "../../components/TextInfoDelete";
+import ButtonChip from "../../components/ButtonChip";
+import CardClient from "../../components/CardClient";
+import EmptyList from "../../components/EmptyList";
+import SearchBar from "../../components/SearchBar";
+import { useTheme } from "react-native-paper";
+import Header from "../../components/Header";
+import { appStore } from "../../store/appStore";
+import Space from "../../tools/Space";
+
+const Clients = () => {
+  const clientList = appStore((state) => state.clientList);
+  const insets = useSafeAreaInsets();
+  const myTheme = useTheme();
+  return (
+    <View
+      style={[
+        styles.main,
+        { paddingTop: insets.top, backgroundColor: myTheme.colors.primary },
+      ]}
+    >
+      <Header title={"Clientes en deuda"} />
+      <SearchBar placeHolder="Buscar clientes..." />
+      <TextInfoDelete text="Para eliminar un cliente debe liquidar sus pagos pendientes." />
+      <ButtonChip text="AGREGAR" href="/modalCreateClient" />
+      <Space space={10} />
+      <FlatList
+        data={clientList}
+        ItemSeparatorComponent={<View style={{ height: 15 }} />}
+        ListEmptyComponent={() => (
+          <EmptyList text="No hay clientes" icon="x-circle" />
+        )}
+        renderItem={({ item }) => (
+          <CardClient
+            nombre={item.nombre}
+            ci={item.ci}
+            cup={item.cup}
+            usd={item.usd}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+      />
+      {/* <View style={{ height: 30 }} /> */}
+    </View>
+  );
+};
+
+export default Clients;
+
+const styles = StyleSheet.create({
+  main: { flex: 1, paddingHorizontal: 15 },
+});
