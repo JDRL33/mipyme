@@ -1,65 +1,56 @@
 import { StyleSheet, View } from "react-native";
-import React, { useEffect, useState } from "react";
 import { CardInfo, CardActionsSpeed } from "./Cards";
 import { appStore } from "../store/appStore";
 
 export const CardsGridInfo = () => {
-  useEffect(() => {}, []);
-  const providersList = appStore((state) => state.providersList);
-  const productsGroupList = appStore((state) => state.productsGroupList);
-  const clientList = appStore((state) => state.clientList);
-  const countDeposit = appStore((state) => state.countDeposit);
-  const countDeposited = appStore((state) => state.countDeposited);
-  const countGanancia = appStore((state) => state.countGanancia);
-  const stockBajo = appStore((state) => state.stockBajo);
+  const store = appStore((state) => state.store);
 
   return (
     // Contenedor de los bloques
     <View style={styles.mainCards}>
       <CardInfo
         textHeader={"Productos"}
-        textBody={productsGroupList.length}
+        textBody={store.nProducts}
         color={2}
         icon={0}
       />
       <CardInfo
         textHeader={"A Depositar"}
-        textBody={countDeposit}
+        textBody={store.cDebito}
         color={0}
         icon={1}
         money
       />
       <CardInfo
         textHeader={"Depositado"}
-        textBody={countDeposited}
+        textBody={store.cPagado}
         color={1}
         icon={2}
         money
       />
       <CardInfo
         textHeader={"Ganancia"}
-        textBody={countGanancia}
+        textBody={store.cGanancia}
         color={0}
         icon={3}
         money
       />
       <CardInfo
         textHeader={"Proveedores"}
-        textBody={providersList.length}
+        textBody={store.nProviders}
         color={0}
         icon={4}
       />
       <CardInfo
         textHeader={"Clientes en Deuda"}
-        textBody={clientList.length}
+        textBody={store.nClients}
         color={1}
         icon={5}
       />
       <CardInfo
         textHeader={"Stock Bajo"}
-        textBody={stockBajo}
+        textBody={store.nProducts_stock_down}
         color={3}
-        money
         icon={6}
       />
     </View>
@@ -76,7 +67,7 @@ export const CardsGridActions = () => {
       }}
     >
       <CardActionsSpeed text={"Nueva Venta"} color={1} icon={0} />
-      <CardActionsSpeed text={"Agregar Producto"} color={0} icon={1} />
+      <CardActionsSpeed text={"Hacer compra"} color={0} icon={1} />
     </View>
   );
 };

@@ -66,7 +66,11 @@ export const CardActionsSpeed = ({ color, text, icon }) => {
   ];
   const icons = [
     <FontAwesome name="plus-circle" size={42} color={myTheme.colors.primary} />,
-    <Feather name="package" size={42} color={myTheme.colors.greenForce} />,
+    <Feather
+      name="shopping-cart"
+      size={42}
+      color={myTheme.colors.greenForce}
+    />,
   ];
   return (
     <View

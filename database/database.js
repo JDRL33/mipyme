@@ -21,12 +21,13 @@ export async function initDatabase() {
       limitStockDown	INTEGER DEFAULT 5,
       tasa_usd	REAL DEFAULT 400.0,
       tasa_eur	REAL DEFAULT 500.0,
-      nProducts	INTEGER,
-      nProviders	INTEGER,
-      nClients	INTEGER,
-      cDebito	REAL,
-      cPagado	REAL,
-      cGanancia	REAL,
+      nProducts	INTEGER DEFAULT 0,
+      nProviders	INTEGER DEFAULT 0,
+      nProducts_stock_down INTEGER DEFAULT 0,
+      nClients	INTEGER DEFAULT 0,
+      cDebito	REAL DEFAULT 0,
+      cPagado	REAL DEFAULT 0,
+      cGanancia	REAL DEFAULT 0,
       PRIMARY KEY(id AUTOINCREMENT)
     );
 
@@ -99,6 +100,16 @@ export async function executeQuery(SQLite, params = []) {
 export async function getData(sql, params = []) {
   const db = await getDatabase();
   return await db.getAllAsync(sql, params);
+}
+// Obteniendo datos de la tienda
+export async function getStore() {
+  const response = await getData("SELECT * FROM store");
+  if (response.length == 0) {
+    await executeQuery("INSERT INTO store (name) VALUES ('Mi Tienda Pro')");
+    return await getData("SELECT * FROM store")[0];
+  } else {
+    return response[0];
+  }
 }
 // Obteniendo TODOS LOS PROVEEDORES, STOCK y CLIENTS
 export async function getProviders() {
@@ -180,6 +191,13 @@ export async function getProviderById(id) {
     [id],
   );
   return response;
+}
+// Obtener Productos de stock bajos
+export async function getProductsStockDown() {
+  const limit = await getData("SELECT limitStockDown FROM store");
+  return await getData("SELECT * FROM producto_grupo WHERE cantidad <= ?", [
+    limit[0],
+  ]);
 }
 // Eliminar proveedor BY id
 export async function delProviderById(id) {

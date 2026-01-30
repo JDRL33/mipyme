@@ -6,8 +6,19 @@ import CambioCard from "../../components/CambioCard";
 import FabButton from "../../components/FabButton";
 import { useTheme } from "react-native-paper";
 import Header from "../../components/Header";
+import { appStore } from "../../store/appStore";
+import { useEffect } from "react";
+import { initDatabase } from "../../database/database";
 
 const index = () => {
+  const initStore = appStore((state) => state.initStore);
+  useEffect(() => {
+    const init = async () => {
+      await initDatabase();
+      await initStore();
+    };
+    init();
+  }, []);
   const myTheme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -34,7 +45,7 @@ const index = () => {
         <View style={{ height: 30 }} />
       </ScrollView>
       {/* Button de faboritos */}
-      {/* <FabButton onClick={async () => {}} /> */}
+      <FabButton onClick={async () => {}} />
     </View>
   );
 };

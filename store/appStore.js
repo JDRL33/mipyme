@@ -13,12 +13,16 @@ import {
   getProviderById,
   getProviders,
   getProductsGroup,
+  getStore,
+  getProductsStockDown,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
   providersList: [],
   productsGroupList: [],
   clientList: [],
+  productsWithStockDown: [],
+  store: {},
   temp: "",
 
   countDeposit: 0,
@@ -31,46 +35,74 @@ export const appStore = create((set, get) => ({
   // METODO PARA INICIAR LA APPSTORE
   initStore: async () => {
     await get().extractDatabaseList();
-    get().updateStatusFinanciero();
+    await get().getDataStore();
+    get().updateStoreStatus();
+  },
+  // METODOS PARA OBTENER LOS DATOS DE LA TIENDA
+  getDataStore: async () => {
+    const response = await getStore();
+    set({ store: response });
   },
   // METODOS PARA ACTUALIZAR VARIABLES DE ESTADISTICAS FINANCIERAS
-  updateStatusFinanciero: () => {
-    const response = get().providersList;
-    let sumaAPagar = 0;
-    let sumaPagada = 0;
-    if (response.length > 0) {
-      response.map((respons) => {
-        sumaAPagar += respons.a_pagar;
-        sumaPagada += respons.pagado;
-      });
-    }
+  updateStoreStatus: () => {
+    const store = get().store;
+    const productsStockBajo = get().productsWithStockDown;
+    const products = get().productsGroupList;
+    const providers = get().providersList;
+    const clients = get().clientList;
 
-    const response1 = get().productsGroupList;
-    let sumaGanancia = 0;
-    if (response1.length > 0) {
-      response1.map((respons) => {
-        sumaGanancia += respons.ganancia;
+    const nProducts = products.length;
+    const nProviders = providers.length;
+    const nClients = clients.length;
+
+    let cDebito = 0;
+    let cPagada = 0;
+    let cGanancia = 0;
+    if (providers.length > 0) {
+      providers.map((provider) => {
+        cDebito += provider.a_pagar;
+        cPagada += provider.pagado;
       });
     }
-    set({
-      countDeposit: sumaAPagar,
-      countDeposited: sumaPagada,
-      countGanancia: sumaGanancia,
-    });
+    if (products.length > 0) {
+      products.map((product) => {
+        cGanancia += product.ganancia_total;
+      });
+    }
+    get().getProductsStockDownStore();
+
+    const newStore = {
+      id: store.id,
+      name: store.name,
+      limitStockDown: store.limitStockDown,
+      tasa_usd: store.tasa_usd,
+      tasa_eur: store.tasa_eur,
+      nProducts: nProducts,
+      nProducts_stock_down: productsStockBajo.length,
+      nProviders: nProviders,
+      nClients: nClients,
+      cDebito: cDebito,
+      cPagado: cPagada,
+      cGanancia: cGanancia,
+    };
+
+    set({ store: newStore });
+    // hacer el update de la tabla___________________________________________________________________________________________________________________
   },
   // METODO PARA OBTENER LOS PRODUCTOS DE STOCK BAJO
   updateStatusStockDown: async () => {
-    const sql = `SELECT * FROM inventario WHERE cantidad <= ${get().limitStockDown}`;
+    const sql = `SELECT * FROM producto_grupo WHERE cantidad <= ${get().limitStockDown}`;
     const response = await getData(sql, []);
     if (response.length > 0) {
       set({ stockBajo: response.length });
     }
   },
-  // METODO PARA REINICIAR LA BD
-  resetDB: async () => {
-    await clearDatabase();
-    await get().initStore();
+  // METODO PARA OBTENER LOS PRODUCTOS DE BAJO STOCK
+  getProductsStockDownStore: async () => {
+    const stockDown = await getProductsStockDown();
+    console.log(stockDown);
   },
+
   // METODOS PARA OBTENER TODAS LAS FILAS DE LA BD
   extractDatabaseList: async () => {
     const providers = await getProviders();
@@ -83,6 +115,12 @@ export const appStore = create((set, get) => ({
       clientList: client,
     });
     return { providers, productsGroup, client };
+  },
+
+  // METODO PARA REINICIAR LA BD
+  resetDB: async () => {
+    await clearDatabase();
+    await get().initStore();
   },
 
   //Mentodos de busquedas____________________________________________________
@@ -145,7 +183,7 @@ export const appStore = create((set, get) => ({
     };
 
     set((state) => ({ providersList: [...state.providersList, newProvider] }));
-    get().updateStatusFinanciero();
+    get().updateStoreStatus();
   },
   // METODO PARA ANIADIR PRODUCTOS
   addProductsStore: async (
@@ -176,7 +214,7 @@ export const appStore = create((set, get) => ({
     set((state) => ({
       productsGroupList: [...state.productsGroupList, newProduct],
     }));
-    get().updateStatusFinanciero();
+    get().updateStoreStatus();
   },
   //METODO PARA ANIADIR CLIENTES
   addClientStore: async (pNombre, pCup, pUsd, pPhone, pCi) => {
@@ -192,6 +230,7 @@ export const appStore = create((set, get) => ({
     set((state) => ({
       clientList: [...state.clientList, newClient],
     }));
+    get().updateStoreStatus();
   },
 
   // METODO PARA ELIMINAR PROVEEDOR POR ID

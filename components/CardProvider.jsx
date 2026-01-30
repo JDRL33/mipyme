@@ -18,7 +18,7 @@ const CardProvider = ({
   const router = useRouter();
 
   const myTheme = useTheme();
-  const longPress = async () => {
+  const DELETE = async () => {
     const currentProvider = await getProviderByIdStore(id);
     setTemp(currentProvider);
     router.navigate("/modalDeleteProvider");
@@ -36,7 +36,7 @@ const CardProvider = ({
       }}
       onLongPress={() => {
         if (onLongPressValidate) {
-          longPress();
+          DELETE();
         }
       }}
     >

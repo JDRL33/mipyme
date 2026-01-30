@@ -4,6 +4,9 @@ import { ToolsBar } from "../devTools/components/toolsBar";
 import { StatusBar } from "expo-status-bar";
 import { PaperProvider } from "react-native-paper";
 import theme from "../theme/theme";
+import { useEffect } from "react";
+import { initDatabase } from "../database/database";
+import { appStore } from "../store/appStore";
 
 const Layuot = () => {
   return (
