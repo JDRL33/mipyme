@@ -111,6 +111,27 @@ export async function getStore() {
     return response[0];
   }
 }
+// Funcion para actualizar la tienda
+export async function updateStore(store) {
+  await executeQuery(
+    "UPDATE store SET name=?, limitStockDown = ?, tasa_usd = ?, tasa_eur = ?, nProducts = ?, nProducts_stock_down = ?, nProviders = ?, nClients = ?, cDebito = ?, cPagado = ?, cGanancia = ? WHERE id = ?",
+    [
+      store.name,
+      store.limitStockDown,
+      store.tasa_usd,
+      store.tasa_eur,
+      store.nProducts,
+      store.nProducts_stock_down,
+      store.nProviders,
+      store.nClients,
+      store.cDebito,
+      store.cPagado,
+      store.cGanancia,
+      store.id,
+    ],
+  );
+}
+
 // Obteniendo TODOS LOS PROVEEDORES, STOCK y CLIENTS
 export async function getProviders() {
   return await getData("SELECT * FROM proveedor");

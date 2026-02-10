@@ -3,10 +3,11 @@ import React from "react";
 import { useTheme } from "react-native-paper";
 import Feather from "@expo/vector-icons/Feather";
 import { Link, useNavigation } from "expo-router";
+import { appStore } from "../store/appStore";
 
 const CambioCard = () => {
   const myTheme = useTheme();
-  const navigate = useNavigation();
+  const store = appStore(state=>state.store)
   return (
     <View
       style={[
@@ -34,10 +35,10 @@ const CambioCard = () => {
       </View>
       <View style={{ marginBottom: 20, alignSelf: "center" }}>
         <Text style={[styles.textStyle, { color: myTheme.colors.Orange }]}>
-          {"USD: $440"}
+          {`USD: $${store.tasa_usd}`}
         </Text>
         <Text style={[styles.textStyle, { color: myTheme.colors.Orange }]}>
-          {"EUR: $580"}
+          {`EUR: $${store.tasa_eur}`}
         </Text>
       </View>
       <Link

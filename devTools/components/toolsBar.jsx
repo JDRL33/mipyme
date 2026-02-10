@@ -1,22 +1,51 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { appStore } from "../../store/appStore";
-import { executeQuery, getData } from "../../database/database";
+import { executeQuery, updateStore } from "../../database/database";
 
 export const ToolsBar = ({ show }) => {
+  const store = appStore((state) => state.store);
+  const getDataStore = appStore((state) => state.getDataStore);
   const resetDB = appStore((state) => state.resetDB);
-  const addProductsStore = appStore((state) => state.addProductsStore);
-  const getProviderByIdStore = appStore((state) => state.getProviderByIdStore);
-  const initStore = appStore((state) => state.initStore);
-  const ACCION1 = async () => {
-    await addProductsStore("jesus daniel", 13, "usd", 3, 2, "gffgerg", 1);
+
+  const ACCION1 = () => {
+    console.log(store);
   };
   const ACCION2 = async () => {
-    await initStore();
+    const store = {
+      name: "My Tienda Pro",
+      limitStockDown: 5,
+      tasa_usd: 480,
+      tasa_eur: 560,
+      nProducts: 34534,
+      nProducts_stock_down: 34535,
+      nProviders: 345345,
+      nClients: 345345,
+      cDebito: 345345,
+      cPagado: 34534535,
+      cGanancia: 34534534,
+      id: 1,
+    };
+    await executeQuery(
+      "UPDATE store SET name=?, limitStockDown = ?, tasa_usd = ?, tasa_eur = ?, nProducts = ?, nProducts_stock_down = ?, nProviders = ?, nClients = ?, cDebito = ?, cPagado = ?, cGanancia = ? WHERE id = ?",
+      [
+        store.name,
+        store.limitStockDown,
+        store.tasa_usd,
+        store.tasa_eur,
+        store.nProducts,
+        store.nProducts_stock_down,
+        store.nProviders,
+        store.nClients,
+        store.cDebito,
+        store.cPagado,
+        store.cGanancia,
+        store.id,
+      ],
+    );
+    await getDataStore();
   };
-  const ACCION3 = async () => {
-    console.log(await getData("DELETE FROM proveedor WHERE id_proveedor = 1"));
-  };
+  const ACCION3 = async () => {};
   const ACCION4 = async () => {
     await resetDB();
   };
@@ -41,7 +70,7 @@ export const ToolsBar = ({ show }) => {
         </TouchableOpacity>
         <TouchableOpacity onPress={ACCION4}>
           <View style={styles.btn}>
-            <Text>ACCION 4</Text>
+            <Text>RESTART DB</Text>
           </View>
         </TouchableOpacity>
       </View>

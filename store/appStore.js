@@ -15,6 +15,7 @@ import {
   getProductsGroup,
   getStore,
   getProductsStockDown,
+  updateStore,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -36,7 +37,7 @@ export const appStore = create((set, get) => ({
   initStore: async () => {
     await get().extractDatabaseList();
     await get().getDataStore();
-    get().updateStoreStatus();
+    await get().updateStoreStatus();
   },
   // METODOS PARA OBTENER LOS DATOS DE LA TIENDA
   getDataStore: async () => {
@@ -44,7 +45,7 @@ export const appStore = create((set, get) => ({
     set({ store: response });
   },
   // METODOS PARA ACTUALIZAR VARIABLES DE ESTADISTICAS FINANCIERAS
-  updateStoreStatus: () => {
+  updateStoreStatus: async () => {
     const store = get().store;
     const productsStockBajo = get().productsWithStockDown;
     const products = get().productsGroupList;
@@ -56,12 +57,12 @@ export const appStore = create((set, get) => ({
     const nClients = clients.length;
 
     let cDebito = 0;
-    let cPagada = 0;
+    let cPagado = 0;
     let cGanancia = 0;
     if (providers.length > 0) {
       providers.map((provider) => {
         cDebito += provider.a_pagar;
-        cPagada += provider.pagado;
+        cPagado += provider.pagado;
       });
     }
     if (products.length > 0) {
@@ -69,7 +70,7 @@ export const appStore = create((set, get) => ({
         cGanancia += product.ganancia_total;
       });
     }
-    get().getProductsStockDownStore();
+    // get().getProductsStockDownStore();
 
     const newStore = {
       id: store.id,
@@ -82,14 +83,23 @@ export const appStore = create((set, get) => ({
       nProviders: nProviders,
       nClients: nClients,
       cDebito: cDebito,
-      cPagado: cPagada,
+      cPagado: cPagado,
       cGanancia: cGanancia,
     };
 
+    await updateStore(newStore);
     set({ store: newStore });
-    // hacer el update de la tabla___________________________________________________________________________________________________________________
   },
-  // METODO PARA OBTENER LOS PRODUCTOS DE STOCK BAJO
+
+  updateTasaCambio: (usd, eur) => {
+    set((state) => ({
+      store: { ...state.store, tasa_usd: usd, tasa_eur: eur },
+    }));
+    get().updateStoreStatus();
+
+    console.log(get().store);
+  },
+
   updateStatusStockDown: async () => {
     const sql = `SELECT * FROM producto_grupo WHERE cantidad <= ${get().limitStockDown}`;
     const response = await getData(sql, []);
@@ -98,7 +108,7 @@ export const appStore = create((set, get) => ({
     }
   },
   // METODO PARA OBTENER LOS PRODUCTOS DE BAJO STOCK
-  getProductsStockDownStore: async () => {
+  getProductsDownStore: async () => {
     const stockDown = await getProductsStockDown();
     console.log(stockDown);
   },
@@ -183,7 +193,7 @@ export const appStore = create((set, get) => ({
     };
 
     set((state) => ({ providersList: [...state.providersList, newProvider] }));
-    get().updateStoreStatus();
+    await get().updateStoreStatus();
   },
   // METODO PARA ANIADIR PRODUCTOS
   addProductsStore: async (
@@ -214,7 +224,7 @@ export const appStore = create((set, get) => ({
     set((state) => ({
       productsGroupList: [...state.productsGroupList, newProduct],
     }));
-    get().updateStoreStatus();
+    await get().updateStoreStatus();
   },
   //METODO PARA ANIADIR CLIENTES
   addClientStore: async (pNombre, pCup, pUsd, pPhone, pCi) => {
@@ -230,7 +240,7 @@ export const appStore = create((set, get) => ({
     set((state) => ({
       clientList: [...state.clientList, newClient],
     }));
-    get().updateStoreStatus();
+    await get().updateStoreStatus();
   },
 
   // METODO PARA ELIMINAR PROVEEDOR POR ID

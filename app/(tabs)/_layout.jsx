@@ -4,6 +4,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { StyleSheet, View } from "react-native";
 import { useTheme } from "react-native-paper";
 import { Tabs } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 const TabsLayout = () => {
   const myTheme = useTheme();
@@ -12,9 +13,11 @@ const TabsLayout = () => {
     <View
       style={{
         backgroundColor: myTheme.colors.primary,
+        paddingTop:10,
         flex: 1,
       }}
     >
+      <StatusBar style="dark" animated  backgroundColor={myTheme.colors.greenLight}/>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: myTheme.colors.greenForce,
