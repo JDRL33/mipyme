@@ -16,6 +16,7 @@ import {
   getStore,
   getProductsStockDown,
   updateStore,
+  getProductsByIdProvider,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -91,15 +92,13 @@ export const appStore = create((set, get) => ({
     set({ store: newStore });
   },
 
+  // METODO PARA ACTUALIZAR LA TASA DE CAMBIO
   updateTasaCambio: (usd, eur) => {
     set((state) => ({
       store: { ...state.store, tasa_usd: usd, tasa_eur: eur },
     }));
     get().updateStoreStatus();
-
-    console.log(get().store);
   },
-
   updateStatusStockDown: async () => {
     const sql = `SELECT * FROM producto_grupo WHERE cantidad <= ${get().limitStockDown}`;
     const response = await getData(sql, []);
@@ -112,7 +111,6 @@ export const appStore = create((set, get) => ({
     const stockDown = await getProductsStockDown();
     console.log(stockDown);
   },
-
   // METODOS PARA OBTENER TODAS LAS FILAS DE LA BD
   extractDatabaseList: async () => {
     const providers = await getProviders();
@@ -126,7 +124,11 @@ export const appStore = create((set, get) => ({
     });
     return { providers, productsGroup, client };
   },
-
+  //METODO PARA OBTENER LOS PRODUCTOS POR ID DE PROVEEDOR
+  getProductsByIdProviderStore: async (id) => {
+    const response = await getProductsByIdProvider(id);
+    return response;
+  },
   // METODO PARA REINICIAR LA BD
   resetDB: async () => {
     await clearDatabase();
@@ -242,7 +244,6 @@ export const appStore = create((set, get) => ({
     }));
     await get().updateStoreStatus();
   },
-
   // METODO PARA ELIMINAR PROVEEDOR POR ID
   deleteProviderByIdStore: async (id) => {
     const response = await delProviderById(id);

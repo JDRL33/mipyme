@@ -31,7 +31,7 @@ const CardProvider = ({
       ]}
       onPress={() => {
         if (onPressValidate) {
-          console.log("Visualizing");
+          router.navigate(`/[${id}]`);
         }
       }}
       onLongPress={() => {

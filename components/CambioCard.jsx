@@ -2,12 +2,12 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useTheme } from "react-native-paper";
 import Feather from "@expo/vector-icons/Feather";
-import { Link, useNavigation } from "expo-router";
+import { Link } from "expo-router";
 import { appStore } from "../store/appStore";
 
 const CambioCard = () => {
   const myTheme = useTheme();
-  const store = appStore(state=>state.store)
+  const store = appStore((state) => state.store);
   return (
     <View
       style={[

@@ -13,7 +13,7 @@ const CardProduct = ({
   pGanancia,
 }) => {
   const myTheme = useTheme();
-  const limitStockDown = appStore((state) => state.limitStockDown);
+  const store = appStore((state) => state.store);
   return (
     <>
       <Pressable
@@ -70,8 +70,8 @@ const CardProduct = ({
             name="circle"
             size={10}
             color={
-              pCantidad > limitStockDown
-                ? myTheme.colors.grayLight
+              pCantidad > store.limitStockDown
+                ? myTheme.colors.greenLight
                 : myTheme.colors.redForce
             }
           />

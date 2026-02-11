@@ -184,21 +184,21 @@ export async function addClient(
   );
   return response.lastInsertRowId;
 }
-// Buscar por nombre los providers
+// Buscar los providers por nombre
 export async function findByNameProvider(name) {
   const response = await getData(
     `SELECT * FROM proveedor WHERE LOWER(nombre) LIKE '%${name}%'`,
   );
   return response;
 }
-// Buscar por nombre los productos
+// Buscar los productos por nombre
 export async function findByNameProduct(name) {
   const response = await getData(
     `SELECT * FROM producto_grupo WHERE LOWER(nombre) LIKE '%${name}%'`,
   );
   return response;
 }
-// Buscar por nombre los clientes
+// Buscar los clientes por nombre
 export async function findByNameClient(name) {
   const response = await getData(
     `SELECT * FROM clientes_deuda WHERE LOWER(nombre) LIKE '%${name}%'`,
@@ -219,6 +219,14 @@ export async function getProductsStockDown() {
   return await getData("SELECT * FROM producto_grupo WHERE cantidad <= ?", [
     limit[0],
   ]);
+}
+//Obtener los productos por id del proveedor
+export async function getProductsByIdProvider(id) {
+  const response = getData(
+    "SELECT * FROM producto_independiente WHERE id = ?",
+    [id],
+  );
+  return response;
 }
 // Eliminar proveedor BY id
 export async function delProviderById(id) {

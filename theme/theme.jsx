@@ -20,7 +20,7 @@ const theme = {
     purpleLight: "#FBC5FF",
     purpleDark: "#D575A5",
     // Textos
-    textPrimary: "#000000",
+    textPrimary: "#1f1f1f",
     textSecondary: "#8B8B8B",
 
     //Esclas grices

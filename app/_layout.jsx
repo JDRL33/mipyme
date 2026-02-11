@@ -3,14 +3,21 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { PaperProvider } from "react-native-paper";
 import theme from "../theme/theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Layuot = () => {
+  const insets = useSafeAreaInsets();
   return (
     <View style={{ flex: 1 }}>
+      <StatusBar hidden />
       <PaperProvider theme={theme}>
-        <StatusBar style="auto" />
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+          <Stack.Screen
+            name="(proveedor)/[id]"
+            options={{ animation: "slide_from_bottom" }}
+          />
 
           {/* PANTALLAS MODALES */}
           <Stack.Screen

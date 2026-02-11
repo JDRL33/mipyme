@@ -1,15 +1,18 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { appStore } from "../../store/appStore";
-import { executeQuery, updateStore } from "../../database/database";
+import { executeQuery, getData, updateStore } from "../../database/database";
 
 export const ToolsBar = ({ show }) => {
   const store = appStore((state) => state.store);
   const getDataStore = appStore((state) => state.getDataStore);
   const resetDB = appStore((state) => state.resetDB);
 
-  const ACCION1 = () => {
-    console.log(store);
+  const ACCION1 = async () => {
+    const response = await executeQuery(
+      "INSERT INTO (nombre, moneda,precio_costo,)",
+    );
+    console.log(response);
   };
   const ACCION2 = async () => {
     const store = {
