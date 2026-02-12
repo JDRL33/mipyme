@@ -1,32 +1,25 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link, useNavigation } from "expo-router";
-import Feather from "@expo/vector-icons/Feather";
-import { useTheme } from "react-native-paper";
-import { appStore } from "../store/appStore";
 import React, { useState } from "react";
-import ButtonsModal from "../components/ButtonsModal";
+import { useTheme } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { appStore } from "../../store/appStore";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useRouter } from "expo-router";
+import ButtonsModal from "../../components/ButtonsModal";
 
-const modalCreateProduct = () => {
+const modalCreateClient = () => {
   const myTheme = useTheme();
   const insets = useSafeAreaInsets();
   const [nombre, setNombre] = useState("");
-  const [moneda, setMoneda] = useState("");
-  const [precioVenta, setPrecioVenta] = useState(0);
-  const navigate = useNavigation();
-  const addProductsStore = appStore((state) => state.addProductsStore);
+  const [ci, setCi] = useState("");
+  const [number, setNumber] = useState("");
+  const router = useRouter();
+  const addClientStore = appStore((state) => state.addClientStore);
 
   const handleSave = async () => {
-    if (nombre.trim() && moneda.trim() && precioVenta > 0) {
-      await addProductsStore(
-        nombre.trim(),
-        moneda.trim(),
-        precioVenta,
-        0, //cantidad
-        0, //ganancia
-        0, //cobro total
-      );
-      navigate.goBack();
+    if (nombre.trim()) {
+      await addClientStore(nombre.trim(), 0, 0, number.trim(), ci.trim());
+      router.back();
     }
   };
 
@@ -43,17 +36,13 @@ const modalCreateProduct = () => {
       <View
         style={{
           flexDirection: "row",
-          alignItems: "center",
           gap: 20,
+          alignItems: "center",
           marginBottom: 40,
         }}
       >
-        <Feather
-          name="shopping-cart"
-          size={36}
-          color={myTheme.colors.greenForce}
-        />
-        <Text style={{ fontSize: 36, fontWeight: "bold" }}>Nuevo Producto</Text>
+        <FontAwesome name="user" size={36} color={myTheme.colors.greenForce} />
+        <Text style={{ fontSize: 36, fontWeight: "bold" }}>Nuevo Cliente</Text>
       </View>
       <TextInput
         value={nombre}
@@ -63,26 +52,7 @@ const modalCreateProduct = () => {
         cursorColor={myTheme.colors.greenForce}
         selectionColor={myTheme.colors.greenForce}
         placeholderTextColor={myTheme.colors.textSecondary}
-        placeholder="Nombre del producto."
-        style={[
-          styles.textInputStyle,
-          {
-            backgroundColor: myTheme.colors.grayLight,
-            marginBottom: 10,
-          },
-        ]}
-      />
-
-      <TextInput
-        value={moneda}
-        onChangeText={(text) => {
-          setMoneda(text);
-        }}
-        keyboardType="default"
-        cursorColor={myTheme.colors.greenForce}
-        selectionColor={myTheme.colors.greenForce}
-        placeholderTextColor={myTheme.colors.textSecondary}
-        placeholder="Tipo de moneda"
+        placeholder="Nombre del cliente."
         style={[
           styles.textInputStyle,
           {
@@ -92,15 +62,33 @@ const modalCreateProduct = () => {
         ]}
       />
       <TextInput
-        value={precioVenta}
+        value={ci}
         onChangeText={(text) => {
-          setPrecioVenta(text);
+          setCi(text);
         }}
-        keyboardType="decimal-pad"
+        keyboardType="number-pad"
         cursorColor={myTheme.colors.greenForce}
         selectionColor={myTheme.colors.greenForce}
         placeholderTextColor={myTheme.colors.textSecondary}
-        placeholder="Precio de venta."
+        placeholder="Carnet de identidad."
+        style={[
+          styles.textInputStyle,
+          {
+            backgroundColor: myTheme.colors.grayLight,
+            marginBottom: 10,
+          },
+        ]}
+      />
+      <TextInput
+        value={number}
+        onChangeText={(text) => {
+          setNumber(text);
+        }}
+        keyboardType="number-pad"
+        cursorColor={myTheme.colors.greenForce}
+        selectionColor={myTheme.colors.greenForce}
+        placeholderTextColor={myTheme.colors.textSecondary}
+        placeholder="Numero de teléfono."
         style={[
           styles.textInputStyle,
           {
@@ -114,7 +102,7 @@ const modalCreateProduct = () => {
   );
 };
 
-export default modalCreateProduct;
+export default modalCreateClient;
 
 const styles = StyleSheet.create({
   textInputStyle: {
@@ -122,14 +110,5 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     fontSize: 20,
     width: "80%",
-  },
-  btnStyle: {
-    width: 350,
-    padding: 10,
-    borderRadius: 15,
-  },
-  textBtnStyle: {
-    fontSize: 24,
-    textAlign: "center",
   },
 });

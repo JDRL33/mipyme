@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useState, useEffect } from "react";
 import { useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { appStore } from "../store/appStore";
+import { appStore } from "../../store/appStore";
 
 const modalTasaCambio = () => {
   const myTheme = useTheme();

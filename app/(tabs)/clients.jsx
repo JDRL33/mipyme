@@ -24,7 +24,7 @@ const Clients = () => {
       <Header title={"Clientes en deuda"} />
       <SearchBar placeHolder="Buscar clientes..." />
       <TextInfoDelete text="Para eliminar un cliente debe liquidar sus pagos pendientes." />
-      <ButtonChip text="AGREGAR" href="/modalCreateClient" />
+      <ButtonChip text="AGREGAR" href="/modal/modalCreateClient" />
       <Space space={10} />
       <FlatList
         data={clientList}

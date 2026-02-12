@@ -15,13 +15,13 @@ const Layuot = () => {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
           <Stack.Screen
-            name="(proveedor)/[id]"
+            name="(info_views)/provider_info"
             options={{ animation: "slide_from_bottom" }}
           />
 
           {/* PANTALLAS MODALES */}
           <Stack.Screen
-            name="(modal)/[name]"
+            name="modal/modalDeleteProductIndi"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
@@ -29,7 +29,7 @@ const Layuot = () => {
             }}
           />
           <Stack.Screen
-            name="modalCreateProduct"
+            name="modal/modalCreateProduct"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
@@ -37,7 +37,7 @@ const Layuot = () => {
             }}
           />
           <Stack.Screen
-            name="modalCreateProvider"
+            name="modal/modalCreateProvider"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
@@ -45,7 +45,7 @@ const Layuot = () => {
             }}
           />
           <Stack.Screen
-            name="modalDeleteProvider"
+            name="modal/modalDeleteProvider"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
@@ -53,7 +53,7 @@ const Layuot = () => {
             }}
           />
           <Stack.Screen
-            name="modalCreateClient"
+            name="modal/modalCreateClient"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
@@ -61,7 +61,7 @@ const Layuot = () => {
             }}
           />
           <Stack.Screen
-            name="modalTasaCambio"
+            name="modal/modalTasaCambio"
             options={{
               presentation: "modal",
               animation: "fade_from_bottom",

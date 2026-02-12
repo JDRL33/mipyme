@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Link, useNavigation } from "expo-router";
-import { appStore } from "../store/appStore";
+import { appStore } from "../../store/appStore";
 import Feather from "@expo/vector-icons/Feather";
-import ButtonsModal from "../components/ButtonsModal";
+import ButtonsModal from "../../components/ButtonsModal";
 
 const modalCreateProvider = () => {
   const myTheme = useTheme();

@@ -27,7 +27,7 @@ const Proveedor = () => {
       <Header title="Proveedores" />
       <SearchBar placeHolder="Buscar proveedores..." providers />
       <TextInfoDelete />
-      <ButtonChip text="AGREGAR" href="/modalCreateProvider" />
+      <ButtonChip text="AGREGAR" href="/modal/modalCreateProvider" />
       <Space space={10} />
       {/* <ScrollView style={{ marginBottom: 10 }}> */}
       <FlatList

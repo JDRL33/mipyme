@@ -1,23 +1,21 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "expo-router";
-import { appStore } from "../store/appStore";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { appStore } from "../../store/appStore";
 
 const modalDeleteProvider = () => {
+  const params = useLocalSearchParams();
   const myTheme = useTheme();
   const insets = useSafeAreaInsets();
-  const navigate = useNavigation();
+  const router = useRouter();
   const deleteProviderByIdStore = appStore(
     (state) => state.deleteProviderByIdStore,
   );
-  const temp = appStore((state) => state.temp);
-  const setTemp = appStore((state) => state.setTemp);
 
   const handleEliminar = async () => {
-    await deleteProviderByIdStore(temp.id_proveedor);
-    setTemp("");
-    navigate.goBack();
+    await deleteProviderByIdStore(params.idProvider);
+    router.back();
   };
 
   return (
@@ -37,7 +35,7 @@ const modalDeleteProvider = () => {
           color: myTheme.colors.textSecondary,
         }}
       >
-        {temp.nombre}
+        {params.name}
       </Text>
       <Text
         style={{
@@ -84,7 +82,7 @@ const modalDeleteProvider = () => {
             },
           ]}
           onPress={() => {
-            navigate.goBack();
+            router.back();
           }}
         >
           <Text

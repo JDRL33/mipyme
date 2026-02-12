@@ -1,7 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTheme } from "react-native-paper";
-import { appStore } from "../store/appStore";
 import { useRouter } from "expo-router";
 
 const CardProvider = ({
@@ -13,15 +12,14 @@ const CardProvider = ({
   onPressValidate = true,
   onLongPressValidate = true,
 }) => {
-  const setTemp = appStore((state) => state.setTemp);
-  const getProviderByIdStore = appStore((state) => state.getProviderByIdStore);
   const router = useRouter();
 
   const myTheme = useTheme();
   const DELETE = async () => {
-    const currentProvider = await getProviderByIdStore(id);
-    setTemp(currentProvider);
-    router.navigate("/modalDeleteProvider");
+    router.navigate({
+      pathname: "/modal/modalDeleteProvider",
+      paramas: { idProvider: id, nameProvider: name },
+    });
   };
   return (
     <Pressable
@@ -31,7 +29,10 @@ const CardProvider = ({
       ]}
       onPress={() => {
         if (onPressValidate) {
-          router.navigate(`(proveedor)/[${id}]`);
+          router.navigate({
+            pathname: `(info_views)/provider_info`,
+            params: { id: id },
+          });
         }
       }}
       onLongPress={() => {

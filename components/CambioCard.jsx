@@ -42,7 +42,7 @@ const CambioCard = () => {
         </Text>
       </View>
       <Link
-        href={"/modalTasaCambio"}
+        href={"/modal/modalTasaCambio"}
         asChild
         push
         style={[

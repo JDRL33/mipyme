@@ -17,10 +17,10 @@ const CardProduct = ({ pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
           },
         ]}
         onPress={() => {
-          ("Visualizar");
+          console.log("Visualizar");
         }}
         onLongPress={() => {
-          ("Eliminar");
+          console.log("Eliminar");
         }}
       >
         <View

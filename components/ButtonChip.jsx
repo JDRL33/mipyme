@@ -1,9 +1,8 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React from "react";
 import { useTheme } from "react-native-paper";
 import { Link } from "expo-router";
 
-const ButtonChip = ({ text, onPress, href }) => {
+const ButtonChip = ({ text, href }) => {
   const myTheme = useTheme();
   return (
     <View
@@ -20,7 +19,6 @@ const ButtonChip = ({ text, onPress, href }) => {
             alignItems: "center",
             borderRadius: 10,
           }}
-          // onPress={onPress}
         >
           <Text
             style={{

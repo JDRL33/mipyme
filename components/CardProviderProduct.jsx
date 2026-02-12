@@ -23,7 +23,7 @@ const CardProviderProduct = ({
       }}
       onLongPress={() => {
         router.push({
-          pathname: `/(modal)/[name]`,
+          pathname: `/modal/modalDeleteProductIndi`,
           params: { id_provider: pIdProvider, name: pNombre, idProductI: pId },
         });
       }}

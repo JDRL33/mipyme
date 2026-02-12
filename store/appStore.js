@@ -29,7 +29,6 @@ export const appStore = create((set, get) => ({
   clientList: [],
   productsWithStockDown: [],
   store: {},
-  temp: "",
 
   countDeposit: 0,
   countDeposited: 0,
@@ -269,9 +268,5 @@ export const appStore = create((set, get) => ({
     const response = await deleteProductIndiById(id);
 
     return response;
-  },
-
-  setTemp: (temporal) => {
-    set({ temp: temporal });
   },
 }));

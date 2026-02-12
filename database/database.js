@@ -35,11 +35,16 @@ export async function initDatabase() {
       id_proveedor	INTEGER NOT NULL,
       nombre	TEXT NOT NULL,
       cantidad_productos	INTEGER,
-      a_pagar	REAL,
+      a_pagar	REAL, 
       pagado	REAL,
       ultimaFechaEntrada TEXT,
       PRIMARY KEY(id_proveedor AUTOINCREMENT)
     );
+
+-- cantidad => productos_independientes.lenght
+-- a_pagar =>  productos.precio_de_costo 
+-- pagado  => registro_de_compra.importe - a_pagar
+-- fecha_de_la_ultima_compra  => registro_compra.fecha
 
     CREATE TABLE IF NOT EXISTS producto_grupo (
 	    id_grupo	INTEGER NOT NULL,
@@ -75,6 +80,22 @@ export async function initDatabase() {
       cup	REAL NOT NULL,
       PRIMARY KEY(id AUTOINCREMENT)
     );
+
+--_________REGISTROS DE LA TIENDA____________
+
+    CREATE TABLE record_buys (
+      id	INTEGER,
+      buy_date	TEXT NOT NULL,
+      id_provider	INTEGER NOT NULL,
+      count_products	INTEGER NOT NULL,
+      import	REAL NOT NULL,
+      PRIMARY KEY(id AUTOINCREMENT),
+      FOREIGN KEY(id_provider) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
+    );
+    
+
+
+
   `);
 
     isInitialized = true;
@@ -85,6 +106,7 @@ export async function initDatabase() {
     throw error;
   }
 }
+//Funcion para obtener la base de datos para usarla
 export async function getDatabase() {
   if (!dbInstance) {
     await initDatabase();
@@ -131,7 +153,6 @@ export async function updateStore(store) {
     ],
   );
 }
-
 // Obteniendo TODOS LOS PROVEEDORES, STOCK y CLIENTS
 export async function getProviders() {
   return await getData("SELECT * FROM proveedor");
@@ -142,6 +163,7 @@ export async function getProductsGroup() {
 export async function getClient() {
   return await getData("SELECT * FROM clientes_deuda");
 }
+
 // Aniadiendo proveedores
 export async function addProvider(
   pNombre,
@@ -252,7 +274,7 @@ export async function delProviderById(id) {
   );
   return true;
 }
-// Eliminar product indi By id
+// Eliminar product indi By id ..
 export async function deleteProductIndiById(id) {
   const response = await executeQuery(
     `DELETE FROM producto_independiente WHERE id = ?`,
@@ -260,8 +282,7 @@ export async function deleteProductIndiById(id) {
   );
   return true;
 }
-
-// Utilidades
+// Utilidades ..
 export async function clearDatabase() {
   const db = await getDatabase();
   await db.execAsync(`
