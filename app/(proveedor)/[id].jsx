@@ -1,38 +1,64 @@
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import InfoProviderText from "../../components/InfoProviderText";
 import EmptyList from "../../components/EmptyList";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CardProviderProduct from "../../components/CardProviderProduct";
 
 const ProveedorInfo = () => {
   const { id } = useLocalSearchParams();
   const getProviderByIdStore = appStore((state) => state.getProviderByIdStore);
-  const getProductsByIdProviderStore = appStore(
-    (state) => state.getProductsByIdProviderStore,
+  const productsIndis = appStore((state) => state.productsIndis);
+  const findByNameProductIndiStore = appStore(
+    (state) => state.findByNameProductIndiStore,
   );
   const myTheme = useTheme();
+  const insets = useSafeAreaInsets();
   const [provider, setProvider] = useState({});
-  const [products, setProducts] = useState({});
+  const [text, setText] = useState("");
+  const [timeoutId, setTimeoutId] = useState(null);
+
   useEffect(() => {
-    const getProviderAndProducts = async () => {
+    const getProvider = async () => {
       const response = await getProviderByIdStore(id.at(1));
       setProvider(response);
-      const aux = await getProductsByIdProviderStore(id.at(1));
-      setProducts(aux);
     };
-    getProviderAndProducts();
+    getProvider();
   }, []);
+
+  useEffect(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    // esperar 400 segundos al dejar de escribir
+    const idTO = setTimeout(async () => {
+      try {
+        await findByNameProductIndiStore(id.at(1), text.toLowerCase());
+      } catch (error) {
+        console.error(error);
+      }
+    }, 400);
+
+    setTimeoutId(idTO);
+
+    return () => clearTimeout(idTO);
+  }, [text]);
 
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: myTheme.colors.primary,
-        padding: 10,
+        paddingTop: 10,
+        paddingHorizontal: 20,
+        paddingBottom: insets.bottom,
       }}
     >
+      <Stack.Screen options={{ title: provider.nombre }} />
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
         <View
           style={{
@@ -109,30 +135,58 @@ const ProveedorInfo = () => {
           textSecondary="Pendiente!!!"
         />
       </View>
-      <Text
+      <View
         style={{
+          flexDirection: "row",
+          gap: 10,
+          alignItems: "center",
           marginTop: 25,
-          marginBottom: 15,
-          fontSize: 20,
-          textAlign: "center",
-          width: "100%",
-          fontWeight: "bold",
+          marginBottom: 20,
         }}
       >
-        PRODUCTOS
-      </Text>
+        <Text
+          style={{
+            fontSize: 20,
+            textAlign: "center",
+            fontWeight: "bold",
+          }}
+        >
+          PRODUCTOS
+        </Text>
+        <TextInput
+          value={text}
+          onChangeText={(text) => {
+            setText(text);
+          }}
+          cursorColor={myTheme.colors.blueForce}
+          selectionColor={myTheme.colors.blueLight}
+          style={{
+            flex: 1,
+            borderRadius: 20,
+            backgroundColor: myTheme.colors.grayLight,
+            borderBottom: myTheme.colors.blueForce,
+            color: myTheme.colors.textPrimary,
+            height: 50,
+            paddingHorizontal: 20,
+          }}
+          placeholder="Buscar productos..."
+          placeholderTextColor={myTheme.colors.textSecondary}
+        />
+      </View>
       <FlatList
-        data={products}
+        data={productsIndis}
         ItemSeparatorComponent={<View style={{ height: 15 }} />}
         ListEmptyComponent={() => (
           <EmptyList text="Stock vacio" icon="x-circle" />
         )}
         renderItem={({ item }) => (
-          <CardProduct
+          <CardProviderProduct
             key={item.id}
+            pId={item.id}
+            pIdProvider={id}
             pNombre={item.nombre}
             pMoneda={item.moneda}
-            pPrecio_venta={item.precio_costo}
+            pPrecio_costo={item.precio_costo}
             pCantidad={item.cantidad}
           />
         )}

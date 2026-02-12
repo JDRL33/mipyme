@@ -4,14 +4,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTheme } from "react-native-paper";
 import { appStore } from "../store/appStore";
 
-const CardProduct = ({
-  pNombre,
-  pMoneda,
-  pPrecio_venta,
-  pCantidad,
-  pCobroTotal,
-  pGanancia,
-}) => {
+const CardProduct = ({ pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
   const myTheme = useTheme();
   const store = appStore((state) => state.store);
   return (
@@ -24,10 +17,10 @@ const CardProduct = ({
           },
         ]}
         onPress={() => {
-          console.log("Visualizar");
+          ("Visualizar");
         }}
         onLongPress={() => {
-          console.log("Eliminar");
+          ("Eliminar");
         }}
       >
         <View

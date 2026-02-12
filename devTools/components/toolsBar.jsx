@@ -10,43 +10,14 @@ export const ToolsBar = ({ show }) => {
 
   const ACCION1 = async () => {
     const response = await executeQuery(
-      "INSERT INTO (nombre, moneda,precio_costo,)",
+      "INSERT INTO producto_independiente (nombre, moneda, precio_costo, cantidad, id_proveedor) VALUES (?,?,?,?,?)",
+      ["medias", "USD", 5000, 7, 1],
     );
-    console.log(response);
+    response;
   };
   const ACCION2 = async () => {
-    const store = {
-      name: "My Tienda Pro",
-      limitStockDown: 5,
-      tasa_usd: 480,
-      tasa_eur: 560,
-      nProducts: 34534,
-      nProducts_stock_down: 34535,
-      nProviders: 345345,
-      nClients: 345345,
-      cDebito: 345345,
-      cPagado: 34534535,
-      cGanancia: 34534534,
-      id: 1,
-    };
-    await executeQuery(
-      "UPDATE store SET name=?, limitStockDown = ?, tasa_usd = ?, tasa_eur = ?, nProducts = ?, nProducts_stock_down = ?, nProviders = ?, nClients = ?, cDebito = ?, cPagado = ?, cGanancia = ? WHERE id = ?",
-      [
-        store.name,
-        store.limitStockDown,
-        store.tasa_usd,
-        store.tasa_eur,
-        store.nProducts,
-        store.nProducts_stock_down,
-        store.nProviders,
-        store.nClients,
-        store.cDebito,
-        store.cPagado,
-        store.cGanancia,
-        store.id,
-      ],
-    );
-    await getDataStore();
+    const response = await getData("SELECT * FROM producto_independiente");
+    response;
   };
   const ACCION3 = async () => {};
   const ACCION4 = async () => {

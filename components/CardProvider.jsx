@@ -31,7 +31,7 @@ const CardProvider = ({
       ]}
       onPress={() => {
         if (onPressValidate) {
-          router.navigate(`/[${id}]`);
+          router.navigate(`(proveedor)/[${id}]`);
         }
       }}
       onLongPress={() => {

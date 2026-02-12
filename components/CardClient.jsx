@@ -13,9 +13,7 @@ const CardClient = ({ nombre, ci, cup, usd }) => {
           styles.cardClient,
           { backgroundColor: myTheme.colors.greenLight },
         ]}
-        onPress={() => {
-          console.log("Visualizar");
-        }}
+        onPress={() => {}}
         onLongPress={() => {
           setVisible(true);
         }}

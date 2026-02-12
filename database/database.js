@@ -37,6 +37,7 @@ export async function initDatabase() {
       cantidad_productos	INTEGER,
       a_pagar	REAL,
       pagado	REAL,
+      ultimaFechaEntrada TEXT,
       PRIMARY KEY(id_proveedor AUTOINCREMENT)
     );
 
@@ -58,9 +59,8 @@ export async function initDatabase() {
       precio_costo	REAL NOT NULL,
       cantidad	INTEGER,
       id_proveedor	INTEGER NOT NULL,
-      id_grupo	INTEGER NOT NULL,
+      id_grupo	INTEGER,
       ganancia	REAL,
-      ultima_fecha_entrada	TEXT NOT NULL,
       PRIMARY KEY(id AUTOINCREMENT),
       FOREIGN KEY(id_grupo) REFERENCES producto_grupo(id_grupo) ON DELETE CASCADE,
       FOREIGN KEY(id_proveedor) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
@@ -78,7 +78,7 @@ export async function initDatabase() {
   `);
 
     isInitialized = true;
-    console.log("✅ Base de datos inicializada");
+    ("✅ Base de datos inicializada");
     return dbInstance;
   } catch (error) {
     console.error("❌ Error inicializando DB:", error);
@@ -198,6 +198,14 @@ export async function findByNameProduct(name) {
   );
   return response;
 }
+// Buscar los productos_independientes por nombre
+export async function findByNameProductIndi(id_proveedor, name) {
+  const response = await getData(
+    `SELECT * FROM producto_independiente WHERE LOWER(nombre) LIKE '%${name}%' AND id_proveedor = ?`,
+    [id_proveedor],
+  );
+  return response;
+}
 // Buscar los clientes por nombre
 export async function findByNameClient(name) {
   const response = await getData(
@@ -208,7 +216,7 @@ export async function findByNameClient(name) {
 // Obtener proveedor By ID
 export async function getProviderById(id) {
   const response = await getData(
-    `SELECT * FROM proveedor WHERE id_proveedor=?`,
+    `SELECT * FROM proveedor WHERE id_proveedor = ?`,
     [id],
   );
   return response;
@@ -222,7 +230,15 @@ export async function getProductsStockDown() {
 }
 //Obtener los productos por id del proveedor
 export async function getProductsByIdProvider(id) {
-  const response = getData(
+  const response = await getData(
+    "SELECT * FROM producto_independiente WHERE id_proveedor = ?",
+    [id],
+  );
+  return response;
+}
+//Obtener los productoIndi por id
+export async function getProductsIndiById(id) {
+  const response = await getData(
     "SELECT * FROM producto_independiente WHERE id = ?",
     [id],
   );
@@ -236,6 +252,15 @@ export async function delProviderById(id) {
   );
   return true;
 }
+// Eliminar product indi By id
+export async function deleteProductIndiById(id) {
+  const response = await executeQuery(
+    `DELETE FROM producto_independiente WHERE id = ?`,
+    [id],
+  );
+  return true;
+}
+
 // Utilidades
 export async function clearDatabase() {
   const db = await getDatabase();

@@ -17,9 +17,13 @@ import {
   getProductsStockDown,
   updateStore,
   getProductsByIdProvider,
+  findByNameProductIndi,
+  deleteProductIndiById,
+  getProductsIndiById,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
+  productsIndis: [],
   providersList: [],
   productsGroupList: [],
   clientList: [],
@@ -109,7 +113,6 @@ export const appStore = create((set, get) => ({
   // METODO PARA OBTENER LOS PRODUCTOS DE BAJO STOCK
   getProductsDownStore: async () => {
     const stockDown = await getProductsStockDown();
-    console.log(stockDown);
   },
   // METODOS PARA OBTENER TODAS LAS FILAS DE LA BD
   extractDatabaseList: async () => {
@@ -127,7 +130,7 @@ export const appStore = create((set, get) => ({
   //METODO PARA OBTENER LOS PRODUCTOS POR ID DE PROVEEDOR
   getProductsByIdProviderStore: async (id) => {
     const response = await getProductsByIdProvider(id);
-    return response;
+    set({ productsIndis: response });
   },
   // METODO PARA REINICIAR LA BD
   resetDB: async () => {
@@ -142,7 +145,6 @@ export const appStore = create((set, get) => ({
     if (name) {
       const response = await findByNameProvider(name);
       set({ providersList: response });
-      console.log(get().providersList);
       return response;
     } else {
       await get().extractDatabaseList();
@@ -153,10 +155,19 @@ export const appStore = create((set, get) => ({
     if (name) {
       const response = await findByNameProduct(name);
       set({ productsGroupList: response });
-      console.log(get().productsGroupList);
       return response;
     } else {
       await get().extractDatabaseList();
+    }
+  },
+  // METODO PARA BUSCAR PRODUCTS INDI BY NAME
+  findByNameProductIndiStore: async (id_proveedor, name) => {
+    if (name) {
+      const response = await findByNameProductIndi(id_proveedor, name);
+      set({ productsIndis: response });
+      return response;
+    } else {
+      await get().getProductsByIdProviderStore(id_proveedor);
     }
   },
   // METODO PARA BUSCAR CLIENTS BY NAME
@@ -164,7 +175,6 @@ export const appStore = create((set, get) => ({
     if (name) {
       const response = await findByNameClient(name);
       set({ clientList: response });
-      console.log(get().clientList);
       return response;
     } else {
       await get().extractDatabaseList();
@@ -174,6 +184,11 @@ export const appStore = create((set, get) => ({
   getProviderByIdStore: async (id) => {
     const response = await getProviderById(id);
     return response[0];
+  },
+  // METODO PARA BUSCAR PRODUCTO INDEPENDIENTE POR ID
+  getProductsIndiByIdStore: async (id) => {
+    const response = await getProductsIndiById(id);
+    return response;
   },
 
   // Metodos para aniadir_________________________________________________________
@@ -248,6 +263,11 @@ export const appStore = create((set, get) => ({
   deleteProviderByIdStore: async (id) => {
     const response = await delProviderById(id);
     await get().initStore();
+    return response;
+  },
+  deleteProductIndiByIdStore: async (id) => {
+    const response = await deleteProductIndiById(id);
+
     return response;
   },
 

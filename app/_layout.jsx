@@ -21,7 +21,7 @@ const Layuot = () => {
 
           {/* PANTALLAS MODALES */}
           <Stack.Screen
-            name="modalCreateProvider"
+            name="(modal)/[name]"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
@@ -30,6 +30,14 @@ const Layuot = () => {
           />
           <Stack.Screen
             name="modalCreateProduct"
+            options={{
+              presentation: "modal",
+              animation: "slide_from_bottom",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="modalCreateProvider"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
