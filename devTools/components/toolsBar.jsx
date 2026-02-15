@@ -10,14 +10,14 @@ export const ToolsBar = ({ show }) => {
 
   const ACCION1 = async () => {
     const response = await executeQuery(
-      "INSERT INTO producto_independiente (nombre, moneda, precio_costo, cantidad, id_proveedor) VALUES (?,?,?,?,?)",
-      ["medias", "USD", 5000, 7, 1],
+      "INSERT INTO producto_grupo (nombre, moneda, precio_venta, cantidad, cobro_total, ganancia_total) VALUES (?,?,?,?,?,?)",
+      ["cucharas", "CUP", 5000, 7, 0, 0],
     );
     response;
   };
   const ACCION2 = async () => {
-    const response = await getData("SELECT * FROM producto_independiente");
-    response;
+    const response = await getData("SELECT * FROM producto_grupo", []);
+    console.log(response);
   };
   const ACCION3 = async () => {};
   const ACCION4 = async () => {

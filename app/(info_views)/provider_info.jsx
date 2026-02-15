@@ -1,16 +1,24 @@
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import InfoProviderText from "../../components/InfoProviderText";
 import EmptyList from "../../components/EmptyList";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CardProviderProduct from "../../components/CardProviderProduct";
+import { getProviderById } from "../../database/database";
+import FabButton from "../../components/FabButton";
 
 const ProveedorInfo = () => {
   const { id } = useLocalSearchParams();
-  const getProviderByIdStore = appStore((state) => state.getProviderByIdStore);
   const productsIndis = appStore((state) => state.productsIndis);
   const findByNameProductIndiStore = appStore(
     (state) => state.findByNameProductIndiStore,
@@ -23,7 +31,7 @@ const ProveedorInfo = () => {
 
   useEffect(() => {
     const getProvider = async () => {
-      const response = await getProviderByIdStore(id.at(1));
+      const response = await getProviderById(id);
       setProvider(response);
     };
     getProvider();
@@ -37,7 +45,7 @@ const ProveedorInfo = () => {
     // esperar 400 segundos al dejar de escribir
     const idTO = setTimeout(async () => {
       try {
-        await findByNameProductIndiStore(id.at(1), text.toLowerCase());
+        await findByNameProductIndiStore(id, text.toLowerCase());
       } catch (error) {
         console.error(error);
       }
@@ -58,7 +66,11 @@ const ProveedorInfo = () => {
         paddingBottom: insets.bottom,
       }}
     >
-      <Stack.Screen options={{ title: provider.nombre }} />
+      <Stack.Screen
+        options={{
+          title: provider.nombre,
+        }}
+      />
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
         <View
           style={{
@@ -190,6 +202,15 @@ const ProveedorInfo = () => {
             pCantidad={item.cantidad}
           />
         )}
+      />
+      <FabButton
+        paperIcon="account-cash"
+        onClick={() => {
+          router.navigate({
+            pathname: "compra/buy",
+            params: { id_provider: id, name_provider: provider.nombre },
+          });
+        }}
       />
     </View>
   );

@@ -83,7 +83,7 @@ export async function initDatabase() {
 
 --_________REGISTROS DE LA TIENDA____________
 
-    CREATE TABLE record_buys (
+    CREATE TABLE IF NOT EXISTS record_buys (
       id	INTEGER,
       buy_date	TEXT NOT NULL,
       id_provider	INTEGER NOT NULL,
@@ -235,13 +235,20 @@ export async function findByNameClient(name) {
   );
   return response;
 }
+// Buscar los grupos de productos por nombre
+export async function findByNameProductGroup(name) {
+  const response = await getData(
+    `SELECT * FROM producto_grupo WHERE LOWER(nombre) LIKE '%${name}%'`,
+  );
+  return response;
+}
 // Obtener proveedor By ID
 export async function getProviderById(id) {
   const response = await getData(
     `SELECT * FROM proveedor WHERE id_proveedor = ?`,
     [id],
   );
-  return response;
+  return response[0];
 }
 // Obtener Productos de stock bajos
 export async function getProductsStockDown() {

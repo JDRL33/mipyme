@@ -18,6 +18,14 @@ const Layuot = () => {
             name="(info_views)/provider_info"
             options={{ animation: "slide_from_bottom" }}
           />
+          <Stack.Screen
+            name="compra/buy"
+            options={{ animation: "slide_from_bottom", headerShown: false }}
+          />
+          <Stack.Screen
+            name="compra/addProductBuy"
+            options={{ animation: "slide_from_bottom", headerShown: false }}
+          />
 
           {/* PANTALLAS MODALES */}
           <Stack.Screen

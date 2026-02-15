@@ -1,14 +1,22 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { FAB, useTheme } from "react-native-paper";
 import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const FabButton = ({ onClick }) => {
+const FabButton = ({ onClick, paperIcon = "storefront-plus-outline" }) => {
+  const insets = useSafeAreaInsets();
   const myTheme = useTheme();
   return (
     <FAB
-      icon="storefront-plus-outline"
+      icon={paperIcon}
       color={myTheme.colors.greenForce}
-      style={[styles.fabStyle, { backgroundColor: myTheme.colors.greenLight }]}
+      style={[
+        styles.fabStyle,
+        {
+          backgroundColor: myTheme.colors.greenLight,
+          marginBottom: insets.bottom,
+        },
+      ]}
       animated
       size="medium"
       onPress={onClick}

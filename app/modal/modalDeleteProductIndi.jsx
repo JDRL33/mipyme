@@ -3,21 +3,19 @@ import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { appStore } from "../../store/appStore";
+import { deleteProductIndiById } from "../../database/database";
 
 const modalDeleteProvider = () => {
   const params = useLocalSearchParams();
   const myTheme = useTheme();
   const insets = useSafeAreaInsets();
-  const deleteProductIndiByIdStore = appStore(
-    (state) => state.deleteProductIndiByIdStore,
-  );
   const getProductsByIdProviderStore = appStore(
     (state) => state.getProductsByIdProviderStore,
   );
 
   const handleEliminar = async () => {
-    await deleteProductIndiByIdStore(params.idProductI);
-    await getProductsByIdProviderStore(params.id_provider.at(1));
+    await deleteProductIndiById(params.idProductI);
+    await getProductsByIdProviderStore(params.id_provider);
     router.back();
   };
 

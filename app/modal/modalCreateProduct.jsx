@@ -116,7 +116,7 @@ const modalCreateProduct = () => {
 
 export default modalCreateProduct;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   textInputStyle: {
     padding: 20,
     borderRadius: 15,

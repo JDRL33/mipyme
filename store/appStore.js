@@ -20,6 +20,7 @@ import {
   findByNameProductIndi,
   deleteProductIndiById,
   getProductsIndiById,
+  findByNameProductGroup,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -179,15 +180,14 @@ export const appStore = create((set, get) => ({
       await get().extractDatabaseList();
     }
   },
-  // METODO PARA BUSCAR PROVEEDOR POR ID
-  getProviderByIdStore: async (id) => {
-    const response = await getProviderById(id);
-    return response[0];
-  },
-  // METODO PARA BUSCAR PRODUCTO INDEPENDIENTE POR ID
-  getProductsIndiByIdStore: async (id) => {
-    const response = await getProductsIndiById(id);
-    return response;
+  findByNameProductGroupStore: async (name) => {
+    if (name) {
+      const response = await findByNameProductGroup(name);
+      set({ productsGroupList: response });
+      return response;
+    } else {
+      await get().extractDatabaseList();
+    }
   },
 
   // Metodos para aniadir_________________________________________________________
@@ -264,9 +264,21 @@ export const appStore = create((set, get) => ({
     await get().initStore();
     return response;
   },
-  deleteProductIndiByIdStore: async (id) => {
-    const response = await deleteProductIndiById(id);
-
-    return response;
-  },
 }));
+
+// METODO PARA BUSCAR PROVEEDOR POR ID
+// getProviderByIdStore: async (id) => {
+//   const response = await getProviderById(id);
+//   return response[0];
+// },
+
+// METODO PARA BUSCAR PRODUCTO INDEPENDIENTE POR ID
+// getProductsIndiByIdStore: async (id) => {
+//   const response = await getProductsIndiById(id);
+//   return response;
+// },
+
+//  deleteProductIndiByIdStore: async (id) => {
+//     const response = await deleteProductIndiById(id);
+//     return response;
+//   },
