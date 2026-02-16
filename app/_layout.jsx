@@ -37,6 +37,14 @@ const Layuot = () => {
             }}
           />
           <Stack.Screen
+            name="modal/modalDeleteProductGroup"
+            options={{
+              presentation: "modal",
+              animation: "slide_from_bottom",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
             name="modal/modalCreateProduct"
             options={{
               presentation: "modal",

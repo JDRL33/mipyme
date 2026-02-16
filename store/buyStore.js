@@ -3,26 +3,20 @@ import { create } from "zustand";
 const buyStore = create((set, get) => ({
   products: [],
   productsGroups: [],
+  productsSearch: [],
 
-  addProduct: (name, pCompra, moneda, count, id_grupo, nuevo = false) => {
+  addProduct: (name, pCompra, moneda, count, id_grupo, par, nuevo = false) => {
     const newProduct = {
       name,
       pCompra,
       moneda,
       count,
       id_grupo,
+      par,
       nuevo,
     };
     set((state) => ({ products: [...state.products, newProduct] }));
   },
-  // id_grupo	INTEGER NOT NULL,
-  //     nombre	TEXT NOT NULL,
-  //     moneda	TEXT NOT NULL,
-  //     precio_venta	REAL NOT NULL,
-  //     cantidad	INTEGER,
-  //     cobro_total	REAL,
-  //     ganancia_total	REAL,
-  //     PRIMARY KEY(id_grupo AUTOINCREMENT)
   addProductGroup: (
     name,
     moneda,
@@ -30,6 +24,7 @@ const buyStore = create((set, get) => ({
     count,
     cTotal,
     gTotal,
+    par,
     nuevo = false,
   ) => {
     const newGroup = {
@@ -39,13 +34,25 @@ const buyStore = create((set, get) => ({
       count,
       cTotal,
       gTotal,
+      par,
       nuevo,
     };
     set((state) => ({ productsGroups: [...state.productsGroups, newGroup] }));
   },
+  cleanSearch: () => {
+    set({ productsSearch: [] });
+  },
+  findByNameProduct: (search) => {
+    const filteredProducts = get().products.filter((item) =>
+      item.name.includes(search),
+    );
+    if (filteredProducts.length > 0) {
+      set({ productsSearch: filteredProducts });
+    }
+  },
 
-  cleanProducts: () => {
-    set({ products: [] });
+  cancelarCompra: () => {
+    set({ products: [], productsGroups: [] });
   },
 }));
 export default buyStore;

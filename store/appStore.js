@@ -21,6 +21,8 @@ import {
   deleteProductIndiById,
   getProductsIndiById,
   findByNameProductGroup,
+  getProductsIndis,
+  deleteGroupProductById,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -118,14 +120,16 @@ export const appStore = create((set, get) => ({
   extractDatabaseList: async () => {
     const providers = await getProviders();
     const productsGroup = await getProductsGroup();
+    const productIndi = await getProductsIndis();
     const client = await getClient();
 
     set({
       providersList: providers,
       productsGroupList: productsGroup,
+      productsIndis: productIndi,
       clientList: client,
     });
-    return { providers, productsGroup, client };
+    return { providers, productsGroup, productIndi, client };
   },
   //METODO PARA OBTENER LOS PRODUCTOS POR ID DE PROVEEDOR
   getProductsByIdProviderStore: async (id) => {
@@ -240,7 +244,7 @@ export const appStore = create((set, get) => ({
     set((state) => ({
       productsGroupList: [...state.productsGroupList, newProduct],
     }));
-    await get().updateStoreStatus();
+    return productId;
   },
   //METODO PARA ANIADIR CLIENTES
   addClientStore: async (pNombre, pCup, pUsd, pPhone, pCi) => {
@@ -264,21 +268,10 @@ export const appStore = create((set, get) => ({
     await get().initStore();
     return response;
   },
+  // METODO PARA ELIMINAR UN GRUPO DE PRODUCTOS POR ID
+  deleteProductGroupByIdStore: async (id) => {
+    const response = await deleteGroupProductById(id);
+    await get().initStore();
+    return response;
+  },
 }));
-
-// METODO PARA BUSCAR PROVEEDOR POR ID
-// getProviderByIdStore: async (id) => {
-//   const response = await getProviderById(id);
-//   return response[0];
-// },
-
-// METODO PARA BUSCAR PRODUCTO INDEPENDIENTE POR ID
-// getProductsIndiByIdStore: async (id) => {
-//   const response = await getProductsIndiById(id);
-//   return response;
-// },
-
-//  deleteProductIndiByIdStore: async (id) => {
-//     const response = await deleteProductIndiById(id);
-//     return response;
-//   },

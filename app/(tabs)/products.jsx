@@ -25,7 +25,7 @@ const Products = () => {
       <Header title={"Productos"} />
       <SearchBar placeHolder="Buscar producto..." products />
       <TextInfoDelete text="Para eliminar el producto mantengalo presionado." />
-      <ButtonChip href={"/modal/modalCreateProduct"} text={"AGREGAR"} />
+      {/* <ButtonChip href={"/modal/modalCreateProduct"} text={"AGREGAR"} /> */}
       <Space space={10} />
       <FlatList
         data={productsGroupList}
@@ -33,9 +33,11 @@ const Products = () => {
         ListEmptyComponent={() => (
           <EmptyList text="Stock vacio" icon="x-circle" />
         )}
+        ListFooterComponent={<View style={{ height: 20 }} />}
         renderItem={({ item }) => (
           <CardProduct
             key={item.id_grupo}
+            pID={item.id_grupo}
             pNombre={item.nombre}
             pMoneda={item.moneda}
             pPrecio_venta={item.precio_venta}

@@ -6,25 +6,54 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useEffect, useState } from "react";
+import buyStore from "../../store/buyStore";
 import { useTheme } from "react-native-paper";
 import Feather from "@expo/vector-icons/Feather";
+import EmptyList from "../../components/EmptyList";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import buyStore from "../../store/buyStore";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CardProviderProduct from "../../components/CardProviderProduct";
-import EmptyList from "../../components/EmptyList";
+import { addProductIndi } from "../../database/database";
+import { appStore } from "../../store/appStore";
 
 const buy = () => {
-  const insets = useSafeAreaInsets();
+  const router = useRouter();
   const myTheme = useTheme();
+  const insets = useSafeAreaInsets();
+  const [text, setText] = useState("");
   const params = useLocalSearchParams();
   const products = buyStore((state) => state.products);
-  const cleanProducts = buyStore((state) => state.cleanProducts);
-  const [text, setText] = useState("");
+  const productsGroups = buyStore((state) => state.productsGroups);
+  const productsSearch = buyStore((state) => state.productsSearch);
+
+  const [timeoutId, setTimeoutId] = useState(null);
   const [enabledSearch, setEnabledSearch] = useState(false);
-  const router = useRouter();
+  const cancelarCompra = buyStore((state) => state.cancelarCompra);
+  const findByNameProduct = buyStore((state) => state.findByNameProduct);
+  const cleanSearch = buyStore((state) => state.cleanSearch);
+  const addProductsStore = appStore((state) => state.addProductsStore);
+  const initStore = appStore((state) => state.initStore);
+
+  useEffect(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    // esperar 400 segundos al dejar de escribir
+    const id = setTimeout(async () => {
+      try {
+        findByNameProduct(text.toLowerCase());
+      } catch (error) {
+        console.error(error);
+      }
+    }, 400);
+
+    setTimeoutId(id);
+
+    return () => clearTimeout(id);
+  }, [text]);
 
   return (
     <View
@@ -70,6 +99,8 @@ const buy = () => {
         <Text style={{ fontSize: 30 }}>Productos</Text>
         <Pressable
           onPress={() => {
+            setEnabledSearch(false);
+            !enabledSearch && cleanSearch();
             router.push({ pathname: "compra/addProductBuy" });
           }}
         >
@@ -81,12 +112,13 @@ const buy = () => {
         </Pressable>
       </View>
       <FlatList
-        data={products}
+        data={productsSearch.length > 0 ? productsSearch : products}
         style={styles.flatList}
         ItemSeparatorComponent={<View style={{ height: 15 }} />}
         ListEmptyComponent={() => (
           <EmptyList text="Carrito vacio" icon="x-circle" />
         )}
+        ListFooterComponent={<View style={{ height: 20 }} />}
         renderItem={({ item }) => (
           <CardProviderProduct
             pCantidad={item.count}
@@ -147,6 +179,7 @@ const buy = () => {
               ]}
               onPress={() => {
                 setEnabledSearch(!enabledSearch);
+                !enabledSearch && cleanSearch();
               }}
             >
               <FontAwesome name="search" size={30} color="black" />
@@ -161,8 +194,45 @@ const buy = () => {
                 },
               ]}
               onPress={() => {
-                console.log("Comprar productos");
-                cleanProducts();
+                products.forEach(async (product) => {
+                  if (product.par === 0) {
+                    await addProductIndi(
+                      product.name,
+                      product.moneda,
+                      product.pCompra,
+                      product.count,
+                      params.id_provider,
+                      product.id_grupo,
+                      0,
+                    );
+                  }
+                });
+                products.forEach((product) =>
+                  productsGroups.forEach(async (group) => {
+                    if (product.par === group.par) {
+                      const id_group = await addProductsStore(
+                        group.name,
+                        group.moneda,
+                        group.pVenta,
+                        group.count,
+                        0,
+                        0,
+                      );
+                      await addProductIndi(
+                        product.name,
+                        product.moneda,
+                        product.pCompra,
+                        product.count,
+                        params.id_provider,
+                        id_group,
+                        group.par,
+                        0,
+                      );
+                    }
+                  }),
+                );
+                initStore();
+                cancelarCompra();
                 router.back();
               }}
             >
@@ -185,7 +255,7 @@ const buy = () => {
                 },
               ]}
               onPress={() => {
-                cleanProducts();
+                cancelarCompra();
                 router.back();
               }}
             >

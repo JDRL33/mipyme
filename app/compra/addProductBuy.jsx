@@ -1,14 +1,15 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "react-native-paper";
+import TextInputComponent from "../../components/TextInput";
+import ButtonsModal from "../../components/ButtonsModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Foundation from "@expo/vector-icons/Foundation";
-import ButtonsModal from "../../components/ButtonsModal";
-import { useRouter } from "expo-router";
-import buyStore from "../../store/buyStore";
-import TextInputComponent from "../../components/TextInput";
+import React, { useEffect, useState } from "react";
 import { appStore } from "../../store/appStore";
+import { useTheme } from "react-native-paper";
+import buyStore from "../../store/buyStore";
+import { useRouter } from "expo-router";
+import { addProductIndi } from "../../database/database";
 
 const addProductBuy = () => {
   const insets = useSafeAreaInsets();
@@ -19,12 +20,13 @@ const addProductBuy = () => {
   const [textError, setTextError] = useState("");
   const [inputCount, setInputCount] = useState(0);
   const [inputPriceBuy, setPriceBuy] = useState(0);
-  const [inputMoney, setInputMoney] = useState("CUP");
-  const [inputPriceVent, setPriceVent] = useState(0);
   const [timeoutId, setTimeoutId] = useState(null);
-  const [windowScrollShow, setWindowScrollShow] = useState(true);
+  const [inputPriceVent, setPriceVent] = useState(0);
+  const [inputMoney, setInputMoney] = useState("CUP");
   const [productsScroll, setProductsScroll] = useState(true);
+  const [windowScrollShow, setWindowScrollShow] = useState(true);
   const [productGroupSelected, setProductGroupSelected] = useState(null);
+  const [par, setPar] = useState(1);
 
   const addProduct = buyStore((state) => state.addProduct);
   const addProductGroup = buyStore((state) => state.addProductGroup);
@@ -32,9 +34,10 @@ const addProductBuy = () => {
     (state) => state.findByNameProductGroupStore,
   );
   const productsGroupList = appStore((state) => state.productsGroupList);
+
   const store = appStore((state) => state.store);
 
-  const save = () => {
+  const save = async () => {
     if (productGroupSelected) {
       if (inputPriceBuy > 0 && inputCount > 0) {
         addProduct(
@@ -43,8 +46,10 @@ const addProductBuy = () => {
           inputMoney,
           inputCount,
           productGroupSelected.id_grupo,
+          0,
           false,
         );
+
         router.back();
       }
     } else {
@@ -62,6 +67,7 @@ const addProductBuy = () => {
           inputCount,
           0,
           0,
+          par,
           true,
         );
         addProduct(
@@ -70,8 +76,10 @@ const addProductBuy = () => {
           inputMoney,
           inputCount,
           null,
+          par,
           true,
         );
+        setPar(par + 1);
         router.back();
       }
     }

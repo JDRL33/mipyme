@@ -11,7 +11,7 @@ export const ToolsBar = ({ show }) => {
   const ACCION1 = async () => {
     const response = await executeQuery(
       "INSERT INTO producto_grupo (nombre, moneda, precio_venta, cantidad, cobro_total, ganancia_total) VALUES (?,?,?,?,?,?)",
-      ["cucharas", "CUP", 5000, 7, 0, 0],
+      ["pan", "CUP", 5000, 7, 0, 0],
     );
     response;
   };

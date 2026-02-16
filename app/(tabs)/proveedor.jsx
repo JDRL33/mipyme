@@ -37,6 +37,7 @@ const Proveedor = () => {
         ListEmptyComponent={() => (
           <EmptyList text="No hay proveedores" icon="x-circle" />
         )}
+        ListFooterComponent={<View style={{ height: 20 }} />}
         renderItem={({ item }) => (
           <CardProvider
             id={item.id_proveedor}

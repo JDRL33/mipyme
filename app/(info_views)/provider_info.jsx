@@ -191,6 +191,7 @@ const ProveedorInfo = () => {
         ListEmptyComponent={() => (
           <EmptyList text="Stock vacio" icon="x-circle" />
         )}
+        ListFooterComponent={<View style={{ height: 70 }} />}
         renderItem={({ item }) => (
           <CardProviderProduct
             key={item.id}

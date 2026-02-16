@@ -3,10 +3,12 @@ import { Pressable, StyleSheet, Text, View, Modal } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTheme } from "react-native-paper";
 import { appStore } from "../store/appStore";
+import { useRouter } from "expo-router";
 
-const CardProduct = ({ pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
+const CardProduct = ({ pID, pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
   const myTheme = useTheme();
   const store = appStore((state) => state.store);
+  const router = useRouter();
   return (
     <>
       <Pressable
@@ -20,7 +22,10 @@ const CardProduct = ({ pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
           console.log("Visualizar");
         }}
         onLongPress={() => {
-          console.log("Eliminar");
+          router.push({
+            pathname: "modal/modalDeleteProductGroup",
+            params: { id_grupo: pID, name: pNombre },
+          });
         }}
       >
         <View
@@ -64,7 +69,7 @@ const CardProduct = ({ pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
             size={10}
             color={
               pCantidad > store.limitStockDown
-                ? myTheme.colors.greenLight
+                ? myTheme.colors.greenForce
                 : myTheme.colors.redForce
             }
           />

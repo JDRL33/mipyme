@@ -32,6 +32,7 @@ const Clients = () => {
         ListEmptyComponent={() => (
           <EmptyList text="No hay clientes" icon="x-circle" />
         )}
+        ListFooterComponent={<View style={{ height: 20 }} />}
         renderItem={({ item }) => (
           <CardClient
             nombre={item.nombre}

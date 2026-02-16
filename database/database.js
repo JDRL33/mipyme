@@ -160,6 +160,9 @@ export async function getProviders() {
 export async function getProductsGroup() {
   return await getData("SELECT * FROM producto_grupo");
 }
+export async function getProductsIndis() {
+  return await getData("SELECT * FROM producto_independiente");
+}
 export async function getClient() {
   return await getData("SELECT * FROM clientes_deuda");
 }
@@ -189,6 +192,30 @@ export async function addProduct(
   const response = await executeQuery(
     "INSERT INTO producto_grupo ( nombre, moneda, precio_venta, cantidad, ganancia_total, cobro_total ) VALUES (?,?,?,?,?,?);",
     [pNombre, pMoneda, pPrecio_venta, pCantidad, pGanancia, pCobroTotal],
+  );
+  return response.lastInsertRowId;
+}
+// Aniadiendo Productos independientes
+export async function addProductIndi(
+  pNombre,
+  pMoneda,
+  pPrecio_costo,
+  pCantidad,
+  pIdProveedor,
+  pIdGrupo,
+  pGanancia,
+) {
+  const response = await executeQuery(
+    "INSERT INTO producto_independiente ( nombre, moneda, precio_costo, cantidad, id_proveedor, id_grupo, ganancia ) VALUES (?,?,?,?,?,?,?);",
+    [
+      pNombre,
+      pMoneda,
+      pPrecio_costo,
+      pCantidad,
+      pIdProveedor,
+      pIdGrupo,
+      pGanancia,
+    ],
   );
   return response.lastInsertRowId;
 }
@@ -285,6 +312,14 @@ export async function delProviderById(id) {
 export async function deleteProductIndiById(id) {
   const response = await executeQuery(
     `DELETE FROM producto_independiente WHERE id = ?`,
+    [id],
+  );
+  return true;
+}
+// Eliminar grupo de product By id ..
+export async function deleteGroupProductById(id) {
+  const response = await executeQuery(
+    `DELETE FROM producto_grupo WHERE id_grupo = ?`,
     [id],
   );
   return true;
