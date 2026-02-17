@@ -25,7 +25,6 @@ const Products = () => {
       <Header title={"Productos"} />
       <SearchBar placeHolder="Buscar producto..." products />
       <TextInfoDelete text="Para eliminar el producto mantengalo presionado." />
-      {/* <ButtonChip href={"/modal/modalCreateProduct"} text={"AGREGAR"} /> */}
       <Space space={10} />
       <FlatList
         data={productsGroupList}

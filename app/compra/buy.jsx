@@ -115,7 +115,7 @@ const buy = () => {
         </Pressable>
       </View>
       <FlatList
-        data={productsSearch.length > 0 ? productsSearch : products}
+        data={productsSearch}
         style={styles.flatList}
         ItemSeparatorComponent={<View style={{ height: 15 }} />}
         ListEmptyComponent={() => (
@@ -136,8 +136,8 @@ const buy = () => {
           <View style={{ flexDirection: "row", gap: 5 }}>
             <TextInput
               value={text}
-              onChangeText={(text) => {
-                setText(text);
+              onChangeText={(texts) => {
+                setText(texts);
               }}
               cursorColor={myTheme.colors.greenForce}
               selectionColor={myTheme.colors.greenLight}

@@ -28,17 +28,16 @@ const product_info = () => {
       mounted = false;
     };
   }, []);
-  //   console.log(products.map((p) => p.cantidad));
   React.useEffect(() => {
     products.map((p) => {
       const cal = p.precio_costo * p.cantidad;
-      setCTotal(cTotal + cal);
+      setCTotal((prev) => prev + cal);
       console.log(cTotal);
     });
 
     products.map((p) => {
       const cal = (params.precioVenta - p.precio_costo) * p.cantidad;
-      setGananciaTotal(gananciaTotal + cal);
+      setGananciaTotal((prev) => prev + cal);
     });
   }, [products]);
 

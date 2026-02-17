@@ -46,6 +46,7 @@ const buyStore = create((set, get) => ({
     const filteredProducts = get().products.filter((item) =>
       item.name.includes(search),
     );
+
     if (filteredProducts.length > 0) {
       set({ productsSearch: filteredProducts });
     }
