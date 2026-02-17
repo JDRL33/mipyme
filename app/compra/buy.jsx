@@ -15,7 +15,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CardProviderProduct from "../../components/CardProviderProduct";
-import { addProductIndi } from "../../database/database";
 import { appStore } from "../../store/appStore";
 
 const buy = () => {
@@ -32,9 +31,13 @@ const buy = () => {
   const [enabledSearch, setEnabledSearch] = useState(false);
   const cancelarCompra = buyStore((state) => state.cancelarCompra);
   const findByNameProduct = buyStore((state) => state.findByNameProduct);
+  const getProductsByIdProviderStore = appStore(
+    (state) => state.getProductsByIdProviderStore,
+  );
   const cleanSearch = buyStore((state) => state.cleanSearch);
   const addProductsStore = appStore((state) => state.addProductsStore);
   const initStore = appStore((state) => state.initStore);
+  const addProductsIndiStore = appStore((state) => state.addProductsIndiStore);
 
   useEffect(() => {
     if (timeoutId) {
@@ -196,7 +199,7 @@ const buy = () => {
               onPress={() => {
                 products.forEach(async (product) => {
                   if (product.par === 0) {
-                    await addProductIndi(
+                    await addProductsIndiStore(
                       product.name,
                       product.moneda,
                       product.pCompra,
@@ -207,8 +210,8 @@ const buy = () => {
                     );
                   }
                 });
-                products.forEach((product) =>
-                  productsGroups.forEach(async (group) => {
+                products.map((product) =>
+                  productsGroups.map(async (group) => {
                     if (product.par === group.par) {
                       const id_group = await addProductsStore(
                         group.name,
@@ -218,14 +221,13 @@ const buy = () => {
                         0,
                         0,
                       );
-                      await addProductIndi(
+                      await addProductsIndiStore(
                         product.name,
                         product.moneda,
                         product.pCompra,
                         product.count,
                         params.id_provider,
                         id_group,
-                        group.par,
                         0,
                       );
                     }

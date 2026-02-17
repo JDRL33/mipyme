@@ -19,7 +19,15 @@ const CardProduct = ({ pID, pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
           },
         ]}
         onPress={() => {
-          console.log("Visualizar");
+          router.push({
+            pathname: "product_info",
+            params: {
+              id_grupo: pID,
+              name: pNombre,
+              precioVenta: pPrecio_venta,
+              moneda: pMoneda,
+            },
+          });
         }}
         onLongPress={() => {
           router.push({

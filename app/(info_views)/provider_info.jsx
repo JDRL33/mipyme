@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import InfoProviderText from "../../components/InfoProviderText";
@@ -20,6 +20,9 @@ import FabButton from "../../components/FabButton";
 const ProveedorInfo = () => {
   const { id } = useLocalSearchParams();
   const productsIndis = appStore((state) => state.productsIndis);
+  const getProductsByIdProviderStore = appStore(
+    (state) => state.getProductsByIdProviderStore,
+  );
   const findByNameProductIndiStore = appStore(
     (state) => state.findByNameProductIndiStore,
   );
@@ -28,6 +31,7 @@ const ProveedorInfo = () => {
   const [provider, setProvider] = useState({});
   const [text, setText] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const getProvider = async () => {
@@ -35,6 +39,7 @@ const ProveedorInfo = () => {
       setProvider(response);
     };
     getProvider();
+    getProductsByIdProviderStore(id);
   }, []);
 
   useEffect(() => {

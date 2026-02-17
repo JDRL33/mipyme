@@ -292,6 +292,14 @@ export async function getProductsByIdProvider(id) {
   );
   return response;
 }
+//Obtener los productos por id del grupo de producto
+export async function getProductsByIdProductGroup(id) {
+  const response = await getData(
+    "SELECT * FROM producto_independiente WHERE id_grupo = ?",
+    [id],
+  );
+  return response;
+}
 //Obtener los productoIndi por id
 export async function getProductsIndiById(id) {
   const response = await getData(

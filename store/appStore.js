@@ -23,6 +23,7 @@ import {
   findByNameProductGroup,
   getProductsIndis,
   deleteGroupProductById,
+  addProductIndi,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -120,22 +121,23 @@ export const appStore = create((set, get) => ({
   extractDatabaseList: async () => {
     const providers = await getProviders();
     const productsGroup = await getProductsGroup();
-    const productIndi = await getProductsIndis();
+    // const productIndi = await getProductsIndis();
     const client = await getClient();
 
     set({
       providersList: providers,
       productsGroupList: productsGroup,
-      productsIndis: productIndi,
+      // productsIndis: productIndi,
       clientList: client,
     });
-    return { providers, productsGroup, productIndi, client };
+    return { providers, productsGroup, client };
   },
   //METODO PARA OBTENER LOS PRODUCTOS POR ID DE PROVEEDOR
   getProductsByIdProviderStore: async (id) => {
     const response = await getProductsByIdProvider(id);
     set({ productsIndis: response });
   },
+
   // METODO PARA REINICIAR LA BD
   resetDB: async () => {
     await clearDatabase();
@@ -243,6 +245,41 @@ export const appStore = create((set, get) => ({
     };
     set((state) => ({
       productsGroupList: [...state.productsGroupList, newProduct],
+    }));
+    return productId;
+  },
+  // METODO PARA ANIADIR PRODUCTOS INDEPENDIENTES
+  addProductsIndiStore: async (
+    pNombre,
+    pMoneda,
+    pPrecio_costo,
+    pCantidad,
+    pIdProveedor,
+    pIdGrupo,
+    pGanancia,
+  ) => {
+    const productId = await addProductIndi(
+      pNombre,
+      pMoneda,
+      pPrecio_costo,
+      pCantidad,
+      pIdProveedor,
+      pIdGrupo,
+      pGanancia,
+    );
+
+    const newProduct = {
+      id: productId,
+      nombre: pNombre,
+      moneda: pMoneda,
+      precio_costo: pPrecio_costo,
+      cantidad: pCantidad,
+      id_proveedor: pIdProveedor,
+      id_grupo: pIdGrupo,
+      ganancia: pGanancia,
+    };
+    set((state) => ({
+      productsIndis: [...state.productsIndis, newProduct],
     }));
     return productId;
   },

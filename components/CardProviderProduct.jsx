@@ -19,7 +19,7 @@ const CardProviderProduct = ({
     <Pressable
       style={[styles.main, { backgroundColor: myTheme.colors.grayLight }]}
       onPress={() => {
-        console.log("press");
+        console.log(pId);
       }}
       onLongPress={() => {
         router.push({
