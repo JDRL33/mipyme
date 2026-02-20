@@ -33,11 +33,10 @@
     },
     "plugins": ["expo-router"],
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "f693049c-bbab-462a-88ba-e219490e3041"
-      }
+      "router": {}
+      
+      
     },
-    "owner": "jdrl33"
+    "ownner":"jdrl33"
   }
 }
