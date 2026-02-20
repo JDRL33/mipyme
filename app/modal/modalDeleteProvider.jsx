@@ -3,6 +3,7 @@ import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
+import Toast from "react-native-toast-message";
 
 const modalDeleteProvider = () => {
   const params = useLocalSearchParams();
@@ -15,6 +16,12 @@ const modalDeleteProvider = () => {
 
   const handleEliminar = async () => {
     await deleteProviderByIdStore(params.idProvider);
+    Toast.show({
+      type: "success",
+      text1: "Proveedor eliminado correctamente ✅",
+      position: "top",
+      visibilityTime: 2000,
+    });
     router.back();
   };
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
+import Toast from "react-native-toast-message";
 
 const modalTasaCambio = () => {
   const myTheme = useTheme();
@@ -15,6 +16,12 @@ const modalTasaCambio = () => {
   const handleSave = () => {
     if (usd >= 0 && eur >= 0) {
       updateTasaCambio(usd, eur);
+      Toast.show({
+        type: "success",
+        text1: "Tasas de cambio actualizadas correctamente 👋",
+        position: "top",
+        visibilityTime: 2000,
+      });
       router.back();
     }
   };
@@ -124,7 +131,7 @@ const modalTasaCambio = () => {
 
 export default modalTasaCambio;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   main: {
     flex: 1,
     justifyContent: "center",

@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { appStore } from "../../store/appStore";
 import { deleteProductIndiById } from "../../database/database";
+import Toast from "react-native-toast-message";
 
 const modalDeleteProvider = () => {
   const params = useLocalSearchParams();
@@ -16,6 +17,12 @@ const modalDeleteProvider = () => {
   const handleEliminar = async () => {
     await deleteProductIndiById(params.idProductI);
     await getProductsByIdProviderStore(params.id_provider);
+    Toast.show({
+      type: "success",
+      text1: "Producto eliminado correctamente ✅",
+      position: "top",
+      visibilityTime: 2000,
+    });
     router.back();
   };
 

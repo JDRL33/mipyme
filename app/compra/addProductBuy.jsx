@@ -9,7 +9,9 @@ import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import buyStore from "../../store/buyStore";
 import { useRouter } from "expo-router";
-import { addProductIndi } from "../../database/database";
+import CurrencyInput from "react-native-currency-input";
+import { Picker } from "@react-native-picker/picker";
+import Toast from "react-native-toast-message";
 
 const addProductBuy = () => {
   const insets = useSafeAreaInsets();
@@ -22,11 +24,10 @@ const addProductBuy = () => {
   const [inputPriceBuy, setPriceBuy] = useState(0);
   const [timeoutId, setTimeoutId] = useState(null);
   const [inputPriceVent, setPriceVent] = useState(0);
-  const [inputMoney, setInputMoney] = useState("CUP");
+  const [inputMoney, setInputMoney] = useState("USD");
   const [productsScroll, setProductsScroll] = useState(true);
   const [windowScrollShow, setWindowScrollShow] = useState(true);
   const [productGroupSelected, setProductGroupSelected] = useState(null);
-  const [par, setPar] = useState(1);
 
   const addProduct = buyStore((state) => state.addProduct);
   const addProductGroup = buyStore((state) => state.addProductGroup);
@@ -34,8 +35,10 @@ const addProductBuy = () => {
     (state) => state.findByNameProductGroupStore,
   );
   const productsGroupList = appStore((state) => state.productsGroupList);
-
   const store = appStore((state) => state.store);
+
+  const par = buyStore((state) => state.par);
+  const plusPar = buyStore((state) => state.plusPar);
 
   const save = async () => {
     if (productGroupSelected) {
@@ -49,43 +52,90 @@ const addProductBuy = () => {
           0,
           false,
         );
-
+        Toast.show({
+          type: "info",
+          text1: "Producto agregado al carrito 🆕",
+          position: "top",
+          visibilityTime: 2000,
+        });
         router.back();
       }
     } else {
-      if (
-        inputName.trim() != "" &&
-        inputPriceVent > 0 &&
-        inputPriceBuy > 0 &&
-        inputPriceBuy < inputPriceVent &&
-        inputCount > 0
-      ) {
-        addProductGroup(
-          inputName,
-          inputMoney,
-          inputPriceVent,
-          inputCount,
-          0,
-          0,
-          par,
-          true,
-        );
-        addProduct(
-          inputName,
-          inputPriceBuy,
-          inputMoney,
-          inputCount,
-          null,
-          par,
-          true,
-        );
-        setPar(par + 1);
-        router.back();
+      if (inputName.trim() != "") {
+        if (inputPriceVent > 0) {
+          if (inputPriceBuy > 0) {
+            if (inputPriceVent > inputPriceBuy) {
+              if (inputCount > 0) {
+                addProductGroup(
+                  inputName,
+                  inputMoney,
+                  inputPriceVent,
+                  inputCount,
+                  0,
+                  0,
+                  par,
+                  true,
+                );
+                addProduct(
+                  inputName,
+                  inputPriceBuy,
+                  inputMoney,
+                  inputCount,
+                  null,
+                  par,
+                  true,
+                );
+                plusPar();
+                Toast.show({
+                  type: "info",
+                  text1: "Producto agregado al carrito 🆕",
+                  position: "top",
+                  visibilityTime: 2000,
+                });
+                router.back();
+              } else {
+                Toast.show({
+                  type: "error",
+                  text1: "Ingrese una cantidad valida ❌",
+                  position: "top",
+                  visibilityTime: 2000,
+                });
+              }
+            } else {
+              Toast.show({
+                type: "error",
+                text1:
+                  "El precio de venta debe ser mayor que el precio de compra ❌",
+                position: "top",
+                visibilityTime: 2000,
+              });
+            }
+          } else {
+            Toast.show({
+              type: "error",
+              text1: "Ingrese un precio de compra valido ❌",
+              position: "top",
+              visibilityTime: 2000,
+            });
+          }
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Ingrese un precio de venta valido ❌",
+            position: "top",
+            visibilityTime: 2000,
+          });
+        }
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Ingrese un nombre para el producto ❌",
+          position: "top",
+          visibilityTime: 2000,
+        });
       }
     }
-    // }
   };
-
   useEffect(() => {
     if (timeoutId) {
       clearTimeout(timeoutId);
@@ -264,20 +314,36 @@ const addProductBuy = () => {
           <View />
         )}
         <View style={{ flexDirection: "row", gap: 10 }}>
-          <TextInputComponent
-            keyboardType={"decimal-pad"}
-            placeHolder={"Precio de costo ..."}
-            textInput={inputPriceBuy}
-            setTextInput={setPriceBuy}
-            style={{ width: "60%" }}
+          <CurrencyInput
+            value={inputPriceBuy}
+            onChangeValue={(value) => {
+              setPriceBuy(value);
+            }}
+            prefix="$"
+            delimiter="."
+            separator=","
+            precision={2}
+            style={{
+              marginBottom: 10,
+              backgroundColor: myTheme.colors.grayLight,
+              padding: 15,
+              borderRadius: 15,
+              fontSize: 20,
+              width: "60%",
+            }}
+            placeholder="Precio de costo"
           />
-          <TextInputComponent
-            keyboardType={""}
-            placeHolder={"CUP"}
-            textInput={inputMoney}
-            setTextInput={setInputMoney}
-            style={{ width: "35%" }}
-          />
+
+          <Picker
+            style={{
+              width: "35%",
+            }}
+            selectedValue={inputMoney}
+            onValueChange={(itemValue, itemIndex) => setInputMoney(itemValue)}
+          >
+            <Picker.Item label="CUP" value="CUP" />
+            <Picker.Item label="USD" value="USD" />
+          </Picker>
         </View>
         {/* Botones de incremento y decremento de cantidad de productos */}
         <View style={{ flexDirection: "row" }}>
@@ -342,20 +408,37 @@ const addProductBuy = () => {
         >
           {!productsScroll && (
             <>
-              <TextInputComponent
-                keyboardType={"decimal-pad"}
-                placeHolder={"Precio de venta ..."}
-                textInput={inputPriceVent}
-                setTextInput={setPriceVent}
-                style={{ width: "60%" }}
+              <CurrencyInput
+                value={inputPriceVent}
+                onChangeValue={(value) => {
+                  setPriceVent(value);
+                }}
+                prefix="$"
+                delimiter="."
+                separator=","
+                precision={2}
+                style={{
+                  marginBottom: 10,
+                  backgroundColor: myTheme.colors.grayLight,
+                  padding: 15,
+                  borderRadius: 15,
+                  fontSize: 20,
+                  width: "60%",
+                }}
+                placeholder="Precio de venta"
               />
-              <TextInputComponent
-                keyboardType={"default"}
-                placeHolder={"CUP ..."}
-                textInput={inputMoney}
-                setTextInput={setInputMoney}
-                style={{ width: "35%" }}
-              />
+              <Picker
+                style={{
+                  width: "35%",
+                }}
+                selectedValue={inputMoney}
+                onValueChange={(itemValue, itemIndex) =>
+                  setInputMoney(itemValue)
+                }
+              >
+                <Picker.Item label="CUP" value="CUP" />
+                <Picker.Item label="USD" value="USD" />
+              </Picker>
             </>
           )}
         </View>

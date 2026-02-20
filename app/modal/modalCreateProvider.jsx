@@ -2,22 +2,30 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useState } from "react";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link, useNavigation } from "expo-router";
+import { useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
 import Feather from "@expo/vector-icons/Feather";
 import ButtonsModal from "../../components/ButtonsModal";
+import { index } from "../(tabs)";
+import Toast from "react-native-toast-message";
 
 const modalCreateProvider = () => {
   const myTheme = useTheme();
   const insets = useSafeAreaInsets();
   const [nombre, setNombre] = useState("");
-  const navigate = useNavigation();
+  const router = useRouter();
   const addProviderStore = appStore((state) => state.addProviderStore);
 
   const handleSave = async () => {
     if (nombre.trim()) {
       await addProviderStore(nombre.trim(), 0, 0, 0);
-      navigate.goBack();
+      Toast.show({
+        type: "success",
+        text1: "Proveedor creado con éxito 🥳✔",
+        position: "top",
+        visibilityTime: 2000,
+      });
+      router.back();
     }
   };
 

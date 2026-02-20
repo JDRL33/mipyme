@@ -16,6 +16,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CardProviderProduct from "../../components/CardProviderProduct";
 import { appStore } from "../../store/appStore";
+import Toast from "react-native-toast-message";
 
 const buy = () => {
   const router = useRouter();
@@ -31,9 +32,6 @@ const buy = () => {
   const [enabledSearch, setEnabledSearch] = useState(false);
   const cancelarCompra = buyStore((state) => state.cancelarCompra);
   const findByNameProduct = buyStore((state) => state.findByNameProduct);
-  const getProductsByIdProviderStore = appStore(
-    (state) => state.getProductsByIdProviderStore,
-  );
   const cleanSearch = buyStore((state) => state.cleanSearch);
   const addProductsStore = appStore((state) => state.addProductsStore);
   const initStore = appStore((state) => state.initStore);
@@ -115,7 +113,7 @@ const buy = () => {
         </Pressable>
       </View>
       <FlatList
-        data={productsSearch}
+        data={text.length > 0 ? productsSearch : products}
         style={styles.flatList}
         ItemSeparatorComponent={<View style={{ height: 15 }} />}
         ListEmptyComponent={() => (
@@ -197,7 +195,8 @@ const buy = () => {
                 },
               ]}
               onPress={() => {
-                products.forEach(async (product) => {
+                products.map(async (product) => {
+                  let newGroup = true;
                   if (product.par === 0) {
                     await addProductsIndiStore(
                       product.name,
@@ -208,33 +207,39 @@ const buy = () => {
                       product.id_grupo,
                       0,
                     );
+                    newGroup = false;
                   }
+                  newGroup &&
+                    productsGroups.map(async (group) => {
+                      if (product.par === group.par) {
+                        const id_group = await addProductsStore(
+                          group.name,
+                          group.moneda,
+                          group.pVenta,
+                          group.count,
+                          0,
+                          0,
+                        );
+                        await addProductsIndiStore(
+                          product.name,
+                          product.moneda,
+                          product.pCompra,
+                          product.count,
+                          params.id_provider,
+                          id_group,
+                          0,
+                        );
+                      }
+                    });
                 });
-                products.map((product) =>
-                  productsGroups.map(async (group) => {
-                    if (product.par === group.par) {
-                      const id_group = await addProductsStore(
-                        group.name,
-                        group.moneda,
-                        group.pVenta,
-                        group.count,
-                        0,
-                        0,
-                      );
-                      await addProductsIndiStore(
-                        product.name,
-                        product.moneda,
-                        product.pCompra,
-                        product.count,
-                        params.id_provider,
-                        id_group,
-                        0,
-                      );
-                    }
-                  }),
-                );
                 initStore();
                 cancelarCompra();
+                Toast.show({
+                  type: "success",
+                  text1: "Nueva compra efectuada con éxito 🥳✔",
+                  position: "top",
+                  visibilityTime: 2000,
+                });
                 router.back();
               }}
             >
@@ -258,6 +263,12 @@ const buy = () => {
               ]}
               onPress={() => {
                 cancelarCompra();
+                Toast.show({
+                  type: "error",
+                  text1: "Compra cancelada   ❌",
+                  position: "top",
+                  visibilityTime: 2000,
+                });
                 router.back();
               }}
             >

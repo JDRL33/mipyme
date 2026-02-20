@@ -10,7 +10,7 @@ import { appStore } from "../../store/appStore";
 import { useEffect } from "react";
 import { initDatabase } from "../../database/database";
 
-const index = () => {
+export const index = () => {
   const initStore = appStore((state) => state.initStore);
   useEffect(() => {
     const init = async () => {
@@ -45,7 +45,7 @@ const index = () => {
         <View style={{ height: 30 }} />
       </ScrollView>
       {/* Button de faboritos */}
-      <FabButton onClick={async () => {}} />
+      <FabButton onClick={() => {}} />
     </View>
   );
 };

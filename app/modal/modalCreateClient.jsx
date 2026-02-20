@@ -19,6 +19,12 @@ const modalCreateClient = () => {
   const handleSave = async () => {
     if (nombre.trim()) {
       await addClientStore(nombre.trim(), 0, 0, number.trim(), ci.trim());
+      Toast.show({
+        type: "success",
+        text1: "Cliente creado correctamente ✅",
+        position: "top",
+        visibilityTime: 2000,
+      });
       router.back();
     }
   };

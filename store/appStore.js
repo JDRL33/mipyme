@@ -137,6 +137,11 @@ export const appStore = create((set, get) => ({
     const response = await getProductsByIdProvider(id);
     set({ productsIndis: response });
   },
+  //METODO PARA OBTENER LOS PROVEEDORES POR ID
+  getProvidersByIdStore: async (id) => {
+    const response = await getProviderById(id);
+    return response;
+  },
 
   // METODO PARA REINICIAR LA BD
   resetDB: async () => {

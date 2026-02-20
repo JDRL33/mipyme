@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { PaperProvider } from "react-native-paper";
 import theme from "../theme/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 const Layuot = () => {
   const insets = useSafeAreaInsets();
@@ -13,7 +14,6 @@ const Layuot = () => {
       <PaperProvider theme={theme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
           <Stack.Screen
             name="(info_views)/provider_info"
             options={{ animation: "slide_from_bottom" }}
@@ -26,7 +26,6 @@ const Layuot = () => {
             name="compra/addProductBuy"
             options={{ animation: "slide_from_bottom", headerShown: false }}
           />
-
           {/* PANTALLAS MODALES */}
           <Stack.Screen
             name="modal/modalDeleteProductIndi"
@@ -38,14 +37,6 @@ const Layuot = () => {
           />
           <Stack.Screen
             name="modal/modalDeleteProductGroup"
-            options={{
-              presentation: "modal",
-              animation: "slide_from_bottom",
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="modal/modalCreateProduct"
             options={{
               presentation: "modal",
               animation: "slide_from_bottom",
@@ -86,6 +77,7 @@ const Layuot = () => {
           />
         </Stack>
       </PaperProvider>
+      <Toast position="top" avoidKeyboard />
     </View>
   );
 };
