@@ -1,11 +1,4 @@
-import {
-  Button,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
@@ -20,9 +13,11 @@ import FabButton from "../../components/FabButton";
 const ProveedorInfo = () => {
   const { id } = useLocalSearchParams();
   const productsIndis = appStore((state) => state.productsIndis);
+  const productsGroupList = appStore((state) => state.productsGroupList);
   const getProductsByIdProviderStore = appStore(
     (state) => state.getProductsByIdProviderStore,
   );
+  const store = appStore((state) => state.store);
   const findByNameProductIndiStore = appStore(
     (state) => state.findByNameProductIndiStore,
   );
@@ -32,6 +27,38 @@ const ProveedorInfo = () => {
   const [text, setText] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
   const router = useRouter();
+
+  const getGanancia = () => {
+    let ganancia = 0;
+    productsIndis.map((product) => {
+      if (product.id_proveedor == id) {
+        productsGroupList.map((productGroup) => {
+          if (productGroup.id_grupo === product.id_grupo) {
+            ganancia +=
+              (productGroup.precio_venta - product.precio_costo) *
+              product.cantidad;
+          }
+        });
+      }
+    });
+    return ganancia.toFixed(2);
+  };
+  const getProductsStockDown = () => {
+    let count = 0;
+    productsIndis.map((product) => {
+      if (product.id_proveedor == id) {
+        product.cantidad <= store.limitStockDown && count++;
+      }
+    });
+    return count;
+  };
+  useEffect(() => {
+    const getProvider = async () => {
+      const response = await getProviderById(id);
+      setProvider(response);
+    };
+    getProvider();
+  }, [productsIndis]);
 
   useEffect(() => {
     const getProvider = async () => {
@@ -94,7 +121,7 @@ const ProveedorInfo = () => {
               fontSize: 20,
             }}
           >
-            ${provider.a_pagar}
+            ${parseFloat(provider.a_pagar).toFixed(2)}
           </Text>
           <Text
             style={{
@@ -122,7 +149,7 @@ const ProveedorInfo = () => {
               fontSize: 20,
             }}
           >
-            ${provider.pagado}
+            ${parseFloat(provider.pagado).toFixed(2)}
           </Text>
           <Text
             style={{
@@ -141,11 +168,11 @@ const ProveedorInfo = () => {
         />
         <InfoProviderText
           textPrimary="Ganancias:"
-          textSecondary="Pendiente a funcion !!!!!!"
+          textSecondary={`$${getGanancia()}`}
         />
         <InfoProviderText
           textPrimary="Productos en bajo Stock:"
-          textSecondary="Pendiente!!!"
+          textSecondary={getProductsStockDown()}
         />
         <InfoProviderText
           textPrimary="Ultima entrada:"

@@ -24,6 +24,8 @@ import {
   getProductsIndis,
   deleteGroupProductById,
   addProductIndi,
+  updateProductGroup,
+  updateProvider,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -34,16 +36,11 @@ export const appStore = create((set, get) => ({
   productsWithStockDown: [],
   store: {},
 
-  countDeposit: 0,
-  countDeposited: 0,
-  countGanancia: 0,
-
-  stockBajo: 0,
-  limitStockDown: 5,
-
   // METODO PARA INICIAR LA APPSTORE
   initStore: async () => {
     await get().extractDatabaseList();
+    await get().updateProductsGroupStatsStore();
+    await get().updateProvidersStatsStore();
     await get().getDataStore();
     await get().updateStoreStatus();
   },
@@ -55,30 +52,21 @@ export const appStore = create((set, get) => ({
   // METODOS PARA ACTUALIZAR VARIABLES DE ESTADISTICAS FINANCIERAS
   updateStoreStatus: async () => {
     const store = get().store;
-    const productsStockBajo = get().productsWithStockDown;
+    const productsStockBajo = get().getProductsDownStore();
     const products = get().productsGroupList;
     const providers = get().providersList;
     const clients = get().clientList;
-
-    const nProducts = products.length;
-    const nProviders = providers.length;
-    const nClients = clients.length;
 
     let cDebito = 0;
     let cPagado = 0;
     let cGanancia = 0;
     if (providers.length > 0) {
-      providers.map((provider) => {
-        cDebito += provider.a_pagar;
-        cPagado += provider.pagado;
-      });
-    }
-    if (products.length > 0) {
       products.map((product) => {
+        cDebito += product.cobro_total;
         cGanancia += product.ganancia_total;
+        // cPagado += product.pagado; -------------------------------------------------------------
       });
     }
-    // get().getProductsStockDownStore();
 
     const newStore = {
       id: store.id,
@@ -86,17 +74,62 @@ export const appStore = create((set, get) => ({
       limitStockDown: store.limitStockDown,
       tasa_usd: store.tasa_usd,
       tasa_eur: store.tasa_eur,
-      nProducts: nProducts,
+      nProducts: products.length,
       nProducts_stock_down: productsStockBajo.length,
-      nProviders: nProviders,
-      nClients: nClients,
-      cDebito: cDebito,
-      cPagado: cPagado,
-      cGanancia: cGanancia,
+      nProviders: providers.length,
+      nClients: clients.length,
+      cDebito: parseFloat(cDebito).toFixed(2),
+      cPagado: parseFloat(cPagado).toFixed(2),
+      cGanancia: parseFloat(cGanancia).toFixed(2),
     };
 
     await updateStore(newStore);
     set({ store: newStore });
+  },
+  //METODO PARA ACTUALIZAR LOS PRODUCTOS GRUPOS
+  updateProductsGroupStatsStore: () => {
+    const productsIndis = get().productsIndis;
+    const productsGroupList = get().productsGroupList;
+    productsGroupList.map(async (group) => {
+      let count = 0;
+      let costoTotal = 0;
+      let gananciaTotal = 0;
+      productsIndis.map((item) => {
+        if (item.id_grupo === group.id_grupo) {
+          count += item.cantidad;
+          costoTotal += item.precio_costo * item.cantidad;
+          gananciaTotal +=
+            (group.precio_venta - item.precio_costo) * item.cantidad;
+        }
+      });
+      group.cantidad = count;
+      group.cobro_total = costoTotal;
+      group.ganancia_total = gananciaTotal;
+      await updateProductGroup(group);
+      set({ productsGroupList: productsGroupList });
+    });
+  },
+  //METODO PARA ACTUALISAR LOS PROVEEDORES
+  updateProvidersStatsStore: async () => {
+    const providersList = get().providersList;
+    const productsIndis = get().productsIndis;
+    providersList.map(async (provider) => {
+      let count = 0;
+      let a_pagar = 0;
+      let pagado = 0;
+      productsIndis.map((product) => {
+        if (product.id_proveedor === provider.id_proveedor) {
+          count += product.cantidad;
+          a_pagar += product.precio_costo * product.cantidad;
+          // pagado += product.ganancia; -------------------------------------------------------------
+        }
+      });
+      provider.cantidad_productos = count;
+      provider.a_pagar = a_pagar;
+      provider.pagado = pagado;
+      await updateProvider(provider);
+      await get().extractDatabaseList();
+    });
   },
 
   // METODO PARA ACTUALIZAR LA TASA DE CAMBIO
@@ -114,20 +147,25 @@ export const appStore = create((set, get) => ({
     }
   },
   // METODO PARA OBTENER LOS PRODUCTOS DE BAJO STOCK
-  getProductsDownStore: async () => {
-    const stockDown = await getProductsStockDown();
+  getProductsDownStore: () => {
+    const store = get().store;
+    const productsGroupList = get().productsGroupList;
+    const productsStockDown = productsGroupList.filter(
+      (product) => product.cantidad <= store.limitStockDown,
+    );
+    return productsStockDown;
   },
   // METODOS PARA OBTENER TODAS LAS FILAS DE LA BD
   extractDatabaseList: async () => {
     const providers = await getProviders();
     const productsGroup = await getProductsGroup();
-    // const productIndi = await getProductsIndis();
+    const productIndi = await getProductsIndis();
     const client = await getClient();
 
     set({
       providersList: providers,
       productsGroupList: productsGroup,
-      // productsIndis: productIndi,
+      productsIndis: productIndi,
       clientList: client,
     });
     return { providers, productsGroup, client };

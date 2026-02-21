@@ -41,8 +41,8 @@ const Products = () => {
             pMoneda={item.moneda}
             pPrecio_venta={item.precio_venta}
             pCantidad={item.cantidad}
-            pCobroTotal={item.cobro_total}
-            pGanancia={item.ganancia}
+            pCTotal={item.cobro_total}
+            pGTotal={item.ganancia_total}
           />
         )}
       />

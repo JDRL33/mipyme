@@ -13,14 +13,15 @@ const product_info = () => {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams();
   const [products, setProducts] = React.useState([]);
-  const [cTotal, setCTotal] = React.useState(0);
-  const [gananciaTotal, setGananciaTotal] = React.useState(0);
   const [providers, setProviders] = React.useState([]);
   const getProvidersByIdStore = appStore(
     (state) => state.getProvidersByIdStore,
   );
   const store = appStore((state) => state.store);
   const productsIndis = appStore((state) => state.productsIndis);
+  const updateProductsGroupStatsStore = appStore(
+    (state) => state.updateProductsGroupStatsStore,
+  );
 
   React.useEffect(() => {
     let mounted = true;
@@ -39,17 +40,6 @@ const product_info = () => {
       mounted = false;
     };
   }, [productsIndis]);
-  React.useEffect(() => {
-    products.map((p) => {
-      const cal = p.precio_costo * p.cantidad;
-      setCTotal((prev) => prev + parseFloat(cal.toFixed(2)));
-    });
-
-    products.map((p) => {
-      const cal = (params.precioVenta - p.precio_costo) * p.cantidad;
-      setGananciaTotal((prev) => prev + parseFloat(cal.toFixed(2)));
-    });
-  }, [products]);
 
   return (
     <View
@@ -113,7 +103,8 @@ const product_info = () => {
           color={myTheme.colors.greenForce}
         />
         <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
-          Cobro total: ${cTotal} {params.moneda.toUpperCase()}
+          Cobro total: ${parseFloat(params.cTotal).toFixed(2)}{" "}
+          {params.moneda.toUpperCase()}
         </Text>
       </View>
       <View
@@ -129,7 +120,8 @@ const product_info = () => {
           color={myTheme.colors.greenForce}
         />
         <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
-          Ganancia total: ${gananciaTotal} {params.moneda.toUpperCase()}
+          Ganancia total: ${parseFloat(params.gTotal).toFixed(2)}{" "}
+          {params.moneda.toUpperCase()}
         </Text>
       </View>
       <Text

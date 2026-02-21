@@ -3,15 +3,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TextInputComponent from "../../components/TextInput";
 import ButtonsModal from "../../components/ButtonsModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import CurrencyInput from "react-native-currency-input";
 import Foundation from "@expo/vector-icons/Foundation";
+import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import { appStore } from "../../store/appStore";
+import Toast from "react-native-toast-message";
 import { useTheme } from "react-native-paper";
 import buyStore from "../../store/buyStore";
 import { useRouter } from "expo-router";
-import CurrencyInput from "react-native-currency-input";
-import { Picker } from "@react-native-picker/picker";
-import Toast from "react-native-toast-message";
 
 const addProductBuy = () => {
   const insets = useSafeAreaInsets();

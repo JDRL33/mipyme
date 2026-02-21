@@ -153,6 +153,35 @@ export async function updateStore(store) {
     ],
   );
 }
+//Funcion para actualizar un grupo de productos
+export async function updateProductGroup(group) {
+  await executeQuery(
+    "UPDATE producto_grupo SET nombre = ?, moneda = ?, precio_venta = ?, cantidad = ?, cobro_total = ?, ganancia_total = ? WHERE id_grupo = ?",
+    [
+      group.nombre,
+      group.moneda,
+      group.precio_venta,
+      group.cantidad,
+      group.cobro_total,
+      group.ganancia_total,
+      group.id_grupo,
+    ],
+  );
+}
+//Funcion para actualizar un proveedor
+export async function updateProvider(provider) {
+  await executeQuery(
+    "UPDATE proveedor SET nombre = ?, cantidad_productos = ?, a_pagar = ?, pagado = ?, ultimaFechaEntrada = ? WHERE id_proveedor = ?",
+    [
+      provider.nombre,
+      provider.cantidad_productos,
+      provider.a_pagar,
+      provider.pagado,
+      provider.ultimaFechaEntrada,
+      provider.id_proveedor,
+    ],
+  );
+}
 // Obteniendo TODOS LOS PROVEEDORES, STOCK y CLIENTS
 export async function getProviders() {
   return await getData("SELECT * FROM proveedor");
@@ -278,12 +307,13 @@ export async function getProviderById(id) {
   return response[0];
 }
 // Obtener Productos de stock bajos
-export async function getProductsStockDown() {
-  const limit = await getData("SELECT limitStockDown FROM store");
-  return await getData("SELECT * FROM producto_grupo WHERE cantidad <= ?", [
-    limit[0],
-  ]);
-}
+// export async function getProductsStockDown() {
+//   const limit = await getData("SELECT limitStockDown FROM store");
+//   return await getData("SELECT * FROM producto_grupo WHERE cantidad <= ?", [
+//     limit,
+//   ]);
+// }
+
 //Obtener los productos por id del proveedor
 export async function getProductsByIdProvider(id) {
   const response = await getData(

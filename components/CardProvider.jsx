@@ -61,12 +61,12 @@ const CardProvider = ({
           <Text
             style={[styles.textPricing, { color: myTheme.colors.redForce }]}
           >
-            ${a_pagar} -
+            ${parseFloat(a_pagar).toFixed(2)} -
           </Text>
           <Text
             style={[styles.textPricing, { color: myTheme.colors.greenForce }]}
           >
-            {` $${pagado}`}
+            {` $${parseFloat(pagado).toFixed(2)}`}
           </Text>
         </View>
       </View>

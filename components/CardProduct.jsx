@@ -5,7 +5,15 @@ import { useTheme } from "react-native-paper";
 import { appStore } from "../store/appStore";
 import { useRouter } from "expo-router";
 
-const CardProduct = ({ pID, pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
+const CardProduct = ({
+  pID,
+  pNombre,
+  pMoneda,
+  pPrecio_venta,
+  pCantidad,
+  pCTotal,
+  pGTotal,
+}) => {
   const myTheme = useTheme();
   const store = appStore((state) => state.store);
   const router = useRouter();
@@ -26,6 +34,9 @@ const CardProduct = ({ pID, pNombre, pMoneda, pPrecio_venta, pCantidad }) => {
               name: pNombre,
               precioVenta: pPrecio_venta,
               moneda: pMoneda,
+              cantidad: pCantidad,
+              cTotal: pCTotal,
+              gTotal: pGTotal,
             },
           });
         }}

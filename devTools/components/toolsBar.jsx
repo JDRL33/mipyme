@@ -7,13 +7,12 @@ export const ToolsBar = ({ show }) => {
   const store = appStore((state) => state.store);
   const getDataStore = appStore((state) => state.getDataStore);
   const resetDB = appStore((state) => state.resetDB);
+  const updateProductsGroupStatsStore = appStore(
+    (state) => state.updateProductsGroupStatsStore,
+  );
 
-  const ACCION1 = async () => {
-    const response = await executeQuery(
-      "INSERT INTO producto_grupo (nombre, moneda, precio_venta, cantidad, cobro_total, ganancia_total) VALUES (?,?,?,?,?,?)",
-      ["pan", "CUP", 5000, 7, 0, 0],
-    );
-    response;
+  const ACCION1 = () => {
+    updateProductsGroupStatsStore();
   };
   const ACCION2 = async () => {
     const response = await getData("SELECT * FROM producto_grupo", []);

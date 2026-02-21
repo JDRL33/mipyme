@@ -194,53 +194,62 @@ const buy = () => {
                   backgroundColor: myTheme.colors.greenLight,
                 },
               ]}
-              onPress={() => {
-                products.map(async (product) => {
-                  let newGroup = true;
-                  if (product.par === 0) {
-                    await addProductsIndiStore(
-                      product.name,
-                      product.moneda,
-                      product.pCompra,
-                      product.count,
-                      params.id_provider,
-                      product.id_grupo,
-                      0,
-                    );
-                    newGroup = false;
-                  }
-                  newGroup &&
-                    productsGroups.map(async (group) => {
-                      if (product.par === group.par) {
-                        const id_group = await addProductsStore(
-                          group.name,
-                          group.moneda,
-                          group.pVenta,
-                          group.count,
-                          0,
-                          0,
-                        );
-                        await addProductsIndiStore(
-                          product.name,
-                          product.moneda,
-                          product.pCompra,
-                          product.count,
-                          params.id_provider,
-                          id_group,
-                          0,
-                        );
-                      }
-                    });
-                });
-                initStore();
-                cancelarCompra();
-                Toast.show({
-                  type: "success",
-                  text1: "Nueva compra efectuada con éxito 🥳✔",
-                  position: "top",
-                  visibilityTime: 2000,
-                });
-                router.back();
+              onPress={async () => {
+                if (products.length > 0) {
+                  products.map(async (product) => {
+                    let newGroup = true;
+                    if (product.par === 0) {
+                      await addProductsIndiStore(
+                        product.name,
+                        product.moneda,
+                        product.pCompra,
+                        product.count,
+                        params.id_provider,
+                        product.id_grupo,
+                        0,
+                      );
+                      newGroup = false;
+                    }
+                    newGroup &&
+                      productsGroups.map(async (group) => {
+                        if (product.par === group.par) {
+                          const id_group = await addProductsStore(
+                            group.name,
+                            group.moneda,
+                            group.pVenta,
+                            group.count,
+                            0,
+                            0,
+                          );
+                          await addProductsIndiStore(
+                            product.name,
+                            product.moneda,
+                            product.pCompra,
+                            product.count,
+                            params.id_provider,
+                            id_group,
+                            0,
+                          );
+                        }
+                      });
+                  });
+                  await initStore();
+                  cancelarCompra();
+                  Toast.show({
+                    type: "success",
+                    text1: "Nueva compra efectuada con éxito 🥳✔",
+                    position: "top",
+                    visibilityTime: 2000,
+                  });
+                  router.back();
+                } else {
+                  Toast.show({
+                    type: "info",
+                    text1: "Añade a un producto si quieres comprar.",
+                    position: "top",
+                    visibilityTime: 2000,
+                  });
+                }
               }}
             >
               <Text
