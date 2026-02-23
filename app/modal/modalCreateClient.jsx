@@ -1,4 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -30,81 +38,92 @@ const modalCreateClient = () => {
   };
 
   return (
-    <View
-      style={{
-        paddingTop: insets.top,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: myTheme.colors.primary,
-      }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
       <View
         style={{
-          flexDirection: "row",
-          gap: 20,
+          paddingTop: insets.top,
+          flex: 1,
+          justifyContent: "center",
           alignItems: "center",
-          marginBottom: 40,
+          backgroundColor: myTheme.colors.primary,
         }}
       >
-        <FontAwesome name="user" size={36} color={myTheme.colors.greenForce} />
-        <Text style={{ fontSize: 36, fontWeight: "bold" }}>Nuevo Cliente</Text>
-      </View>
-      <TextInput
-        value={nombre}
-        onChangeText={(text) => {
-          setNombre(text);
-        }}
-        cursorColor={myTheme.colors.greenForce}
-        selectionColor={myTheme.colors.greenForce}
-        placeholderTextColor={myTheme.colors.textSecondary}
-        placeholder="Nombre del cliente."
-        style={[
-          styles.textInputStyle,
-          {
-            backgroundColor: myTheme.colors.grayLight,
-            marginBottom: 10,
-          },
-        ]}
-      />
-      <TextInput
-        value={ci}
-        onChangeText={(text) => {
-          setCi(text);
-        }}
-        keyboardType="number-pad"
-        cursorColor={myTheme.colors.greenForce}
-        selectionColor={myTheme.colors.greenForce}
-        placeholderTextColor={myTheme.colors.textSecondary}
-        placeholder="Carnet de identidad."
-        style={[
-          styles.textInputStyle,
-          {
-            backgroundColor: myTheme.colors.grayLight,
-            marginBottom: 10,
-          },
-        ]}
-      />
-      <TextInput
-        value={number}
-        onChangeText={(text) => {
-          setNumber(text);
-        }}
-        keyboardType="number-pad"
-        cursorColor={myTheme.colors.greenForce}
-        selectionColor={myTheme.colors.greenForce}
-        placeholderTextColor={myTheme.colors.textSecondary}
-        placeholder="Numero de teléfono."
-        style={[
-          styles.textInputStyle,
-          {
-            backgroundColor: myTheme.colors.grayLight,
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 20,
+            alignItems: "center",
             marginBottom: 40,
-          },
-        ]}
-      />
-      <ButtonsModal handleSave={handleSave} />
-    </View>
+          }}
+        >
+          <FontAwesome
+            name="user"
+            size={36}
+            color={myTheme.colors.greenForce}
+          />
+          <Text style={{ fontSize: 36, fontWeight: "bold" }}>
+            Nuevo Cliente
+          </Text>
+        </View>
+        <TextInput
+          value={nombre}
+          onChangeText={(text) => {
+            setNombre(text);
+          }}
+          cursorColor={myTheme.colors.greenForce}
+          selectionColor={myTheme.colors.greenForce}
+          placeholderTextColor={myTheme.colors.textSecondary}
+          placeholder="Nombre del cliente."
+          style={[
+            styles.textInputStyle,
+            {
+              backgroundColor: myTheme.colors.grayLight,
+              marginBottom: 10,
+            },
+          ]}
+        />
+        <TextInput
+          value={ci}
+          onChangeText={(text) => {
+            setCi(text);
+          }}
+          keyboardType="number-pad"
+          cursorColor={myTheme.colors.greenForce}
+          selectionColor={myTheme.colors.greenForce}
+          placeholderTextColor={myTheme.colors.textSecondary}
+          placeholder="Carnet de identidad."
+          style={[
+            styles.textInputStyle,
+            {
+              backgroundColor: myTheme.colors.grayLight,
+              marginBottom: 10,
+            },
+          ]}
+        />
+        <TextInput
+          value={number}
+          onChangeText={(text) => {
+            setNumber(text);
+          }}
+          keyboardType="number-pad"
+          cursorColor={myTheme.colors.greenForce}
+          selectionColor={myTheme.colors.greenForce}
+          placeholderTextColor={myTheme.colors.textSecondary}
+          placeholder="Numero de teléfono."
+          style={[
+            styles.textInputStyle,
+            {
+              backgroundColor: myTheme.colors.grayLight,
+              marginBottom: 40,
+            },
+          ]}
+        />
+        <ButtonsModal handleSave={handleSave} />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

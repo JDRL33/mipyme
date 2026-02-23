@@ -1,4 +1,12 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TextInputComponent from "../../components/TextInput";
 import ButtonsModal from "../../components/ButtonsModal";
@@ -163,7 +171,8 @@ const addProductBuy = () => {
   }, [inputName]);
 
   return (
-    <View
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[
         styles.main,
         {
@@ -444,7 +453,7 @@ const addProductBuy = () => {
         </View>
         <ButtonsModal handleSave={save} />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -1,4 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useState, useEffect } from "react";
 import { useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
@@ -27,105 +35,113 @@ const modalTasaCambio = () => {
   };
 
   return (
-    <View style={[styles.main, { backgroundColor: myTheme.colors.primary }]}>
-      <View style={{ marginBottom: 30 }}>
-        <Text style={styles.title}>Actualizar </Text>
-        <Text style={styles.title}>Tasas de Cambio</Text>
-      </View>
-      <View style={styles.textInputFlex}>
-        <Text style={[styles.label]}>USD</Text>
-        <TextInput
-          value={usd}
-          onChangeText={setUsd}
-          placeholder={`$${store.tasa_usd}`}
-          placeholderColor={myTheme.colors.greenForce}
-          cursorColor={myTheme.colors.purpleForce}
-          selectionColor={myTheme.colors.purpleForce}
-          placeholderTextColor={myTheme.colors.textSecondary}
-          keyboardType="decimal-pad"
-          style={[
-            styles.tInput,
-            {
-              backgroundColor: myTheme.colors.grayLight,
-              color: myTheme.colors.textSecondary,
-            },
-          ]}
-        />
-      </View>
-      <View style={styles.textInputFlex}>
-        <Text style={[styles.label]}>EUR</Text>
-        <TextInput
-          value={eur}
-          onChangeText={setEur}
-          placeholder={`$${store.tasa_eur}`}
-          placeholderColor={myTheme.colors.greenForce}
-          cursorColor={myTheme.colors.purpleForce}
-          selectionColor={myTheme.colors.purpleForce}
-          placeholderTextColor={myTheme.colors.textSecondary}
-          keyboardType="decimal-pad"
-          style={[
-            styles.tInput,
-            {
-              backgroundColor: myTheme.colors.grayLight,
-              color: myTheme.colors.textSecondary,
-            },
-          ]}
-        />
-      </View>
-      <View
-        style={{
-          marginTop: 30,
-          flexDirection: "row",
-          height: 60,
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 20,
-        }}
-      >
-        <Pressable
-          onPress={handleSave}
-          style={[
-            styles.btnSave,
-            { backgroundColor: myTheme.colors.purpleLight },
-          ]}
-        >
-          {({ pressed }) => (
-            <Text
-              style={[
-                styles.textBtn,
-                {
-                  color: myTheme.colors.purpleForce,
-                  fontSize: !pressed ? 20 : 22,
-                },
-              ]}
-            >
-              Actualizar
-            </Text>
-          )}
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            router.back();
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <View style={[styles.main, { backgroundColor: myTheme.colors.primary }]}>
+        <View style={{ marginBottom: 30 }}>
+          <Text style={styles.title}>Actualizar </Text>
+          <Text style={styles.title}>Tasas de Cambio</Text>
+        </View>
+        <View style={styles.textInputFlex}>
+          <Text style={[styles.label]}>USD</Text>
+          <TextInput
+            value={usd}
+            onChangeText={setUsd}
+            placeholder={`$${store.tasa_usd}`}
+            placeholderColor={myTheme.colors.greenForce}
+            cursorColor={myTheme.colors.purpleForce}
+            selectionColor={myTheme.colors.purpleForce}
+            placeholderTextColor={myTheme.colors.textSecondary}
+            keyboardType="decimal-pad"
+            style={[
+              styles.tInput,
+              {
+                backgroundColor: myTheme.colors.grayLight,
+                color: myTheme.colors.textSecondary,
+              },
+            ]}
+          />
+        </View>
+        <View style={styles.textInputFlex}>
+          <Text style={[styles.label]}>EUR</Text>
+          <TextInput
+            value={eur}
+            onChangeText={setEur}
+            placeholder={`$${store.tasa_eur}`}
+            placeholderColor={myTheme.colors.greenForce}
+            cursorColor={myTheme.colors.purpleForce}
+            selectionColor={myTheme.colors.purpleForce}
+            placeholderTextColor={myTheme.colors.textSecondary}
+            keyboardType="decimal-pad"
+            style={[
+              styles.tInput,
+              {
+                backgroundColor: myTheme.colors.grayLight,
+                color: myTheme.colors.textSecondary,
+              },
+            ]}
+          />
+        </View>
+        <View
+          style={{
+            marginTop: 30,
+            flexDirection: "row",
+            height: 60,
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 20,
           }}
-          style={[styles.btnSave, { backgroundColor: myTheme.colors.redForce }]}
         >
-          {({ pressed }) => (
-            <Text
-              style={[
-                styles.textBtn,
-                {
-                  color: myTheme.colors.redLight,
-                  fontSize: !pressed ? 20 : 22,
-                },
-              ]}
-            >
-              Cancelar
-            </Text>
-          )}
-        </Pressable>
+          <Pressable
+            onPress={handleSave}
+            style={[
+              styles.btnSave,
+              { backgroundColor: myTheme.colors.purpleLight },
+            ]}
+          >
+            {({ pressed }) => (
+              <Text
+                style={[
+                  styles.textBtn,
+                  {
+                    color: myTheme.colors.purpleForce,
+                    fontSize: !pressed ? 20 : 22,
+                  },
+                ]}
+              >
+                Actualizar
+              </Text>
+            )}
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              router.back();
+            }}
+            style={[
+              styles.btnSave,
+              { backgroundColor: myTheme.colors.redForce },
+            ]}
+          >
+            {({ pressed }) => (
+              <Text
+                style={[
+                  styles.textBtn,
+                  {
+                    color: myTheme.colors.redLight,
+                    fontSize: !pressed ? 20 : 22,
+                  },
+                ]}
+              >
+                Cancelar
+              </Text>
+            )}
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

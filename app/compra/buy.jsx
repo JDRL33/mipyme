@@ -1,5 +1,7 @@
 import {
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -57,7 +59,8 @@ const buy = () => {
   }, [text]);
 
   return (
-    <View
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[
         styles.main,
         {
@@ -170,6 +173,7 @@ const buy = () => {
         ) : (
           <View style={{ flexDirection: "row", gap: 5, flexWrap: "wrap" }}>
             {/* Button de busqueda */}
+
             <Pressable
               style={[
                 styles.button,
@@ -290,7 +294,7 @@ const buy = () => {
           </View>
         )}
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

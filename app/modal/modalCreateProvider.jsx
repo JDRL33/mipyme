@@ -1,4 +1,12 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Platform,
+} from "react-native";
 import React, { useState } from "react";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,7 +14,6 @@ import { useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
 import Feather from "@expo/vector-icons/Feather";
 import ButtonsModal from "../../components/ButtonsModal";
-import { index } from "../(tabs)";
 import Toast from "react-native-toast-message";
 
 const modalCreateProvider = () => {
@@ -30,47 +37,52 @@ const modalCreateProvider = () => {
   };
 
   return (
-    <View
-      style={{
-        paddingTop: insets.top,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: myTheme.colors.primary,
-      }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
       <View
         style={{
-          flexDirection: "row",
-          gap: 20,
+          paddingTop: insets.top,
+          justifyContent: "center",
+          flex: 1,
           alignItems: "center",
-          marginBottom: 40,
+          backgroundColor: myTheme.colors.primary,
         }}
       >
-        <Feather name="truck" size={36} color={myTheme.colors.greenForce} />
-        <Text style={{ fontSize: 36, fontWeight: "bold" }}>
-          Nuevo Proveedor
-        </Text>
-      </View>
-      <TextInput
-        value={nombre}
-        onChangeText={(text) => {
-          setNombre(text);
-        }}
-        cursorColor={myTheme.colors.greenForce}
-        selectionColor={myTheme.colors.greenForce}
-        placeholderTextColor={myTheme.colors.textSecondary}
-        placeholder="Nombre del proveedor."
-        style={[
-          styles.textInputStyle,
-          {
-            backgroundColor: myTheme.colors.grayLight,
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 20,
+            alignItems: "center",
             marginBottom: 40,
-          },
-        ]}
-      />
-      <ButtonsModal handleSave={handleSave} />
-    </View>
+          }}
+        >
+          <Feather name="truck" size={36} color={myTheme.colors.greenForce} />
+          <Text style={{ fontSize: 36, fontWeight: "bold" }}>
+            Nuevo Proveedor
+          </Text>
+        </View>
+        <TextInput
+          value={nombre}
+          onChangeText={(text) => {
+            setNombre(text);
+          }}
+          cursorColor={myTheme.colors.greenForce}
+          selectionColor={myTheme.colors.greenForce}
+          placeholderTextColor={myTheme.colors.textSecondary}
+          placeholder="Nombre del proveedor."
+          style={[
+            styles.textInputStyle,
+            {
+              backgroundColor: myTheme.colors.grayLight,
+              marginBottom: 40,
+            },
+          ]}
+        />
+        <ButtonsModal handleSave={handleSave} />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
