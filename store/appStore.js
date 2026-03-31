@@ -109,7 +109,7 @@ export const appStore = create((set, get) => ({
       set({ productsGroupList: productsGroupList });
     });
   },
-  //METODO PARA ACTUALISAR LOS PROVEEDORES
+  //METODO PARA ACTUALIZAR LOS PROVEEDORES
   updateProvidersStatsStore: async () => {
     const providersList = get().providersList;
     const productsIndis = get().productsIndis;
@@ -231,7 +231,7 @@ export const appStore = create((set, get) => ({
   },
   findByNameProductGroupStore: async (name) => {
     if (name) {
-      const response = await findByNameProductGroup(name);
+      const response = await findByNameProductGroup(name.toLocaleLowerCase());
       set({ productsGroupList: response });
       return response;
     } else {
@@ -301,6 +301,7 @@ export const appStore = create((set, get) => ({
     pIdGrupo,
     pGanancia,
   ) => {
+    const currentDate = Date();
     const productId = await addProductIndi(
       pNombre,
       pMoneda,
@@ -309,6 +310,7 @@ export const appStore = create((set, get) => ({
       pIdProveedor,
       pIdGrupo,
       pGanancia,
+      currentDate,
     );
 
     const newProduct = {
@@ -320,6 +322,7 @@ export const appStore = create((set, get) => ({
       id_proveedor: pIdProveedor,
       id_grupo: pIdGrupo,
       ganancia: pGanancia,
+      dateOfBuy: pDateOfBuy,
     };
     set((state) => ({
       productsIndis: [...state.productsIndis, newProduct],

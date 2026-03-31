@@ -14,6 +14,7 @@ import { appStore } from "../../store/appStore";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import ButtonsModal from "../../components/ButtonsModal";
+import Toast from "react-native-toast-message";
 
 const modalCreateClient = () => {
   const myTheme = useTheme();

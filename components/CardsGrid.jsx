@@ -1,10 +1,11 @@
 import { StyleSheet, View } from "react-native";
 import { CardInfo, CardActionsSpeed } from "./Cards";
 import { appStore } from "../store/appStore";
+import { useRouter } from "expo-router";
 
 export const CardsGridInfo = () => {
   const store = appStore((state) => state.store);
-
+  const router = useRouter();
   return (
     // Contenedor de los bloques
     <View style={styles.mainCards}>
@@ -13,6 +14,9 @@ export const CardsGridInfo = () => {
         textBody={store.nProducts}
         color={2}
         icon={0}
+        LongPress={() => {
+          router.push("(tabs)/products");
+        }}
       />
       <CardInfo
         textHeader={"A Depositar"}
@@ -40,12 +44,18 @@ export const CardsGridInfo = () => {
         textBody={store.nProviders}
         color={0}
         icon={4}
+        LongPress={() => {
+          router.push("(tabs)/proveedor");
+        }}
       />
       <CardInfo
         textHeader={"Clientes en Deuda"}
         textBody={store.nClients}
         color={1}
         icon={5}
+        LongPress={() => {
+          router.push("(tabs)/clients");
+        }}
       />
       <CardInfo
         textHeader={"Stock Bajo"}

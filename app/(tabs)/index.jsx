@@ -9,9 +9,12 @@ import Header from "../../components/Header";
 import { appStore } from "../../store/appStore";
 import { useEffect } from "react";
 import { initDatabase } from "../../database/database";
+import { useRouter } from "expo-router";
 
 export const index = () => {
   const initStore = appStore((state) => state.initStore);
+  const router = useRouter();
+  const myTheme = useTheme();
   useEffect(() => {
     const init = async () => {
       await initDatabase();
@@ -19,7 +22,6 @@ export const index = () => {
     };
     init();
   }, []);
-  const myTheme = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
@@ -45,7 +47,11 @@ export const index = () => {
         <View style={{ height: 30 }} />
       </ScrollView>
       {/* Button de faboritos */}
-      <FabButton onClick={() => {}} />
+      <FabButton
+        onClick={() => {
+          router.push("venta/newVenta");
+        }}
+      />
     </View>
   );
 };

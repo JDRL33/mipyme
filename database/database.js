@@ -16,7 +16,7 @@ export async function initDatabase() {
     PRAGMA foreign_keys = ON;
 
     CREATE TABLE IF NOT EXISTS store (
-      id	INTEGER NOT NULL,
+      id	INTEGER NOT NULL, 
       name	TEXT NOT NULL DEFAULT 'Mi Tienda Pro',
       limitStockDown	INTEGER DEFAULT 5,
       tasa_usd	REAL DEFAULT 400.0,
@@ -66,6 +66,7 @@ export async function initDatabase() {
       id_proveedor	INTEGER NOT NULL,
       id_grupo	INTEGER,
       ganancia	REAL,
+      dateOfBuy TEXT,
       PRIMARY KEY(id AUTOINCREMENT),
       FOREIGN KEY(id_grupo) REFERENCES producto_grupo(id_grupo) ON DELETE CASCADE,
       FOREIGN KEY(id_proveedor) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
@@ -233,6 +234,7 @@ export async function addProductIndi(
   pIdProveedor,
   pIdGrupo,
   pGanancia,
+  pDateOfBuy,
 ) {
   const response = await executeQuery(
     "INSERT INTO producto_independiente ( nombre, moneda, precio_costo, cantidad, id_proveedor, id_grupo, ganancia ) VALUES (?,?,?,?,?,?,?);",
@@ -244,6 +246,7 @@ export async function addProductIndi(
       pIdProveedor,
       pIdGrupo,
       pGanancia,
+      pDateOfBuy,
     ],
   );
   return response.lastInsertRowId;

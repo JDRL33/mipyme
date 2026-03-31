@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable } from "react-native";
 import React from "react";
 import { useTheme } from "react-native-paper";
 import Feather from "@expo/vector-icons/Feather";
@@ -10,6 +10,7 @@ export const CardInfo = ({
   money = false,
   icon,
   color,
+  LongPress = null,
 }) => {
   const myTheme = useTheme();
   const colors = [
@@ -38,7 +39,10 @@ export const CardInfo = ({
   ];
 
   return (
-    <View style={[stylesCards.card, { backgroundColor: colors[color] }]}>
+    <Pressable
+      onLongPress={() => LongPress && LongPress()}
+      style={[stylesCards.card, { backgroundColor: colors[color] }]}
+    >
       <View style={{ alignSelf: "flex-start" }}>{icons[icon]}</View>
       <Text
         style={[stylesCards.textBody, { color: myTheme.colors.textPrimary }]}
@@ -54,7 +58,7 @@ export const CardInfo = ({
       >
         {textHeader}
       </Text>
-    </View>
+    </Pressable>
   );
 };
 

@@ -249,7 +249,7 @@ const buy = () => {
                 } else {
                   Toast.show({
                     type: "info",
-                    text1: "Añade a un producto si quieres comprar.",
+                    text1: "Añade un producto si quieres comprar.",
                     position: "top",
                     visibilityTime: 2000,
                   });

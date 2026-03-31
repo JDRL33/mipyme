@@ -19,6 +19,10 @@ const Layuot = () => {
             options={{ animation: "slide_from_bottom" }}
           />
           <Stack.Screen
+            name="venta/newVenta"
+            options={{ animation: "slide_from_bottom", headerShown: false }}
+          />
+          <Stack.Screen
             name="compra/buy"
             options={{ animation: "slide_from_bottom", headerShown: false }}
           />
