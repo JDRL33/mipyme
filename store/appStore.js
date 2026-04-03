@@ -392,7 +392,6 @@ export const appStore = create((set, get) => ({
   },
   // METODO PARA ELIMINAR UN GRUPO DE PRODUCTOS POR ID
   deleteProductGroupWithEmptyStock: async () => {
-    console.log(await getProductsGroup());
     get().productsGroupList.map(async (product) => {
       if (product.cantidad <= 0) {
         await get().deleteProductGroupByIdStore(product.id_grupo);

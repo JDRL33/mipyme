@@ -81,7 +81,7 @@ const Layuot = () => {
           />
         </Stack>
       </PaperProvider>
-      {/* <Toast position="top" avoidKeyboard /> */}
+      <Toast position="top" avoidKeyboard />
     </View>
   );
 };

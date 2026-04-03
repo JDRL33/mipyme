@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { appStore } from "../../store/appStore";
 
-export const ToolsBar = ({ show }) => {
+export const ToolsBar = ({ show = false }) => {
   const productsIndis = appStore((state) => state.productsIndis);
   const resetDB = appStore((state) => state.resetDB);
 

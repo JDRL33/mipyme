@@ -7,15 +7,15 @@ const Header = ({ title, start = false }) => {
   const myTheme = useTheme();
   const [date, setDate] = useState(new Date());
 
-  // useEffect(() => {
-  // Crear intervalo que se actualiza cada segundo
-  // const intervalo = setInterval(() => {
-  //   setDate(new Date());
-  // }, 1000);
+  useEffect(() => {
+    // Crear intervalo que se actualiza cada segundo
+    const intervalo = setInterval(() => {
+      setDate(new Date());
+    }, 1000);
 
-  // Limpiar el intervalo al desmontar el componente
-  // return () => clearInterval(intervalo);
-  // }, []);
+    // Limpiar el intervalo al desmontar el componente
+    return () => clearInterval(intervalo);
+  }, []);
 
   return (
     <View style={[styles.header]}>

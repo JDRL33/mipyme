@@ -71,10 +71,10 @@ const newVenta = () => {
       <Text style={{ fontSize: 40, textAlign: "center" }}>Nueva Venta</Text>
 
       <SearchBar
-        placeHolder="Buscar producto..."
         productsVentas
         inputText={inputName}
         setInputText={setInputName}
+        placeHolder="Buscar producto..."
       />
 
       {/* Esta es los resultados de busquedas de los productos */}
@@ -86,12 +86,12 @@ const newVenta = () => {
       {/* ticket */}
       <ScrollView
         style={{
-          backgroundColor: myTheme.colors.grayLight,
           padding: 20,
           marginTop: 20,
           shadowRadius: 10,
           borderRadius: 10,
           shadowOpacity: 0.3,
+          backgroundColor: myTheme.colors.grayLight,
         }}
       >
         <View
@@ -108,8 +108,8 @@ const newVenta = () => {
           {/* Date & Time */}
           <View
             style={{
-              flexDirection: "column",
               alignItems: "center",
+              flexDirection: "column",
             }}
           >
             <Text>20/10/2026</Text>
@@ -245,42 +245,11 @@ const newVenta = () => {
                     (a, b) => parseDMY(a.dateOfBuy) - parseDMY(b.dateOfBuy),
                   );
                   let count = product.cantidad;
-                  console.log(count);
                   for (let i = 0; i <= productsOrder.length - 1; i++) {
                     if (count > 0) {
-                      console.log("jjjjj");
                       // SE VENDE AL SER IGUAL QUE CERO
                       if (count - productsOrder[i].cantidad === 0) {
-                        await deleteProductIndiByIdStore(productsOrder[i].id);
-                        count = 0;
-                        const provider = await getProvidersByIdStore(
-                          productsOrder[0].id_proveedor,
-                        );
-                        await updatePagoProviderStore(
-                          productsOrder[0].precio_costo + provider.pagado,
-                          productsOrder[0].id_proveedor,
-                        );
-                      }
-                      // SE VENDE AL SOBRAR PRODUCTOS TODAVIA
-                      else if (count - productsOrder[i].cantidad < 0) {
-                        count = productsOrder[i].cantidad - count;
-                        await updateCountProductsIndisStore(
-                          count,
-                          productsOrder[i].id,
-                        );
-                        count = 0;
-                        const provider = await getProvidersByIdStore(
-                          productsOrder[0].id_proveedor,
-                        );
-                        await updatePagoProviderStore(
-                          productsOrder[0].precio_costo + provider.pagado,
-                          productsOrder[0].id_proveedor,
-                        );
-                        // await deleteProductIndiByIdStore(productsOrder[i].id);  ELIMINAR LO QUE FALTA
-                      }
-                      // SE VENDE AL TODAVIA FALTANTE
-                      else if (count - productsOrder[i].cantidad > 0) {
-                        count -= productsOrder[i].cantidad;
+                        console.log("__________IGUALES");
                         await deleteProductIndiByIdStore(productsOrder[i].id);
                         const provider = await getProvidersByIdStore(
                           productsOrder[i].id_proveedor,
@@ -289,14 +258,108 @@ const newVenta = () => {
                           productsOrder[i].precio_costo + provider.pagado,
                           productsOrder[i].id_proveedor,
                         );
-                        continue;
+                        break;
+                      }
+                      // SE VENDE AL SOBRAR PRODUCTOS
+                      else if (count - productsOrder[i].cantidad < 0) {
+                        console.log("____________SOBRAN");
+                        count = productsOrder[i].cantidad - count;
+                        await updateCountProductsIndisStore(
+                          count,
+                          productsOrder[i].id,
+                        );
+
+                        const provider = await getProvidersByIdStore(
+                          productsOrder[i].id_proveedor,
+                        );
+                        await updatePagoProviderStore(
+                          productsOrder[i].precio_costo + provider.pagado,
+                          productsOrder[i].id_proveedor,
+                        );
+                        break;
+                      }
+                      // SE VENDE AL TODAVIA FALTANTE
+                      else if (count - productsOrder[i].cantidad > 0) {
+                        console.log("___________FALTAN");
+                        let cantRest = count - productsOrder[i].cantidad;
+                        await deleteProductIndiByIdStore(productsOrder[i].id);
+                        const provider = await getProvidersByIdStore(
+                          productsOrder[i].id_proveedor,
+                        );
+                        await updatePagoProviderStore(
+                          productsOrder[i].precio_costo + provider.pagado,
+                          productsOrder[i].id_proveedor,
+                        );
+                        let aux = 1;
+                        while (cantRest > 0) {
+                          // SE VENDE AL SER IGUAL QUE CERO
+                          if (
+                            cantRest - productsOrder[i + aux].cantidad ===
+                            0
+                          ) {
+                            console.log("__________IGUALES******");
+                            await deleteProductIndiByIdStore(
+                              productsOrder[i + aux].id,
+                            );
+                            const provider = await getProvidersByIdStore(
+                              productsOrder[i + aux].id_proveedor,
+                            );
+                            await updatePagoProviderStore(
+                              productsOrder[i + aux].precio_costo +
+                                provider.pagado,
+                              productsOrder[i + aux].id_proveedor,
+                            );
+                            cantRest = 0;
+                            break;
+                          }
+                          // SE VENDE AL SOBRAR PRODUCTOS
+                          else if (
+                            cantRest - productsOrder[i + aux].cantidad <
+                            0
+                          ) {
+                            console.log("____________SOBRAN***********");
+                            count = productsOrder[i + aux].cantidad - count;
+                            await updateCountProductsIndisStore(
+                              count,
+                              productsOrder[i + aux].id,
+                            );
+
+                            const provider = await getProvidersByIdStore(
+                              productsOrder[i + aux].id_proveedor,
+                            );
+                            await updatePagoProviderStore(
+                              productsOrder[i + aux].precio_costo +
+                                provider.pagado,
+                              productsOrder[i + aux].id_proveedor,
+                            );
+                            cantRest = 0;
+                            break;
+                          } else if (cantRest - productsOrder[i].cantidad > 0) {
+                            console.log("___________FALTAN*********");
+                            cantRest -= productsOrder[i].cantidad;
+                            await deleteProductIndiByIdStore(
+                              productsOrder[i + aux].id,
+                            );
+                            const provider = await getProvidersByIdStore(
+                              productsOrder[i + aux].id_proveedor,
+                            );
+                            await updatePagoProviderStore(
+                              productsOrder[i + aux].precio_costo +
+                                provider.pagado,
+                              productsOrder[i + aux].id_proveedor,
+                            );
+                            continue;
+                          }
+                          aux += 1;
+                        }
+                        break;
                       }
                     }
                   }
                 });
                 await deleteProductGroupWithEmptyStock();
                 await initStore();
-                router.navigate("/");
+                router.replace("/");
               }
             }}
           >
