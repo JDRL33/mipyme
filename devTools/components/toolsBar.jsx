@@ -1,26 +1,23 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import { appStore } from "../../store/appStore";
-import { executeQuery, getData, updateStore } from "../../database/database";
-import ventaStore from "../../store/ventaStore";
 
 export const ToolsBar = ({ show }) => {
-  const store = appStore((state) => state.store);
-  const getDataStore = appStore((state) => state.getDataStore);
+  const productsIndis = appStore((state) => state.productsIndis);
   const resetDB = appStore((state) => state.resetDB);
-  const findByNameProductGroupStore = appStore(
-    (state) => state.findByNameProductGroupStore,
-  );
-  const currentProductEdit = ventaStore((state) => state.currentProductEdit);
-  const productsGroupList = appStore((state) => state.productsGroupList);
 
-  const ACCION1 = () => {
-    const date = new Date();
-    const dateNow = date.toLocaleDateString();
-  };
+  const ACCION1 = () => {};
   const ACCION2 = async () => {
-    const response = await getData("SELECT * FROM producto_grupo", []);
-    console.log(response);
+    const order = productsIndis.sort(
+      (a, b) => parseDMY(b.dateOfBuy) - parseDMY(a.dateOfBuy),
+    );
+    console.log(order[order.length - 1].dateOfBuy);
   };
   const ACCION3 = async () => {};
   const ACCION4 = async () => {

@@ -1,15 +1,14 @@
+import { CardsGridInfo, CardsGridActions } from "../../components/CardsGrid";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
-
-import { CardsGridInfo, CardsGridActions } from "../../components/CardsGrid";
+import { initDatabase } from "../../database/database";
 import CambioCard from "../../components/CambioCard";
 import FabButton from "../../components/FabButton";
+import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import Header from "../../components/Header";
-import { appStore } from "../../store/appStore";
-import { useEffect } from "react";
-import { initDatabase } from "../../database/database";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 
 export const index = () => {
   const initStore = appStore((state) => state.initStore);

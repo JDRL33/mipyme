@@ -7,7 +7,7 @@ import {
   View,
   Platform,
 } from "react-native";
-import React, { useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -65,9 +65,7 @@ const modalCreateProvider = () => {
         </View>
         <TextInput
           value={nombre}
-          onChangeText={(text) => {
-            setNombre(text);
-          }}
+          onChangeText={setNombre}
           cursorColor={myTheme.colors.greenForce}
           selectionColor={myTheme.colors.greenForce}
           placeholderTextColor={myTheme.colors.textSecondary}
@@ -76,7 +74,6 @@ const modalCreateProvider = () => {
             styles.textInputStyle,
             {
               backgroundColor: myTheme.colors.grayLight,
-              marginBottom: 40,
             },
           ]}
         />
@@ -90,6 +87,7 @@ export default modalCreateProvider;
 
 const styles = StyleSheet.create({
   textInputStyle: {
+    marginBottom: 40,
     padding: 20,
     borderRadius: 15,
     fontSize: 20,

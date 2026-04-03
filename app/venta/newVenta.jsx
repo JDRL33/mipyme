@@ -6,18 +6,19 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, useTheme } from "react-native-paper";
+import React, { useEffect, useState } from "react";
 
 import MatchSeach from "../../components/Venta/MatchSeach";
-import ItemEdit from "../../components/Venta/ItemEdit";
 import ItemInCart from "../../components/Venta/ItemInCart";
+import ItemEdit from "../../components/Venta/ItemEdit";
 import { Picker } from "@react-native-picker/picker";
+import SearchBar from "../../components/SearchBar";
+import EmptyList from "../../components/EmptyList";
 import { appStore } from "../../store/appStore";
 import ventaStore from "../../store/ventaStore";
-import EmptyList from "../../components/EmptyList";
-import SearchBar from "../../components/SearchBar";
+import parseDMY from "../../tools/parseDMY";
 import { useRouter } from "expo-router";
 
 const newVenta = () => {
@@ -25,18 +26,31 @@ const newVenta = () => {
   const myTheme = useTheme();
   const router = useRouter();
 
-  const findByNameProductGroupStore = appStore(
-    (state) => state.findByNameProductGroupStore,
+  const updatePagoProviderStore = appStore(
+    (state) => state.updatePagoProviderStore,
+  );
+  const updateCountProductsIndisStore = appStore(
+    (state) => state.updateCountProductsIndisStore,
+  );
+  const deleteProductGroupWithEmptyStock = appStore(
+    (state) => state.deleteProductGroupWithEmptyStock,
   );
   const clientList = appStore((state) => state.clientList);
-  const currentProductEdit = ventaStore((state) => state.currentProductEdit);
   const findByNameProductStore = appStore(
     (state) => state.findByNameProductStore,
   );
   const getProductsByIdProductGroupStore = appStore(
     (state) => state.getProductsByIdProductGroupStore,
   );
+  const deleteProductIndiByIdStore = appStore(
+    (state) => state.deleteProductIndiByIdStore,
+  );
+  const getProvidersByIdStore = appStore(
+    (state) => state.getProvidersByIdStore,
+  );
+  const initStore = appStore((state) => state.initStore);
 
+  const currentProductEdit = ventaStore((state) => state.currentProductEdit);
   const cartProductsList = ventaStore((state) => state.cartProductsList);
   const totalPagarUSD = ventaStore((state) => state.totalPagarUSD);
   const totalPagarCUP = ventaStore((state) => state.totalPagarCUP);
@@ -44,18 +58,14 @@ const newVenta = () => {
   const [inputName, setInputName] = useState("");
   const [inputMoney, setInputMoney] = useState("efectivo");
 
-  useEffect(() => {
-    console.log(inputName, " => ", currentProductEdit);
-  }, [inputName]);
-
   return (
     <View
       style={{
+        flex: 1,
         paddingHorizontal: 20,
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
         backgroundColor: myTheme.colors.primary,
-        flex: 1,
       }}
     >
       <Text style={{ fontSize: 40, textAlign: "center" }}>Nueva Venta</Text>
@@ -78,17 +88,17 @@ const newVenta = () => {
         style={{
           backgroundColor: myTheme.colors.grayLight,
           padding: 20,
-          shadowRadius: 10,
-          shadowOpacity: 0.3,
-          borderRadius: 10,
           marginTop: 20,
+          shadowRadius: 10,
+          borderRadius: 10,
+          shadowOpacity: 0.3,
         }}
       >
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between",
             alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
           <Text style={{ fontWeight: "bold", fontSize: 20 }}>
@@ -222,7 +232,7 @@ const newVenta = () => {
               borderColor: myTheme.colors.greenForce,
               borderWidth: 2,
             }}
-            onPress={() => {
+            onPress={async () => {
               if (inputMoney === "efectivo" || inputMoney === "transferencia") {
                 cartProductsList.map(async (product) => {
                   const groupProduct = await findByNameProductStore(
@@ -231,8 +241,62 @@ const newVenta = () => {
                   const productsI = await getProductsByIdProductGroupStore(
                     groupProduct.at(0).id_grupo,
                   );
-                  console.log(productsI);
+                  const productsOrder = productsI.sort(
+                    (a, b) => parseDMY(a.dateOfBuy) - parseDMY(b.dateOfBuy),
+                  );
+                  let count = product.cantidad;
+                  console.log(count);
+                  for (let i = 0; i <= productsOrder.length - 1; i++) {
+                    if (count > 0) {
+                      console.log("jjjjj");
+                      // SE VENDE AL SER IGUAL QUE CERO
+                      if (count - productsOrder[i].cantidad === 0) {
+                        await deleteProductIndiByIdStore(productsOrder[i].id);
+                        count = 0;
+                        const provider = await getProvidersByIdStore(
+                          productsOrder[0].id_proveedor,
+                        );
+                        await updatePagoProviderStore(
+                          productsOrder[0].precio_costo + provider.pagado,
+                          productsOrder[0].id_proveedor,
+                        );
+                      }
+                      // SE VENDE AL SOBRAR PRODUCTOS TODAVIA
+                      else if (count - productsOrder[i].cantidad < 0) {
+                        count = productsOrder[i].cantidad - count;
+                        await updateCountProductsIndisStore(
+                          count,
+                          productsOrder[i].id,
+                        );
+                        count = 0;
+                        const provider = await getProvidersByIdStore(
+                          productsOrder[0].id_proveedor,
+                        );
+                        await updatePagoProviderStore(
+                          productsOrder[0].precio_costo + provider.pagado,
+                          productsOrder[0].id_proveedor,
+                        );
+                        // await deleteProductIndiByIdStore(productsOrder[i].id);  ELIMINAR LO QUE FALTA
+                      }
+                      // SE VENDE AL TODAVIA FALTANTE
+                      else if (count - productsOrder[i].cantidad > 0) {
+                        count -= productsOrder[i].cantidad;
+                        await deleteProductIndiByIdStore(productsOrder[i].id);
+                        const provider = await getProvidersByIdStore(
+                          productsOrder[i].id_proveedor,
+                        );
+                        await updatePagoProviderStore(
+                          productsOrder[i].precio_costo + provider.pagado,
+                          productsOrder[i].id_proveedor,
+                        );
+                        continue;
+                      }
+                    }
+                  }
                 });
+                await deleteProductGroupWithEmptyStock();
+                await initStore();
+                router.navigate("/");
               }
             }}
           >

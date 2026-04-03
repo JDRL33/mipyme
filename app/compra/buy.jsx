@@ -212,7 +212,7 @@ const buy = () => {
                         params.id_provider,
                         product.id_grupo,
                         0,
-                        date.toLocaleDateString(),
+                        date.toLocaleDateString("en-US"),
                       );
                       newGroup = false;
                     }
@@ -235,7 +235,7 @@ const buy = () => {
                             params.id_provider,
                             id_group,
                             0,
-                            date.toLocaleDateString(),
+                            date.toLocaleDateString("en-US"),
                           );
                         }
                       });

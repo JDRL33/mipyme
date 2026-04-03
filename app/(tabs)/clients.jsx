@@ -1,15 +1,14 @@
-import { FlatList, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TextInfoDelete from "../../components/TextInfoDelete";
-import ButtonChip from "../../components/ButtonChip";
+import { FlatList, StyleSheet, View } from "react-native";
 import CardClient from "../../components/CardClient";
 import EmptyList from "../../components/EmptyList";
 import SearchBar from "../../components/SearchBar";
+import { appStore } from "../../store/appStore";
+import Toast from "react-native-toast-message";
 import { useTheme } from "react-native-paper";
 import Header from "../../components/Header";
-import { appStore } from "../../store/appStore";
 import Space from "../../tools/Space";
-import Toast from "react-native-toast-message";
 
 const Clients = () => {
   const clientList = appStore((state) => state.clientList);

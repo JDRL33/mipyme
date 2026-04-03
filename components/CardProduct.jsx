@@ -40,12 +40,12 @@ const CardProduct = ({
             },
           });
         }}
-        onLongPress={() => {
-          router.navigate({
-            pathname: "modal/modalDeleteProductGroup",
-            params: { id_grupo: pID, name: pNombre },
-          });
-        }}
+        // onLongPress={() => {
+        //   router.navigate({
+        //     pathname: "modal/modalDeleteProductGroup",
+        //     params: { id_grupo: pID, name: pNombre },
+        //   });
+        // }}
       >
         <View
           style={[styles.box, { backgroundColor: myTheme.colors.grayForce }]}

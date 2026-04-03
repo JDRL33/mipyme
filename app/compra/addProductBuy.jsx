@@ -27,6 +27,7 @@ const addProductBuy = () => {
   const router = useRouter();
 
   const [inputName, setInputName] = useState("");
+  1;
   const [textError, setTextError] = useState("");
   const [inputCount, setInputCount] = useState(0);
   const [inputPriceBuy, setPriceBuy] = useState(0);

@@ -32,7 +32,6 @@ const SearchBar = ({
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    console.log("update");
     // esperar 400 segundos al dejar de escribir
     const id = setTimeout(async () => {
       try {

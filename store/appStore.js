@@ -1,32 +1,34 @@
 import { create } from "zustand";
 import {
+  getData,
+  getStore,
   addClient,
+  getClient,
   addProduct,
+  updateStore,
   addProvider,
+  getProviders,
   clearDatabase,
+  addProductIndi,
+  updateProvider,
+  getProviderById,
   delProviderById,
+  getProductsGroup,
   findByNameClient,
+  getProductsIndis,
   findByNameProduct,
   findByNameProvider,
-  getClient,
-  getData,
-  getProviderById,
-  getProviders,
-  getProductsGroup,
-  getStore,
-  getProductsStockDown,
-  updateStore,
-  getProductsByIdProvider,
-  findByNameProductIndi,
-  deleteProductIndiById,
-  getProductsIndiById,
-  findByNameProductGroup,
-  getProductsIndis,
-  deleteGroupProductById,
-  addProductIndi,
+  updatePagoProvider,
   updateProductGroup,
-  updateProvider,
+  getProductsIndiById,
+  getProductsStockDown,
+  deleteProductIndiById,
+  findByNameProductIndi,
+  findByNameProductGroup,
+  deleteGroupProductById,
+  getProductsByIdProvider,
   getProductsByIdProductGroup,
+  updateCountProductsIndis,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -36,6 +38,11 @@ export const appStore = create((set, get) => ({
   clientList: [],
   productsWithStockDown: [],
   store: {},
+  aux: "",
+
+  setAux: (value) => {
+    set({ aux: value });
+  },
 
   // METODO PARA INICIAR LA APPSTORE
   initStore: async () => {
@@ -87,6 +94,13 @@ export const appStore = create((set, get) => ({
     await updateStore(newStore);
     set({ store: newStore });
   },
+
+  // METODO PARA ACTUALIZAR LOS PAGOS A PROVEEDORES
+  updatePagoProviderStore: async (count, id) => {
+    const response = await updatePagoProvider(count, id);
+    return response;
+  },
+
   //METODO PARA ACTUALIZAR LOS PRODUCTOS GRUPOS
   updateProductsGroupStatsStore: () => {
     const productsIndis = get().productsIndis;
@@ -129,7 +143,8 @@ export const appStore = create((set, get) => ({
       provider.a_pagar = a_pagar;
       provider.pagado = pagado;
       await updateProvider(provider);
-      await get().extractDatabaseList();
+      const providers = await getProviders();
+      set({ providersList: providers });
     });
   },
 
@@ -140,6 +155,12 @@ export const appStore = create((set, get) => ({
     }));
     get().updateStoreStatus();
   },
+
+  // METODO PARA ACTUALIZAR CANTIDAD DE PRODUCTOS INDEPENDIENTES
+  updateCountProductsIndisStore: async (count, id) => {
+    await updateCountProductsIndis(count, id);
+  },
+
   updateStatusStockDown: async () => {
     const sql = `SELECT * FROM producto_grupo WHERE cantidad <= ${get().limitStockDown}`;
     const response = await getData(sql, []);
@@ -358,10 +379,29 @@ export const appStore = create((set, get) => ({
     await get().initStore();
     return response;
   },
+  // METODO PARA ELIMINAR PRODUCTO INDEPENDIENTE POR ID
+  deleteProductIndiByIdStore: async (id) => {
+    const response = await deleteProductIndiById(id);
+    await get().initStore();
+    return response;
+  },
   // METODO PARA ELIMINAR UN GRUPO DE PRODUCTOS POR ID
   deleteProductGroupByIdStore: async (id) => {
     const response = await deleteGroupProductById(id);
-    await get().initStore();
     return response;
+  },
+  // METODO PARA ELIMINAR UN GRUPO DE PRODUCTOS POR ID
+  deleteProductGroupWithEmptyStock: async () => {
+    console.log(await getProductsGroup());
+    get().productsGroupList.map(async (product) => {
+      if (product.cantidad <= 0) {
+        await get().deleteProductGroupByIdStore(product.id_grupo);
+        // const productsGroupUpdate = get().productsGroupList.filter(
+        //   (item) => item.id_grupo !== product.id_grupo,
+        // );
+        // set({ productsGroupList: productsGroupUpdate });
+        await get().initStore();
+      }
+    });
   },
 }));

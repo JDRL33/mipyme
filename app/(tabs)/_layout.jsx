@@ -12,7 +12,6 @@ const TabsLayout = () => {
     <View
       style={{
         backgroundColor: myTheme.colors.primary,
-        // paddingTop: 10,
         flex: 1,
       }}
     >
@@ -22,7 +21,6 @@ const TabsLayout = () => {
           tabBarStyle: {
             backgroundColor: myTheme.colors.primary,
             borderColor: myTheme.colors.primary,
-            // height: 70,
           },
           tabBarItemStyle: {
             padding: 0,

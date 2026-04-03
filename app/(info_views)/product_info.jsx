@@ -1,23 +1,28 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { useTheme } from "react-native-paper";
+import { getProductsByIdProductGroup } from "../../database/database";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { getProductsByIdProductGroup } from "../../database/database";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { appStore } from "../../store/appStore";
+import { useTheme } from "react-native-paper";
+import React, { useEffect, useState } from "react";
 
 const product_info = () => {
+  // CONSTANTES NECESARIAS
   const myTheme = useTheme();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams();
-  const [products, setProducts] = React.useState([]);
-  const [providers, setProviders] = React.useState([]);
+
+  // USESTATES
+  const [products, setProducts] = useState([]);
+  const [providers, setProviders] = useState([]);
+
+  // STATE GLOBALES
+  const productsIndis = appStore((state) => state.productsIndis);
+  const store = appStore((state) => state.store);
   const getProvidersByIdStore = appStore(
     (state) => state.getProvidersByIdStore,
   );
-  const store = appStore((state) => state.store);
-  const productsIndis = appStore((state) => state.productsIndis);
 
   useEffect(() => {
     let mounted = true;
@@ -35,16 +40,17 @@ const product_info = () => {
     return () => {
       mounted = false;
     };
-  }, [productsIndis]);
+  }, []);
 
   return (
     <View
-      style={{
-        flex: 1,
-        paddingTop: insets.top,
-        backgroundColor: myTheme.colors.primary,
-        paddingHorizontal: 20,
-      }}
+      style={[
+        {
+          paddingTop: insets.top,
+          backgroundColor: myTheme.colors.primary,
+        },
+        styles.parent,
+      ]}
     >
       <Stack.Screen
         options={{
@@ -56,33 +62,33 @@ const product_info = () => {
       />
       {params.moneda === "USD" && (
         <Text
-          style={{
-            color: myTheme.colors.greenForce,
-            fontSize: 32,
-            textAlign: "center",
-            marginTop: 20,
-          }}
+          style={[
+            {
+              color: myTheme.colors.greenForce,
+            },
+            styles.cambio,
+          ]}
         >
           ${params.precioVenta * store.tasa_usd} {"CUP"}
         </Text>
       )}
       <Text
-        style={{
-          color: myTheme.colors.greenForce,
-          fontSize: 32,
-          textAlign: "center",
-          marginTop: 5,
-        }}
+        style={[
+          {
+            color: myTheme.colors.greenForce,
+          },
+          styles.price,
+        ]}
       >
         ${params.precioVenta} {params.moneda.toUpperCase()}
       </Text>
       <Text
-        style={{
-          color: myTheme.colors.textSecondary,
-          fontSize: 20,
-          textAlign: "center",
-          marginBottom: 30,
-        }}
+        style={[
+          {
+            color: myTheme.colors.textSecondary,
+          },
+          styles.label,
+        ]}
       >
         Precio de Venta
       </Text>
@@ -121,12 +127,14 @@ const product_info = () => {
         </Text>
       </View>
       <Text
-        style={{
-          color: myTheme.colors.textSecondary,
-          fontSize: 18,
-          textAlign: "center",
-          marginTop: 50,
-        }}
+        style={[
+          {
+            color: myTheme.colors.textSecondary,
+
+            marginTop: 50,
+          },
+          styles.label,
+        ]}
       >
         Proveedores
       </Text>
@@ -159,4 +167,24 @@ const product_info = () => {
 
 export default product_info;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  parent: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  cambio: {
+    fontSize: 32,
+    textAlign: "center",
+    marginTop: 20,
+  },
+  price: {
+    fontSize: 32,
+    textAlign: "center",
+    marginTop: 5,
+  },
+  label: {
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 5,
+  },
+});

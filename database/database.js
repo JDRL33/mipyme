@@ -265,6 +265,23 @@ export async function addClient(
   );
   return response.lastInsertRowId;
 }
+
+// Incrementar o Decrementar pago a proveedor
+export async function updatePagoProvider(count, id) {
+  const response = await executeQuery(
+    "UPDATE proveedor SET pagado = ? WHERE id_proveedor = ?",
+    [count, id],
+  );
+  return true;
+}
+// Actualizar la cantidad del producto independiente
+export async function updateCountProductsIndis(count, id) {
+  const response = await executeQuery(
+    "UPDATE producto_independiente SET cantidad = ? WHERE id = ?",
+    [count, id],
+  );
+  return true;
+}
 // Buscar los providers por nombre
 export async function findByNameProvider(name) {
   const response = await getData(
@@ -328,7 +345,7 @@ export async function getProductsByIdProvider(id) {
 //Obtener los productos por id del grupo de producto
 export async function getProductsByIdProductGroup(id) {
   const response = await getData(
-    "SELECT * FROM producto_independiente WHERE id_grupo = ?",
+    "SELECT * FROM producto_independiente WHERE id_grupo = ? ORDER BY dateOfBuy ASC",
     [id],
   );
   console.log(response);
@@ -350,18 +367,19 @@ export async function delProviderById(id) {
   );
   return true;
 }
-// Eliminar product indi By id ..
-export async function deleteProductIndiById(id) {
-  const response = await executeQuery(
-    `DELETE FROM producto_independiente WHERE id = ?`,
-    [id],
-  );
-  return true;
-}
+
 // Eliminar grupo de product By id ..
 export async function deleteGroupProductById(id) {
   const response = await executeQuery(
     `DELETE FROM producto_grupo WHERE id_grupo = ?`,
+    [id],
+  );
+  return true;
+}
+// Eliminar producto indi By id ....
+export async function deleteProductIndiById(id) {
+  const response = await executeQuery(
+    `DELETE FROM producto_independiente WHERE id = ?`,
     [id],
   );
   return true;
