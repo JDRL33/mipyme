@@ -26,6 +26,7 @@ import {
   addProductIndi,
   updateProductGroup,
   updateProvider,
+  getProductsByIdProductGroup,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -229,6 +230,7 @@ export const appStore = create((set, get) => ({
       await get().extractDatabaseList();
     }
   },
+  // METODO PARA BUSCAR GRUPO DE PRODUCTS BY NAME
   findByNameProductGroupStore: async (name) => {
     if (name) {
       const response = await findByNameProductGroup(name.toLocaleLowerCase());
@@ -237,6 +239,11 @@ export const appStore = create((set, get) => ({
     } else {
       await get().extractDatabaseList();
     }
+  },
+  //METODO PARA BUCAR PRODUCTOS INDEPENDIENTES POR EL ID DEL GRUPO
+  getProductsByIdProductGroupStore: async (id_grupo) => {
+    const response = await getProductsByIdProductGroup(id_grupo);
+    return response;
   },
 
   // Metodos para aniadir_________________________________________________________
@@ -300,8 +307,8 @@ export const appStore = create((set, get) => ({
     pIdProveedor,
     pIdGrupo,
     pGanancia,
+    pDateOfBuy,
   ) => {
-    const currentDate = Date();
     const productId = await addProductIndi(
       pNombre,
       pMoneda,
@@ -310,7 +317,7 @@ export const appStore = create((set, get) => ({
       pIdProveedor,
       pIdGrupo,
       pGanancia,
-      currentDate,
+      pDateOfBuy,
     );
 
     const newProduct = {

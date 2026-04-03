@@ -7,7 +7,6 @@ import InfoProviderText from "../../components/InfoProviderText";
 import EmptyList from "../../components/EmptyList";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CardProviderProduct from "../../components/CardProviderProduct";
-import { getProviderById } from "../../database/database";
 import FabButton from "../../components/FabButton";
 
 const ProveedorInfo = () => {
@@ -16,6 +15,9 @@ const ProveedorInfo = () => {
   const productsGroupList = appStore((state) => state.productsGroupList);
   const getProductsByIdProviderStore = appStore(
     (state) => state.getProductsByIdProviderStore,
+  );
+  const getProvidersByIdStore = appStore(
+    (state) => state.getProvidersByIdStore,
   );
   const store = appStore((state) => state.store);
   const findByNameProductIndiStore = appStore(
@@ -54,7 +56,7 @@ const ProveedorInfo = () => {
   };
   useEffect(() => {
     const getProvider = async () => {
-      const response = await getProviderById(id);
+      const response = await getProvidersByIdStore(id);
       setProvider(response);
     };
     getProvider();

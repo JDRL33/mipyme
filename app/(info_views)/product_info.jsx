@@ -1,6 +1,6 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect } from "react";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -9,7 +9,6 @@ import { appStore } from "../../store/appStore";
 
 const product_info = () => {
   const myTheme = useTheme();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams();
   const [products, setProducts] = React.useState([]);
@@ -19,11 +18,8 @@ const product_info = () => {
   );
   const store = appStore((state) => state.store);
   const productsIndis = appStore((state) => state.productsIndis);
-  const updateProductsGroupStatsStore = appStore(
-    (state) => state.updateProductsGroupStatsStore,
-  );
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
     const fetchProductsAndProviders = async () => {
       const product = await getProductsByIdProductGroup(params.id_grupo);
@@ -144,16 +140,6 @@ const product_info = () => {
               padding: 10,
               backgroundColor: myTheme.colors.grayLight,
               borderRadius: 10,
-            }}
-            onLongPress={() => {
-              router.push({
-                pathname: "modal/modalDeleteProductIndi",
-                params: {
-                  id_provider: item.id_proveedor,
-                  idProductI: item.id,
-                  name: item.nombre,
-                },
-              });
             }}
           >
             <Text style={{ color: myTheme.colors.textPrimary, fontSize: 18 }}>

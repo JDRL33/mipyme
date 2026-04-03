@@ -2,11 +2,15 @@ import { StyleSheet, TextInput } from "react-native";
 import { useTheme } from "react-native-paper";
 import React, { useEffect, useState } from "react";
 import { appStore } from "../store/appStore";
+import ventaStore from "../store/ventaStore";
 
 const SearchBar = ({
   placeHolder = "Buscar...",
   providers = false,
   products = false,
+  productsVentas = false,
+  inputText = "",
+  setInputText = () => {},
 }) => {
   const myTheme = useTheme();
   const [text, setText] = useState("");
@@ -20,12 +24,15 @@ const SearchBar = ({
   const findByNameClientStore = appStore(
     (state) => state.findByNameClientStore,
   );
+  const setCurrentProductEdit = ventaStore(
+    (state) => state.setCurrentProductEdit,
+  );
 
   useEffect(() => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-
+    console.log("update");
     // esperar 400 segundos al dejar de escribir
     const id = setTimeout(async () => {
       try {
@@ -33,6 +40,9 @@ const SearchBar = ({
           await findByNameProviderStore(text.toLowerCase());
         } else if (products) {
           await findByNameProductStore(text.toLowerCase());
+        } else if (productsVentas) {
+          await findByNameProductStore(inputText.toLowerCase());
+          setCurrentProductEdit(null);
         } else {
           await findByNameClientStore(text.toLowerCase());
         }
@@ -44,13 +54,13 @@ const SearchBar = ({
     setTimeoutId(id);
 
     return () => clearTimeout(id);
-  }, [text]);
+  }, [text, inputText]);
 
   return (
     <TextInput
-      value={text}
+      value={productsVentas ? inputText : text}
       onChangeText={(text) => {
-        setText(text);
+        productsVentas ? setInputText(text) : setText(text);
       }}
       cursorColor={myTheme.colors.greenForce}
       selectionColor={myTheme.colors.greenLight}

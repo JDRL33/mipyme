@@ -66,7 +66,7 @@ export async function initDatabase() {
       id_proveedor	INTEGER NOT NULL,
       id_grupo	INTEGER,
       ganancia	REAL,
-      dateOfBuy TEXT,
+      dateOfBuy TEXT NOT NULL,
       PRIMARY KEY(id AUTOINCREMENT),
       FOREIGN KEY(id_grupo) REFERENCES producto_grupo(id_grupo) ON DELETE CASCADE,
       FOREIGN KEY(id_proveedor) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
@@ -237,7 +237,7 @@ export async function addProductIndi(
   pDateOfBuy,
 ) {
   const response = await executeQuery(
-    "INSERT INTO producto_independiente ( nombre, moneda, precio_costo, cantidad, id_proveedor, id_grupo, ganancia ) VALUES (?,?,?,?,?,?,?);",
+    "INSERT INTO producto_independiente ( nombre, moneda, precio_costo, cantidad, id_proveedor, id_grupo, ganancia, dateOfBuy ) VALUES (?,?,?,?,?,?,?,?);",
     [
       pNombre,
       pMoneda,
@@ -331,6 +331,7 @@ export async function getProductsByIdProductGroup(id) {
     "SELECT * FROM producto_independiente WHERE id_grupo = ?",
     [id],
   );
+  console.log(response);
   return response;
 }
 //Obtener los productoIndi por id

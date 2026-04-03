@@ -1,11 +1,11 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useState } from "react";
-import { Button, Checkbox, useTheme } from "react-native-paper";
+import { Button, useTheme } from "react-native-paper";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import ventaStore from "../../store/ventaStore";
 import { appStore } from "../../store/appStore";
 
-const ItemEdit = () => {
+const ItemEdit = ({ setText }) => {
   const myTheme = useTheme();
   const currentProduct = ventaStore((state) => state.currentProductEdit);
   const store = appStore((state) => state.store);
@@ -13,7 +13,6 @@ const ItemEdit = () => {
   const setCurrentProductEdit = ventaStore(
     (state) => state.setCurrentProductEdit,
   );
-  const cartProductsList = ventaStore((state) => state.cartProductsList);
 
   const [cant, setCant] = useState(0);
   return (
@@ -167,6 +166,7 @@ const ItemEdit = () => {
             };
             addCartProduct(newProductCart);
             setCurrentProductEdit(null);
+            setText("");
           }}
         >
           <Text>

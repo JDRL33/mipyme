@@ -1,5 +1,5 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useTheme } from "react-native-paper";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { appStore } from "../../store/appStore";
@@ -8,11 +8,19 @@ import EmptyList from "../EmptyList";
 
 const MatchSeach = () => {
   const ProductList = appStore((state) => state.productsGroupList);
+  const findByNameProductGroupStore = appStore(
+    (state) => state.findByNameProductGroupStore,
+  );
   const Store = appStore((state) => state.store);
   const setCurrentProductEdit = ventaStore(
     (state) => state.setCurrentProductEdit,
   );
   const myTheme = useTheme();
+
+  useState(() => {
+    findByNameProductGroupStore("");
+  }, []);
+
   return (
     <View
       style={{

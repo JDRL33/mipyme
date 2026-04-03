@@ -1,6 +1,5 @@
 import {
   FlatList,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,7 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, useTheme } from "react-native-paper";
-import { useRouter } from "expo-router";
 
 import MatchSeach from "../../components/Venta/MatchSeach";
 import ItemEdit from "../../components/Venta/ItemEdit";
@@ -19,22 +17,26 @@ import { Picker } from "@react-native-picker/picker";
 import { appStore } from "../../store/appStore";
 import ventaStore from "../../store/ventaStore";
 import EmptyList from "../../components/EmptyList";
+import SearchBar from "../../components/SearchBar";
+import { useRouter } from "expo-router";
 
 const newVenta = () => {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const myTheme = useTheme();
+  const router = useRouter();
 
-  const [timeoutId, setTimeoutId] = useState(null);
   const findByNameProductGroupStore = appStore(
     (state) => state.findByNameProductGroupStore,
   );
-  const ProductList = appStore((state) => state.productsGroupList);
   const clientList = appStore((state) => state.clientList);
   const currentProductEdit = ventaStore((state) => state.currentProductEdit);
-  const setCurrentProductEdit = ventaStore(
-    (state) => state.setCurrentProductEdit,
+  const findByNameProductStore = appStore(
+    (state) => state.findByNameProductStore,
   );
+  const getProductsByIdProductGroupStore = appStore(
+    (state) => state.getProductsByIdProductGroupStore,
+  );
+
   const cartProductsList = ventaStore((state) => state.cartProductsList);
   const totalPagarUSD = ventaStore((state) => state.totalPagarUSD);
   const totalPagarCUP = ventaStore((state) => state.totalPagarCUP);
@@ -43,24 +45,7 @@ const newVenta = () => {
   const [inputMoney, setInputMoney] = useState("efectivo");
 
   useEffect(() => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    // esperar 400 segundos al dejar de escribir
-    const id = setTimeout(async () => {
-      try {
-        // console.log(inputName);
-        await findByNameProductGroupStore(inputName);
-        setCurrentProductEdit(null);
-      } catch (error) {
-        console.error(error);
-      }
-    }, 400);
-
-    setTimeoutId(id);
-
-    return () => clearTimeout(id);
+    console.log(inputName, " => ", currentProductEdit);
   }, [inputName]);
 
   return (
@@ -74,28 +59,19 @@ const newVenta = () => {
       }}
     >
       <Text style={{ fontSize: 40, textAlign: "center" }}>Nueva Venta</Text>
-      <TextInput
-        value={inputName}
-        onChangeText={(text) => {
-          setInputName(text);
-        }}
-        placeholder="Buscar producto ..."
-        style={{
-          backgroundColor: myTheme.colors.grayLight,
-          borderRadius: 10,
-          paddingHorizontal: 20,
-          paddingVertical: 15,
-          marginTop: 20,
-          fontSize: 15,
-        }}
-        cursorColor={myTheme.colors.greenForce}
+
+      <SearchBar
+        placeHolder="Buscar producto..."
+        productsVentas
+        inputText={inputName}
+        setInputText={setInputName}
       />
 
       {/* Esta es los resultados de busquedas de los productos */}
       {inputName.length > 0 && !currentProductEdit && <MatchSeach />}
 
       {/* ITEM EDIT */}
-      {currentProductEdit && <ItemEdit />}
+      {currentProductEdit && <ItemEdit setText={setInputName} />}
 
       {/* ticket */}
       <ScrollView
@@ -164,12 +140,6 @@ const newVenta = () => {
           <Text>
             {`    `}- Pago total en CUP: {totalPagarCUP.toFixed(2)} CUP
           </Text>
-          {/* <Text>
-            {`    `}- Cambio: {`50.000 CUP`}
-          </Text> */}
-          {/* <Text>
-            {`    `}- Descuento: {`20 USD`}
-          </Text> */}
         </View>
 
         {/* TIPO DE PAGO */}
@@ -228,6 +198,10 @@ const newVenta = () => {
                     value={client.id}
                   />
                 ))}
+                <Picker.Item
+                  label="Crear nuevo cliente"
+                  value="crear_cliente"
+                />
               </Picker>
             )}
           </View>
@@ -248,6 +222,19 @@ const newVenta = () => {
               borderColor: myTheme.colors.greenForce,
               borderWidth: 2,
             }}
+            onPress={() => {
+              if (inputMoney === "efectivo" || inputMoney === "transferencia") {
+                cartProductsList.map(async (product) => {
+                  const groupProduct = await findByNameProductStore(
+                    product.nombre,
+                  );
+                  const productsI = await getProductsByIdProductGroupStore(
+                    groupProduct.at(0).id_grupo,
+                  );
+                  console.log(productsI);
+                });
+              }
+            }}
           >
             <Text
               style={{
@@ -265,6 +252,9 @@ const newVenta = () => {
               backgroundColor: myTheme.colors.redLight,
               borderColor: myTheme.colors.redForce,
               borderWidth: 2,
+            }}
+            onPress={() => {
+              router.back();
             }}
           >
             <Text

@@ -49,7 +49,7 @@ export const index = () => {
       {/* Button de faboritos */}
       <FabButton
         onClick={() => {
-          router.push("venta/newVenta");
+          router.navigate("venta/newVenta");
         }}
       />
     </View>

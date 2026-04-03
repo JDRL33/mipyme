@@ -105,7 +105,7 @@ const buy = () => {
           onPress={() => {
             setEnabledSearch(false);
             !enabledSearch && cleanSearch();
-            router.push({ pathname: "compra/addProductBuy" });
+            router.navigate({ pathname: "compra/addProductBuy" });
           }}
         >
           <Feather
@@ -200,6 +200,7 @@ const buy = () => {
               ]}
               onPress={async () => {
                 if (products.length > 0) {
+                  const date = new Date();
                   products.map(async (product) => {
                     let newGroup = true;
                     if (product.par === 0) {
@@ -211,6 +212,7 @@ const buy = () => {
                         params.id_provider,
                         product.id_grupo,
                         0,
+                        date.toLocaleDateString(),
                       );
                       newGroup = false;
                     }
@@ -233,6 +235,7 @@ const buy = () => {
                             params.id_provider,
                             id_group,
                             0,
+                            date.toLocaleDateString(),
                           );
                         }
                       });

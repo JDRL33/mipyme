@@ -15,7 +15,7 @@ export const CardsGridInfo = () => {
         color={2}
         icon={0}
         LongPress={() => {
-          router.push("(tabs)/products");
+          router.navigate("(tabs)/products");
         }}
       />
       <CardInfo
@@ -45,7 +45,7 @@ export const CardsGridInfo = () => {
         color={0}
         icon={4}
         LongPress={() => {
-          router.push("(tabs)/proveedor");
+          router.navigate("(tabs)/proveedor");
         }}
       />
       <CardInfo
@@ -54,7 +54,7 @@ export const CardsGridInfo = () => {
         color={1}
         icon={5}
         LongPress={() => {
-          router.push("(tabs)/clients");
+          router.navigate("(tabs)/clients");
         }}
       />
       <CardInfo

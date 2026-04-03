@@ -15,7 +15,8 @@ export const ToolsBar = ({ show }) => {
   const productsGroupList = appStore((state) => state.productsGroupList);
 
   const ACCION1 = () => {
-    console.log(currentProductEdit);
+    const date = new Date();
+    const dateNow = date.toLocaleDateString();
   };
   const ACCION2 = async () => {
     const response = await getData("SELECT * FROM producto_grupo", []);

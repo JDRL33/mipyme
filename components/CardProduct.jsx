@@ -27,7 +27,7 @@ const CardProduct = ({
           },
         ]}
         onPress={() => {
-          router.push({
+          router.navigate({
             pathname: "product_info",
             params: {
               id_grupo: pID,
@@ -41,7 +41,7 @@ const CardProduct = ({
           });
         }}
         onLongPress={() => {
-          router.push({
+          router.navigate({
             pathname: "modal/modalDeleteProductGroup",
             params: { id_grupo: pID, name: pNombre },
           });
