@@ -10,7 +10,7 @@ const Settings = () => {
   return (
     <Screen style={[styles.parent, {}]}>
       <Title text="Configuraciones" />
-      {/* <ToolsBar /> */}
+      <ToolsBar />
       <View
         style={{
           backgroundColor: myTheme.colors.blueLight,

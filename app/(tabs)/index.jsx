@@ -1,28 +1,18 @@
 import { CardsGridInfo, CardsGridActions } from "../../components/CardsGrid";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
-import { initDatabase } from "../../database/database";
 import CambioCard from "../../components/CambioCard";
 import FabButton from "../../components/FabButton";
 import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import Header from "../../components/Header";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
 
 export const index = () => {
-  const initStore = appStore((state) => state.initStore);
   const router = useRouter();
   const myTheme = useTheme();
-  useEffect(() => {
-    const init = async () => {
-      await initDatabase();
-      await initStore();
-    };
-    init();
-  }, []);
-  const insets = useSafeAreaInsets();
 
+  const insets = useSafeAreaInsets();
   return (
     // View contenedor de la pantalla INICIO
     <View
@@ -57,7 +47,7 @@ export const index = () => {
 
 export default index;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   main: {
     flex: 1,
     paddingHorizontal: 15,

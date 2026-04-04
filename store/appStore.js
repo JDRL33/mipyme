@@ -51,6 +51,8 @@ export const appStore = create((set, get) => ({
     await get().updateProvidersStatsStore();
     await get().getDataStore();
     await get().updateStoreStatus();
+
+    return true;
   },
   // METODOS PARA OBTENER LOS DATOS DE LA TIENDA
   getDataStore: async () => {
@@ -72,7 +74,9 @@ export const appStore = create((set, get) => ({
       products.map((product) => {
         cDebito += product.cobro_total;
         cGanancia += product.ganancia_total;
-        // cPagado += product.pagado; -------------------------------------------------------------
+        providers.map((p) => {
+          cPagado += p.pagado;
+        });
       });
     }
 
@@ -131,17 +135,15 @@ export const appStore = create((set, get) => ({
     providersList.map(async (provider) => {
       let count = 0;
       let a_pagar = 0;
-      let pagado = 0;
       productsIndis.map((product) => {
         if (product.id_proveedor === provider.id_proveedor) {
           count += product.cantidad;
           a_pagar += product.precio_costo * product.cantidad;
-          // pagado += product.ganancia; -------------------------------------------------------------
         }
       });
       provider.cantidad_productos = count;
       provider.a_pagar = a_pagar;
-      provider.pagado = pagado;
+      provider.pagado = provider.pagado;
       await updateProvider(provider);
       const providers = await getProviders();
       set({ providersList: providers });

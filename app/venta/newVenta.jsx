@@ -254,6 +254,7 @@ const newVenta = () => {
                         const provider = await getProvidersByIdStore(
                           productsOrder[i].id_proveedor,
                         );
+                        console.log(provider);
                         await updatePagoProviderStore(
                           productsOrder[i].precio_costo + provider.pagado,
                           productsOrder[i].id_proveedor,
@@ -318,9 +319,10 @@ const newVenta = () => {
                             0
                           ) {
                             console.log("____________SOBRAN***********");
-                            count = productsOrder[i + aux].cantidad - count;
+                            cantRest =
+                              productsOrder[i + aux].cantidad - cantRest;
                             await updateCountProductsIndisStore(
-                              count,
+                              cantRest,
                               productsOrder[i + aux].id,
                             );
 
@@ -333,6 +335,7 @@ const newVenta = () => {
                               productsOrder[i + aux].id_proveedor,
                             );
                             cantRest = 0;
+                            console.log("Perfect");
                             break;
                           } else if (cantRest - productsOrder[i].cantidad > 0) {
                             console.log("___________FALTAN*********");

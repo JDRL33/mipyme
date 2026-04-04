@@ -14,7 +14,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import CurrencyInput from "react-native-currency-input";
 import Foundation from "@expo/vector-icons/Foundation";
 import { Picker } from "@react-native-picker/picker";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { appStore } from "../../store/appStore";
 import Toast from "react-native-toast-message";
 import { useTheme } from "react-native-paper";
@@ -49,7 +49,7 @@ const addProductBuy = () => {
   const par = buyStore((state) => state.par);
   const plusPar = buyStore((state) => state.plusPar);
 
-  const save = async () => {
+  const save = useCallback(async () => {
     if (productGroupSelected) {
       if (inputPriceBuy > 0 && inputCount > 0) {
         addProduct(
@@ -144,7 +144,16 @@ const addProductBuy = () => {
         });
       }
     }
-  };
+  }, [
+    productGroupSelected,
+    inputPriceBuy,
+    inputCount,
+    inputMoney,
+    inputName,
+    inputPriceVent,
+    par,
+  ]);
+
   useEffect(() => {
     if (timeoutId) {
       clearTimeout(timeoutId);

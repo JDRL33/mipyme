@@ -1,4 +1,5 @@
 import * as SQLite from "expo-sqlite";
+import { appStore } from "../store/appStore";
 
 let dbInstance = null;
 let isInitialized = false;
@@ -100,7 +101,7 @@ export async function initDatabase() {
   `);
 
     isInitialized = true;
-    ("✅ Base de datos inicializada");
+    console.log("✅ Base de datos inicializada");
     return dbInstance;
   } catch (error) {
     console.error("❌ Error inicializando DB:", error);

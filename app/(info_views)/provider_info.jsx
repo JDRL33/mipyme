@@ -1,7 +1,12 @@
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import CardProviderProduct from "../../components/CardProviderProduct";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+  Stack,
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import InfoProviderText from "../../components/InfoProviderText";
 import FabButton from "../../components/FabButton";
@@ -64,14 +69,16 @@ const ProveedorInfo = () => {
     return count;
   }, [productsIndis, store.limitStockDown]);
 
-  useEffect(() => {
-    const getProvider = async () => {
-      const response = await getProvidersByIdStore(id);
-      setProvider(response);
-    };
-    getProvider();
-    getProductsByIdProviderStore(id);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const getProvider = async () => {
+        const response = await getProvidersByIdStore(id);
+        setProvider(response);
+      };
+      getProvider();
+      getProductsByIdProviderStore(id);
+    }, []),
+  );
 
   useEffect(() => {
     if (timeoutId) {
@@ -237,7 +244,7 @@ const ProveedorInfo = () => {
       <FabButton
         paperIcon="account-cash"
         onClick={() => {
-          router.navigate({
+          router.replace({
             pathname: "compra/buy",
             params: { id_provider: id, name_provider: provider.nombre },
           });

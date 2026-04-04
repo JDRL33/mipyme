@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 import { appStore } from "../../store/appStore";
+import { isInitialized } from "../../database/database";
 
 export const ToolsBar = ({ show = false }) => {
   const productsIndis = appStore((state) => state.productsIndis);
@@ -19,7 +20,9 @@ export const ToolsBar = ({ show = false }) => {
     );
     console.log(order[order.length - 1].dateOfBuy);
   };
-  const ACCION3 = async () => {};
+  const ACCION3 = async () => {
+    console.log(isInitialized);
+  };
   const ACCION4 = async () => {
     await resetDB();
   };

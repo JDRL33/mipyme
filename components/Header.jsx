@@ -1,21 +1,24 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTheme } from "react-native-paper";
 import Feather from "@expo/vector-icons/Feather";
+import { useFocusEffect } from "expo-router";
 
 const Header = ({ title, start = false }) => {
   const myTheme = useTheme();
   const [date, setDate] = useState(new Date());
 
-  useEffect(() => {
-    // Crear intervalo que se actualiza cada segundo
-    const intervalo = setInterval(() => {
-      setDate(new Date());
-    }, 1000);
+  useFocusEffect(
+    useCallback(() => {
+      // Crear intervalo que se actualiza cada segundo
+      const intervalo = setInterval(() => {
+        setDate(new Date());
+      }, 1000);
 
-    // Limpiar el intervalo al desmontar el componente
-    return () => clearInterval(intervalo);
-  }, []);
+      // Limpiar el intervalo al desmontar el componente
+      return () => clearInterval(intervalo);
+    }, []),
+  );
 
   return (
     <View style={[styles.header]}>
