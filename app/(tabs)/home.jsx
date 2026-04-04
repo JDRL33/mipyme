@@ -7,12 +7,19 @@ import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import Header from "../../components/Header";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 
 export const index = () => {
   const router = useRouter();
   const myTheme = useTheme();
+  const initStore = appStore((state) => state.initStore);
+
+  useEffect(() => {
+    initStore();
+  }, []);
 
   const insets = useSafeAreaInsets();
+
   return (
     // View contenedor de la pantalla INICIO
     <View

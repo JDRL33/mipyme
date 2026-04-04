@@ -1,5 +1,4 @@
 import * as SQLite from "expo-sqlite";
-import { appStore } from "../store/appStore";
 
 let dbInstance = null;
 let isInitialized = false;
@@ -17,7 +16,7 @@ export async function initDatabase() {
     PRAGMA foreign_keys = ON;
 
     CREATE TABLE IF NOT EXISTS store (
-      id	INTEGER NOT NULL, 
+      id	INTEGER NOT NULL CHECK (id = 1), 
       name	TEXT NOT NULL DEFAULT 'Mi Tienda Pro',
       limitStockDown	INTEGER DEFAULT 5,
       tasa_usd	REAL DEFAULT 400.0,
@@ -31,6 +30,9 @@ export async function initDatabase() {
       cGanancia	REAL DEFAULT 0,
       PRIMARY KEY(id AUTOINCREMENT)
     );
+    
+
+    INSERT OR IGNORE INTO store (name) VALUES ('Mi Tienda Pro');
 
     CREATE TABLE IF NOT EXISTS proveedor (
       id_proveedor	INTEGER NOT NULL,
@@ -128,12 +130,8 @@ export async function getData(sql, params = []) {
 // Obteniendo datos de la tienda
 export async function getStore() {
   const response = await getData("SELECT * FROM store");
-  if (response.length == 0) {
-    await executeQuery("INSERT INTO store (name) VALUES ('Mi Tienda Pro')");
-    return await getData("SELECT * FROM store")[0];
-  } else {
-    return response[0];
-  }
+
+  return response[0];
 }
 // Funcion para actualizar la tienda
 export async function updateStore(store) {

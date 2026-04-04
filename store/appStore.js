@@ -46,10 +46,10 @@ export const appStore = create((set, get) => ({
 
   // METODO PARA INICIAR LA APPSTORE
   initStore: async () => {
+    await get().getDataStore();
     await get().extractDatabaseList();
     await get().updateProductsGroupStatsStore();
     await get().updateProvidersStatsStore();
-    await get().getDataStore();
     await get().updateStoreStatus();
 
     return true;
