@@ -30,10 +30,10 @@ const product_info = () => {
       const product = await getProductsByIdProductGroup(params.id_grupo);
       if (mounted) setProducts(product);
 
-      product.map(async (p) => {
+      for (let p of product) {
         const provider = await getProvidersByIdStore(p.id_proveedor);
         if (mounted) setProviders((prev) => [...prev, provider]);
-      });
+      }
     };
     fetchProductsAndProviders();
 

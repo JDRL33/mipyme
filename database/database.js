@@ -44,11 +44,6 @@ export async function initDatabase() {
       PRIMARY KEY(id_proveedor AUTOINCREMENT)
     );
 
--- cantidad => productos_independientes.lenght
--- a_pagar =>  productos.precio_de_costo 
--- pagado  => registro_de_compra.importe - a_pagar
--- fecha_de_la_ultima_compra  => registro_compra.fecha
-
     CREATE TABLE IF NOT EXISTS producto_grupo (
 	    id_grupo	INTEGER NOT NULL,
 	    nombre	TEXT NOT NULL,
@@ -268,16 +263,21 @@ export async function addClient(
 // Incrementar o Decrementar pago a proveedor
 export async function updatePagoProvider(count, id) {
   const response = await executeQuery(
-    "UPDATE proveedor SET pagado = ? WHERE id_proveedor = ?",
-    [count, id],
+    `UPDATE proveedor SET pagado = ${count} WHERE id_proveedor = ${id}`,
   );
-  return true;
+  return response;
+}
+// Actualizar ganancias
+export async function updateGanancia(count) {
+  const response = await executeQuery(
+    `UPDATE store SET cGanancia = ${count} WHERE id = 1`,
+  );
+  return response;
 }
 // Actualizar la cantidad del producto independiente
 export async function updateCountProductsIndis(count, id) {
   const response = await executeQuery(
-    "UPDATE producto_independiente SET cantidad = ? WHERE id = ?",
-    [count, id],
+    `UPDATE producto_independiente SET cantidad = ${count} WHERE id = ${id}`,
   );
   return true;
 }
@@ -387,6 +387,7 @@ export async function deleteProductIndiById(id) {
 export async function clearDatabase() {
   const db = await getDatabase();
   await db.execAsync(`
+    DELETE FROM store;
     DELETE FROM proveedor;
     DELETE FROM producto_independiente;
     DELETE FROM producto_grupo;
@@ -394,4 +395,5 @@ export async function clearDatabase() {
     DELETE FROM sqlite_sequence;
     VACUUM;
   `);
+  await initDatabase();
 }

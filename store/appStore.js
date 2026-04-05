@@ -69,14 +69,12 @@ export const appStore = create((set, get) => ({
 
     let cDebito = 0;
     let cPagado = 0;
-    let cGanancia = 0;
     if (providers.length > 0) {
       products.map((product) => {
         cDebito += product.cobro_total;
-        cGanancia += product.ganancia_total;
-        providers.map((p) => {
-          cPagado += p.pagado;
-        });
+      });
+      providers.map((p) => {
+        cPagado += p.pagado;
       });
     }
 
@@ -92,7 +90,7 @@ export const appStore = create((set, get) => ({
       nClients: clients.length,
       cDebito: parseFloat(cDebito).toFixed(2),
       cPagado: parseFloat(cPagado).toFixed(2),
-      cGanancia: parseFloat(cGanancia).toFixed(2),
+      cGanancia: store.cGanancia,
     };
 
     await updateStore(newStore);
@@ -104,12 +102,16 @@ export const appStore = create((set, get) => ({
     const response = await updatePagoProvider(count, id);
     return response;
   },
+  updateGanaciaStore: async (count) => {
+    const response = await updateGanancia(count);
+    return response;
+  },
 
   //METODO PARA ACTUALIZAR LOS PRODUCTOS GRUPOS
-  updateProductsGroupStatsStore: () => {
+  updateProductsGroupStatsStore: async () => {
     const productsIndis = get().productsIndis;
     const productsGroupList = get().productsGroupList;
-    productsGroupList.map(async (group) => {
+    for (let group of productsGroupList) {
       let count = 0;
       let costoTotal = 0;
       let gananciaTotal = 0;
@@ -126,13 +128,13 @@ export const appStore = create((set, get) => ({
       group.ganancia_total = gananciaTotal;
       await updateProductGroup(group);
       set({ productsGroupList: productsGroupList });
-    });
+    }
   },
   //METODO PARA ACTUALIZAR LOS PROVEEDORES
   updateProvidersStatsStore: async () => {
     const providersList = get().providersList;
     const productsIndis = get().productsIndis;
-    providersList.map(async (provider) => {
+    for (let provider of providersList) {
       let count = 0;
       let a_pagar = 0;
       productsIndis.map((product) => {
@@ -147,7 +149,7 @@ export const appStore = create((set, get) => ({
       await updateProvider(provider);
       const providers = await getProviders();
       set({ providersList: providers });
-    });
+    }
   },
 
   // METODO PARA ACTUALIZAR LA TASA DE CAMBIO
@@ -207,8 +209,9 @@ export const appStore = create((set, get) => ({
 
   // METODO PARA REINICIAR LA BD
   resetDB: async () => {
-    await clearDatabase();
-    await get().initStore();
+    await clearDatabase().finally(async () => {
+      await get().initStore();
+    });
   },
 
   //Mentodos de busquedas____________________________________________________
@@ -394,7 +397,7 @@ export const appStore = create((set, get) => ({
   },
   // METODO PARA ELIMINAR UN GRUPO DE PRODUCTOS POR ID
   deleteProductGroupWithEmptyStock: async () => {
-    get().productsGroupList.map(async (product) => {
+    for (let product of get().productsGroupList) {
       if (product.cantidad <= 0) {
         await get().deleteProductGroupByIdStore(product.id_grupo);
         // const productsGroupUpdate = get().productsGroupList.filter(
@@ -403,6 +406,6 @@ export const appStore = create((set, get) => ({
         // set({ productsGroupList: productsGroupUpdate });
         await get().initStore();
       }
-    });
+    }
   },
 }));

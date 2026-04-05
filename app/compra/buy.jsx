@@ -201,7 +201,7 @@ const buy = () => {
               onPress={async () => {
                 if (products.length > 0) {
                   const date = new Date();
-                  products.map(async (product) => {
+                  for (let product of products) {
                     let newGroup = true;
                     if (product.par === 0) {
                       await addProductsIndiStore(
@@ -216,8 +216,8 @@ const buy = () => {
                       );
                       newGroup = false;
                     }
-                    newGroup &&
-                      productsGroups.map(async (group) => {
+                    if (newGroup)
+                      for (let group of productsGroups) {
                         if (product.par === group.par) {
                           const id_group = await addProductsStore(
                             group.name,
@@ -238,8 +238,8 @@ const buy = () => {
                             date.toLocaleDateString("en-US"),
                           );
                         }
-                      });
-                  });
+                      }
+                  }
                   await initStore();
                   cancelarCompra();
                   Toast.show({

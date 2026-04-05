@@ -3,7 +3,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -48,6 +47,7 @@ const newVenta = () => {
   const getProvidersByIdStore = appStore(
     (state) => state.getProvidersByIdStore,
   );
+  const updateGanaciaStore = appStore((state) => state.updateGanaciaStore);
   const initStore = appStore((state) => state.initStore);
 
   const currentProductEdit = ventaStore((state) => state.currentProductEdit);
@@ -234,17 +234,19 @@ const newVenta = () => {
             }}
             onPress={async () => {
               if (inputMoney === "efectivo" || inputMoney === "transferencia") {
-                cartProductsList.map(async (product) => {
+                for (let product of cartProductsList) {
                   const groupProduct = await findByNameProductStore(
                     product.nombre,
                   );
+
                   const productsI = await getProductsByIdProductGroupStore(
-                    groupProduct.at(0).id_grupo,
+                    groupProduct[0].id_grupo,
                   );
                   const productsOrder = productsI.sort(
                     (a, b) => parseDMY(a.dateOfBuy) - parseDMY(b.dateOfBuy),
                   );
                   let count = product.cantidad;
+
                   for (let i = 0; i <= productsOrder.length - 1; i++) {
                     if (count > 0) {
                       // SE VENDE AL SER IGUAL QUE CERO
@@ -254,19 +256,25 @@ const newVenta = () => {
                         const provider = await getProvidersByIdStore(
                           productsOrder[i].id_proveedor,
                         );
-                        console.log(provider);
+                        console.log(i);
                         await updatePagoProviderStore(
-                          productsOrder[i].precio_costo + provider.pagado,
+                          // SE PAGA AL PROVEEDOR EL PRECIO DE COSTO * LA CANTIDAD DEL PRODUCTO VENDIDO
+                          productsOrder[i].precio_costo * product.cantidad +
+                            provider.pagado,
                           productsOrder[i].id_proveedor,
                         );
-                        break;
+                        await updateGanaciaStore(
+                          (groupProduct.precio_venta -
+                            productsOrder[i].precio_costo) *
+                            productsOrder[i].cantidad,
+                        );
+                        count = 0;
                       }
                       // SE VENDE AL SOBRAR PRODUCTOS
                       else if (count - productsOrder[i].cantidad < 0) {
                         console.log("____________SOBRAN");
-                        count = productsOrder[i].cantidad - count;
                         await updateCountProductsIndisStore(
-                          count,
+                          productsOrder[i].cantidad - count,
                           productsOrder[i].id,
                         );
 
@@ -274,10 +282,16 @@ const newVenta = () => {
                           productsOrder[i].id_proveedor,
                         );
                         await updatePagoProviderStore(
-                          productsOrder[i].precio_costo + provider.pagado,
+                          productsOrder[i].precio_costo * product.cantidad +
+                            provider.pagado,
                           productsOrder[i].id_proveedor,
                         );
-                        break;
+                        await updateGanaciaStore(
+                          (groupProduct.precio_venta -
+                            productsOrder[i].precio_costo) *
+                            count,
+                        );
+                        count = 0;
                       }
                       // SE VENDE AL TODAVIA FALTANTE
                       else if (count - productsOrder[i].cantidad > 0) {
@@ -288,8 +302,15 @@ const newVenta = () => {
                           productsOrder[i].id_proveedor,
                         );
                         await updatePagoProviderStore(
-                          productsOrder[i].precio_costo + provider.pagado,
+                          productsOrder[i].precio_costo *
+                            productsOrder[i].cantidad +
+                            provider.pagado,
                           productsOrder[i].id_proveedor,
+                        );
+                        await updateGanaciaStore(
+                          (groupProduct.precio_venta -
+                            productsOrder[i].precio_costo) *
+                            productsOrder[i].cantidad,
                         );
                         let aux = 1;
                         while (cantRest > 0) {
@@ -306,12 +327,16 @@ const newVenta = () => {
                               productsOrder[i + aux].id_proveedor,
                             );
                             await updatePagoProviderStore(
-                              productsOrder[i + aux].precio_costo +
+                              productsOrder[i + aux].precio_costo * cantRest +
                                 provider.pagado,
                               productsOrder[i + aux].id_proveedor,
                             );
+                            await updateGanaciaStore(
+                              (groupProduct.precio_venta -
+                                productsOrder[i + aux].precio_costo) *
+                                cantRest,
+                            );
                             cantRest = 0;
-                            break;
                           }
                           // SE VENDE AL SOBRAR PRODUCTOS
                           else if (
@@ -319,10 +344,9 @@ const newVenta = () => {
                             0
                           ) {
                             console.log("____________SOBRAN***********");
-                            cantRest =
-                              productsOrder[i + aux].cantidad - cantRest;
+
                             await updateCountProductsIndisStore(
-                              cantRest,
+                              productsOrder[i + aux].cantidad - cantRest,
                               productsOrder[i + aux].id,
                             );
 
@@ -330,13 +354,16 @@ const newVenta = () => {
                               productsOrder[i + aux].id_proveedor,
                             );
                             await updatePagoProviderStore(
-                              productsOrder[i + aux].precio_costo +
+                              productsOrder[i + aux].precio_costo * cantRest +
                                 provider.pagado,
                               productsOrder[i + aux].id_proveedor,
                             );
+                            await updateGanaciaStore(
+                              (groupProduct.precio_venta -
+                                productsOrder[i + aux].precio_costo) *
+                                cantRest,
+                            );
                             cantRest = 0;
-                            console.log("Perfect");
-                            break;
                           } else if (cantRest - productsOrder[i].cantidad > 0) {
                             console.log("___________FALTAN*********");
                             cantRest -= productsOrder[i].cantidad;
@@ -347,9 +374,15 @@ const newVenta = () => {
                               productsOrder[i + aux].id_proveedor,
                             );
                             await updatePagoProviderStore(
-                              productsOrder[i + aux].precio_costo +
+                              productsOrder[i + aux].precio_costo *
+                                productsOrder[i + aux].cantidad +
                                 provider.pagado,
                               productsOrder[i + aux].id_proveedor,
+                            );
+                            await updateGanaciaStore(
+                              (groupProduct.precio_venta -
+                                productsOrder[i + aux].precio_costo) *
+                                productsOrder[i + aux].cantidad,
                             );
                             continue;
                           }
@@ -359,10 +392,11 @@ const newVenta = () => {
                       }
                     }
                   }
-                });
+                }
                 await deleteProductGroupWithEmptyStock();
                 await initStore();
-                router.replace("/");
+                console.log("Vendido con exito");
+                router.replace("home");
               }
             }}
           >
