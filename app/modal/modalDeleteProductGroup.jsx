@@ -3,7 +3,7 @@ import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { appStore } from "../../store/appStore";
-import Toast from "react-native-toast-message";
+import toastShow from "../../tools/toastShow";
 
 const modalDeleteProductGroup = () => {
   const params = useLocalSearchParams();
@@ -13,45 +13,32 @@ const modalDeleteProductGroup = () => {
     (state) => state.deleteProductGroupByIdStore,
   );
 
-  const handleEliminar = async () => {
+  const handleEliminar = useCallback(async () => {
     await deleteProductGroupByIdStore(params.id_grupo);
-    Toast.show({
-      type: "success",
-      text1: "Producto eliminado correctamente ✅",
-      position: "top",
-      visibilityTime: 2000,
-    });
-    router.back();
-  };
+    toastShow("Producto eliminado correctamente ✅", "success");
+    router.dismiss(1);
+  }, [router, params.id_grupo]);
 
   return (
     <View
-      style={{
-        paddingTop: insets.top,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: myTheme.colors.primary,
-        paddingHorizontal: 20,
-      }}
+      style={[
+        styles.parent,
+        {
+          backgroundColor: myTheme.colors.primary,
+          paddingTop: insets.top,
+        },
+      ]}
     >
       <Text
         style={{
+          color: myTheme.colors.textSecondary,
           marginBottom: 30,
           fontSize: 30,
-          color: myTheme.colors.textSecondary,
         }}
       >
         {params.name}
       </Text>
-      <Text
-        style={{
-          fontSize: 36,
-          fontWeight: "bold",
-          marginBottom: 10,
-          textAlign: "center",
-        }}
-      >
+      <Text style={styles.title}>
         ¿Quieres eliminar este grupo de productos?
       </Text>
 
@@ -83,9 +70,7 @@ const modalDeleteProductGroup = () => {
               backgroundColor: myTheme.colors.redForce,
             },
           ]}
-          onPress={() => {
-            router.back();
-          }}
+          onPress={router.back}
         >
           <Text
             style={[
@@ -106,6 +91,18 @@ const modalDeleteProductGroup = () => {
 export default modalDeleteProductGroup;
 
 const styles = StyleSheet.create({
+  parent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
   btnStyle: {
     width: "300",
     padding: 10,

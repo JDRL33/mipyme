@@ -7,77 +7,50 @@ import Toast from "react-native-toast-message";
 
 const Layuot = () => {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.parent}>
       <StatusBar hidden />
       <PaperProvider theme={theme}>
         <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          {/* SCREEN INICIAL */}
+          <Stack.Screen name="index" options={screenOptions} />
+          {/* TABS DONDE ESTA LA PANTALLA HOME */}
+          <Stack.Screen name="(tabs)" options={screenOptions} />
+          {/* SCREEN DE INFORMACION DEL PROVEEDOR */}
           <Stack.Screen
             name="(info_views)/provider_info"
-            options={{ animation: "slide_from_bottom" }}
+            options={screenOptions}
           />
+          {/* SCREEN DE LA INFORMACION DEL PRODUCTO */}
           <Stack.Screen
-            name="venta/newVenta"
-            options={{ animation: "slide_from_bottom", headerShown: false }}
+            name="(info_views)/product_info"
+            options={screenOptions}
           />
-          <Stack.Screen
-            name="compra/buy"
-            options={{ animation: "slide_from_bottom", headerShown: false }}
-          />
-          <Stack.Screen
-            name="compra/addProductBuy"
-            options={{ animation: "slide_from_bottom", headerShown: false }}
-          />
+          {/* SCREEN DE LA VENTA DE PRODUCTOS */}
+          <Stack.Screen name="venta/newVenta" options={screenOptions} />
+          {/* SCREEN DE LA COMPRA DE PRODUCTOS A LOS PROVEEDORES */}
+          <Stack.Screen name="compra/buy" options={screenOptions} />
+          {/* SCREEN PARA ANIADIR LOS PRODUCTOS QUE SE VAN A COMPRAR AL LISTADO DE COMPRA */}
+          <Stack.Screen name="compra/addProductBuy" options={screenOptions} />
+
           {/* PANTALLAS MODALES */}
           <Stack.Screen
             name="modal/modalDeleteProductIndi"
-            options={{
-              presentation: "modal",
-              animation: "slide_from_bottom",
-              headerShown: false,
-            }}
+            options={modalOptions}
           />
           <Stack.Screen
             name="modal/modalDeleteProductGroup"
-            options={{
-              presentation: "modal",
-              animation: "slide_from_bottom",
-              headerShown: false,
-            }}
+            options={modalOptions}
           />
           <Stack.Screen
             name="modal/modalCreateProvider"
-            options={{
-              presentation: "modal",
-              animation: "slide_from_bottom",
-              headerShown: false,
-            }}
+            options={modalOptions}
           />
           <Stack.Screen
             name="modal/modalDeleteProvider"
-            options={{
-              presentation: "modal",
-              animation: "slide_from_bottom",
-              headerShown: false,
-            }}
+            options={modalOptions}
           />
-          <Stack.Screen
-            name="modal/modalCreateClient"
-            options={{
-              presentation: "modal",
-              animation: "slide_from_bottom",
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="modal/modalTasaCambio"
-            options={{
-              presentation: "modal",
-              animation: "fade_from_bottom",
-              headerShown: false,
-            }}
-          />
+          <Stack.Screen name="modal/modalCreateClient" options={modalOptions} />
+          <Stack.Screen name="modal/modalTasaCambio" options={modalOptions} />
         </Stack>
       </PaperProvider>
       <Toast position="top" avoidKeyboard />
@@ -87,4 +60,13 @@ const Layuot = () => {
 
 export default Layuot;
 
-const styles = StyleSheet.create({});
+const screenOptions = { animation: "fade", headerShown: false };
+const modalOptions = {
+  presentation: "modal",
+  animation: "slide_from_bottom",
+  headerShown: false,
+};
+
+const styles = StyleSheet.create({
+  parent: { flex: 1 },
+});

@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import buyStore from "../../store/buyStore";
 import { useTheme } from "react-native-paper";
 import Feather from "@expo/vector-icons/Feather";
@@ -19,6 +19,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CardProviderProduct from "../../components/CardProviderProduct";
 import { appStore } from "../../store/appStore";
 import Toast from "react-native-toast-message";
+import toastShow from "../../tools/toastShow";
 
 const buy = () => {
   const router = useRouter();
@@ -43,7 +44,6 @@ const buy = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-
     // esperar 400 segundos al dejar de escribir
     const id = setTimeout(async () => {
       try {
@@ -52,11 +52,60 @@ const buy = () => {
         console.error(error);
       }
     }, 400);
-
     setTimeoutId(id);
-
     return () => clearTimeout(id);
   }, [text]);
+
+  const completeBuy = useCallback(async () => {
+    if (products.length > 0) {
+      const date = new Date();
+      for (let product of products) {
+        let newGroup = true;
+        if (product.par === 0) {
+          await addProductsIndiStore(
+            product.name,
+            product.moneda,
+            product.pCompra,
+            product.count,
+            params.id_provider,
+            product.id_grupo,
+            0,
+            date.toLocaleDateString("en-US"),
+          );
+          newGroup = false;
+        }
+        if (newGroup)
+          for (let group of productsGroups) {
+            if (product.par === group.par) {
+              const id_group = await addProductsStore(
+                group.name,
+                group.moneda,
+                group.pVenta,
+                group.count,
+                0,
+                0,
+              );
+              await addProductsIndiStore(
+                product.name,
+                product.moneda,
+                product.pCompra,
+                product.count,
+                params.id_provider,
+                id_group,
+                0,
+                date.toLocaleDateString("en-US"),
+              );
+            }
+          }
+      }
+      await initStore();
+      cancelarCompra();
+      toastShow("Nueva compra efectuada con éxito 🥳✔", "success");
+      router.dismiss(1);
+    } else {
+      toastShow("Añade un producto si quieres comprar.", "info");
+    }
+  }, [products, params.id_provider, productsGroups, router]);
 
   return (
     <KeyboardAvoidingView
@@ -154,14 +203,12 @@ const buy = () => {
               placeholderTextColor={myTheme.colors.textSecondary}
             />
             <Pressable
-              style={{
-                width: "20%",
-                height: 50,
-                borderRadius: 10,
-                backgroundColor: myTheme.colors.grayForce,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={[
+                styles.switchSave,
+                {
+                  backgroundColor: myTheme.colors.grayForce,
+                },
+              ]}
               onPress={() => {
                 setEnabledSearch(!enabledSearch);
                 setText("");
@@ -198,66 +245,7 @@ const buy = () => {
                   backgroundColor: myTheme.colors.greenLight,
                 },
               ]}
-              onPress={async () => {
-                if (products.length > 0) {
-                  const date = new Date();
-                  for (let product of products) {
-                    let newGroup = true;
-                    if (product.par === 0) {
-                      await addProductsIndiStore(
-                        product.name,
-                        product.moneda,
-                        product.pCompra,
-                        product.count,
-                        params.id_provider,
-                        product.id_grupo,
-                        0,
-                        date.toLocaleDateString("en-US"),
-                      );
-                      newGroup = false;
-                    }
-                    if (newGroup)
-                      for (let group of productsGroups) {
-                        if (product.par === group.par) {
-                          const id_group = await addProductsStore(
-                            group.name,
-                            group.moneda,
-                            group.pVenta,
-                            group.count,
-                            0,
-                            0,
-                          );
-                          await addProductsIndiStore(
-                            product.name,
-                            product.moneda,
-                            product.pCompra,
-                            product.count,
-                            params.id_provider,
-                            id_group,
-                            0,
-                            date.toLocaleDateString("en-US"),
-                          );
-                        }
-                      }
-                  }
-                  await initStore();
-                  cancelarCompra();
-                  Toast.show({
-                    type: "success",
-                    text1: "Nueva compra efectuada con éxito 🥳✔",
-                    position: "top",
-                    visibilityTime: 2000,
-                  });
-                  router.back();
-                } else {
-                  Toast.show({
-                    type: "info",
-                    text1: "Añade un producto si quieres comprar.",
-                    position: "top",
-                    visibilityTime: 2000,
-                  });
-                }
-              }}
+              onPress={completeBuy}
             >
               <Text
                 style={[
@@ -279,13 +267,8 @@ const buy = () => {
               ]}
               onPress={() => {
                 cancelarCompra();
-                Toast.show({
-                  type: "error",
-                  text1: "Compra cancelada   ❌",
-                  position: "top",
-                  visibilityTime: 2000,
-                });
-                router.back();
+                toastShow("Compra cancelada   ❌", "error");
+                router.dismiss(1);
               }}
             >
               <Text
@@ -351,5 +334,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 20,
     fontSize: 18,
+  },
+  switchSave: {
+    height: 50,
+    width: "20%",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

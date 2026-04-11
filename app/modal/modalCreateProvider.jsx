@@ -1,20 +1,19 @@
 import {
   KeyboardAvoidingView,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
   Platform,
 } from "react-native";
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
 import Feather from "@expo/vector-icons/Feather";
 import ButtonsModal from "../../components/ButtonsModal";
-import Toast from "react-native-toast-message";
+import toastShow from "../../tools/toastShow";
 
 const modalCreateProvider = () => {
   const myTheme = useTheme();
@@ -23,18 +22,13 @@ const modalCreateProvider = () => {
   const router = useRouter();
   const addProviderStore = appStore((state) => state.addProviderStore);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (nombre.trim()) {
       await addProviderStore(nombre.trim(), 0, 0, 0);
-      Toast.show({
-        type: "success",
-        text1: "Proveedor creado con éxito 🥳✔",
-        position: "top",
-        visibilityTime: 2000,
-      });
-      router.back();
+      toastShow("Proveedor creado con éxito 🥳✔", "success");
+      router.dismiss(1);
     }
-  };
+  }, [router, nombre]);
 
   return (
     <KeyboardAvoidingView
@@ -42,13 +36,14 @@ const modalCreateProvider = () => {
       style={{ flex: 1 }}
     >
       <View
-        style={{
-          paddingTop: insets.top,
-          justifyContent: "center",
-          flex: 1,
-          alignItems: "center",
-          backgroundColor: myTheme.colors.primary,
-        }}
+        style={[
+          styles.parent,
+          {
+            paddingTop: insets.top,
+
+            backgroundColor: myTheme.colors.primary,
+          },
+        ]}
       >
         <View
           style={{
@@ -86,6 +81,11 @@ const modalCreateProvider = () => {
 export default modalCreateProvider;
 
 const styles = StyleSheet.create({
+  parent: {
+    justifyContent: "center",
+    flex: 1,
+    alignItems: "center",
+  },
   textInputStyle: {
     marginBottom: 40,
     padding: 20,

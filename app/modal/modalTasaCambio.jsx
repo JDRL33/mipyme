@@ -7,11 +7,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
-import Toast from "react-native-toast-message";
+import toastShow from "../../tools/toastShow";
 
 const modalTasaCambio = () => {
   const myTheme = useTheme();
@@ -21,18 +21,13 @@ const modalTasaCambio = () => {
   const [usd, setUsd] = useState(store.tasa_usd);
   const [eur, setEur] = useState(store.tasa_eur);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (usd >= 0 && eur >= 0) {
       updateTasaCambio(usd, eur);
-      Toast.show({
-        type: "success",
-        text1: "Tasas de cambio actualizadas correctamente 👋",
-        position: "top",
-        visibilityTime: 2000,
-      });
-      router.back();
+      toastShow("Tasas de cambio actualizadas correctamente 👋", "success");
+      router.dismiss(1);
     }
-  };
+  }, [router, usd, eur]);
 
   return (
     <KeyboardAvoidingView
@@ -84,17 +79,7 @@ const modalTasaCambio = () => {
             ]}
           />
         </View>
-        <View
-          style={{
-            marginTop: 30,
-            flexDirection: "row",
-            height: 60,
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-          }}
-        >
+        <View style={styles.parentButtonsSaveAndCancel}>
           <Pressable
             onPress={handleSave}
             style={[
@@ -118,7 +103,7 @@ const modalTasaCambio = () => {
           </Pressable>
           <Pressable
             onPress={() => {
-              router.back();
+              router.dismiss(1);
             }}
             style={[
               styles.btnSave,
@@ -183,5 +168,14 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 10,
+  },
+  parentButtonsSaveAndCancel: {
+    marginTop: 30,
+    flexDirection: "row",
+    height: 60,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 20,
   },
 });

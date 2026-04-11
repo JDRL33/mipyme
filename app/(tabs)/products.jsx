@@ -1,4 +1,4 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TextInfoDelete from "../../components/TextInfoDelete";
 import CardProduct from "../../components/CardProduct";
@@ -7,8 +7,6 @@ import EmptyList from "../../components/EmptyList";
 import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import Header from "../../components/Header";
-import React from "react";
-import ButtonChip from "../../components/ButtonChip";
 import Space from "../../tools/Space";
 
 const Products = () => {

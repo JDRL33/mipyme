@@ -7,24 +7,29 @@ import {
 } from "react-native";
 import React from "react";
 import { appStore } from "../../store/appStore";
-import { isInitialized, updatePagoProvider } from "../../database/database";
+import {
+  addProduct,
+  addProductIndi,
+  addProvider,
+  getStore,
+  isInitialized,
+  updatePagoProvider,
+} from "../../database/database";
 import { useRouter } from "expo-router";
 
 export const ToolsBar = ({ show = false }) => {
   const productsIndis = appStore((state) => state.productsIndis);
   const resetDB = appStore((state) => state.resetDB);
   const initStore = appStore((state) => state.initStore);
-  const deleteProductGroupWithEmptyStock = appStore(
-    (state) => state.deleteProductGroupWithEmptyStock,
-  );
+  const updateGanaciaStore = appStore((state) => state.updateGanaciaStore);
   const router = useRouter();
 
-  const ACCION1 = () => {};
+  const ACCION1 = async () => {
+    await addProvider("Carlos", 0, 0, 0);
+  };
   const ACCION2 = async () => {
-    await updatePagoProvider(520, 2);
-    await deleteProductGroupWithEmptyStock();
-    await initStore();
-    router.replace("home");
+    await updateGanaciaStore(0);
+    console.log(await getStore());
   };
   const ACCION3 = async () => {
     console.log(isInitialized);

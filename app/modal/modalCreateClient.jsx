@@ -1,13 +1,12 @@
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { appStore } from "../../store/appStore";
@@ -15,6 +14,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import ButtonsModal from "../../components/ButtonsModal";
 import Toast from "react-native-toast-message";
+import toastShow from "../../tools/toastShow";
 
 const modalCreateClient = () => {
   const myTheme = useTheme();
@@ -28,13 +28,8 @@ const modalCreateClient = () => {
   const handleSave = async () => {
     if (nombre.trim()) {
       await addClientStore(nombre.trim(), 0, 0, number.trim(), ci.trim());
-      Toast.show({
-        type: "success",
-        text1: "Cliente creado correctamente ✅",
-        position: "top",
-        visibilityTime: 2000,
-      });
-      router.back();
+      toastShow("Cliente creado correctamente ✅", "success");
+      router.dismiss(1);
     }
   };
 
@@ -44,22 +39,15 @@ const modalCreateClient = () => {
       style={{ flex: 1 }}
     >
       <View
-        style={{
-          paddingTop: insets.top,
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: myTheme.colors.primary,
-        }}
+        style={[
+          styles.parent,
+          {
+            paddingTop: insets.top,
+            backgroundColor: myTheme.colors.primary,
+          },
+        ]}
       >
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 20,
-            alignItems: "center",
-            marginBottom: 40,
-          }}
-        >
+        <View style={styles.titleAndIcon}>
           <FontAwesome
             name="user"
             size={36}
@@ -131,6 +119,17 @@ const modalCreateClient = () => {
 export default modalCreateClient;
 
 const styles = StyleSheet.create({
+  parent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleAndIcon: {
+    flexDirection: "row",
+    gap: 20,
+    alignItems: "center",
+    marginBottom: 40,
+  },
   textInputStyle: {
     padding: 20,
     borderRadius: 15,

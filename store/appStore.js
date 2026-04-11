@@ -29,6 +29,7 @@ import {
   getProductsByIdProvider,
   getProductsByIdProductGroup,
   updateCountProductsIndis,
+  updateGanancia,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -103,8 +104,8 @@ export const appStore = create((set, get) => ({
     return response;
   },
   updateGanaciaStore: async (count) => {
-    const response = await updateGanancia(count);
-    return response;
+    await updateGanancia(count);
+    return true;
   },
 
   //METODO PARA ACTUALIZAR LOS PRODUCTOS GRUPOS

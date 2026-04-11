@@ -3,7 +3,8 @@ import { useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
-import Toast from "react-native-toast-message";
+import toastShow from "../../tools/toastShow";
+import { useCallback } from "react";
 
 const modalDeleteProvider = () => {
   const params = useLocalSearchParams();
@@ -14,26 +15,21 @@ const modalDeleteProvider = () => {
     (state) => state.deleteProviderByIdStore,
   );
 
-  const handleEliminar = async () => {
+  const handleEliminar = useCallback(async () => {
     await deleteProviderByIdStore(params.idProvider);
-    Toast.show({
-      type: "success",
-      text1: "Proveedor eliminado correctamente ✅",
-      position: "top",
-      visibilityTime: 2000,
-    });
-    router.back();
-  };
+    toastShow("Proveedor eliminado correctamente ✅", "success");
+    router.dismiss(1);
+  }, [params.idProvider, router]);
 
   return (
     <View
-      style={{
-        paddingTop: insets.top,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: myTheme.colors.primary,
-      }}
+      style={[
+        styles.parent,
+        {
+          backgroundColor: myTheme.colors.primary,
+          paddingTop: insets.top,
+        },
+      ]}
     >
       <Text
         style={{
@@ -44,17 +40,8 @@ const modalDeleteProvider = () => {
       >
         {params.name}
       </Text>
-      <Text
-        style={{
-          fontSize: 36,
-          fontWeight: "bold",
-          marginBottom: 10,
-          textAlign: "center",
-        }}
-      >
-        ¿Quieres eliminar este proveedor?
-      </Text>
-      <Text style={{ fontSize: 21, marginBottom: 60, textAlign: "center" }}>
+      <Text style={styles.title}>¿Quieres eliminar este proveedor?</Text>
+      <Text style={styles.subTitle}>
         {
           "(Al eliminarlo se quitaran del stock los productos de este proveedor !!!!!)"
         }
@@ -89,7 +76,7 @@ const modalDeleteProvider = () => {
             },
           ]}
           onPress={() => {
-            router.back();
+            router.dismiss(1);
           }}
         >
           <Text
@@ -111,6 +98,14 @@ const modalDeleteProvider = () => {
 export default modalDeleteProvider;
 
 const styles = StyleSheet.create({
+  parent: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: {
+    fontSize: 36,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  subTitle: { fontSize: 21, marginBottom: 60, textAlign: "center" },
   btnStyle: {
     width: 350,
     padding: 10,

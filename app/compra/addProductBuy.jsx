@@ -5,6 +5,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,12 +15,13 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import CurrencyInput from "react-native-currency-input";
 import Foundation from "@expo/vector-icons/Foundation";
 import { Picker } from "@react-native-picker/picker";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { appStore } from "../../store/appStore";
 import Toast from "react-native-toast-message";
 import { useTheme } from "react-native-paper";
 import buyStore from "../../store/buyStore";
 import { useRouter } from "expo-router";
+import toastShow from "../../tools/toastShow";
 
 const addProductBuy = () => {
   const insets = useSafeAreaInsets();
@@ -27,8 +29,6 @@ const addProductBuy = () => {
   const router = useRouter();
 
   const [inputName, setInputName] = useState("");
-  1;
-  const [textError, setTextError] = useState("");
   const [inputCount, setInputCount] = useState(0);
   const [inputPriceBuy, setPriceBuy] = useState(0);
   const [timeoutId, setTimeoutId] = useState(null);
@@ -38,18 +38,22 @@ const addProductBuy = () => {
   const [windowScrollShow, setWindowScrollShow] = useState(true);
   const [productGroupSelected, setProductGroupSelected] = useState(null);
 
+  // GLOBAL STATES OF BUYSTORE
+  const par = buyStore((state) => state.par);
+  const plusPar = buyStore((state) => state.plusPar);
   const addProduct = buyStore((state) => state.addProduct);
   const addProductGroup = buyStore((state) => state.addProductGroup);
+
+  // GLOBAL STATES OF APPSTORE
   const findByNameProductGroupStore = appStore(
     (state) => state.findByNameProductGroupStore,
   );
   const productsGroupList = appStore((state) => state.productsGroupList);
   const store = appStore((state) => state.store);
 
-  const par = buyStore((state) => state.par);
-  const plusPar = buyStore((state) => state.plusPar);
-
+  // FUNCTION FOR SAVE BUY
   const save = useCallback(async () => {
+    // COMPROBANDO SI HAY ALGUN PRODUCTO SELECCIONADO
     if (productGroupSelected) {
       if (inputPriceBuy > 0 && inputCount > 0) {
         addProduct(
@@ -61,15 +65,11 @@ const addProductBuy = () => {
           0,
           false,
         );
-        Toast.show({
-          type: "info",
-          text1: "Producto agregado al carrito 🆕",
-          position: "top",
-          visibilityTime: 2000,
-        });
-        router.back();
+        toastShow("Producto agregado al carrito 🆕", "info");
+        router.dismiss(1);
       }
     } else {
+      // NO HAY NINGUN PRODUCTO SELECIONADO
       if (inputName.trim() != "") {
         if (inputPriceVent > 0) {
           if (inputPriceBuy > 0) {
@@ -95,53 +95,25 @@ const addProductBuy = () => {
                   true,
                 );
                 plusPar();
-                Toast.show({
-                  type: "info",
-                  text1: "Producto agregado al carrito 🆕",
-                  position: "top",
-                  visibilityTime: 2000,
-                });
-                router.back();
+                toastShow("Producto agregado al carrito 🆕", "info");
+                router.dismiss(1);
               } else {
-                Toast.show({
-                  type: "error",
-                  text1: "Ingrese una cantidad valida ❌",
-                  position: "top",
-                  visibilityTime: 2000,
-                });
+                toastShow("Ingrese una cantidad valida ❌", "error");
               }
             } else {
-              Toast.show({
-                type: "error",
-                text1:
-                  "El precio de venta debe ser mayor que el precio de compra ❌",
-                position: "top",
-                visibilityTime: 2000,
-              });
+              toastShow(
+                "El precio de venta debe ser mayor que el precio de compra ❌",
+                "error",
+              );
             }
           } else {
-            Toast.show({
-              type: "error",
-              text1: "Ingrese un precio de compra valido ❌",
-              position: "top",
-              visibilityTime: 2000,
-            });
+            toastShow("Ingrese un precio de compra valido ❌", "error");
           }
         } else {
-          Toast.show({
-            type: "error",
-            text1: "Ingrese un precio de venta valido ❌",
-            position: "top",
-            visibilityTime: 2000,
-          });
+          toastShow("Ingrese un precio de venta valido ❌", "error");
         }
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Ingrese un nombre para el producto ❌",
-          position: "top",
-          visibilityTime: 2000,
-        });
+        toastShow("Ingrese un nombre para el producto ❌", "error");
       }
     }
   }, [
@@ -154,11 +126,11 @@ const addProductBuy = () => {
     par,
   ]);
 
+  // USEEFFECT PARA QUE AL DEJAR ESCRIBIR ME MUESTRE LOS PRODUCTOS
   useEffect(() => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-
     // esperar 400 segundos al dejar de escribir
     const id = setTimeout(async () => {
       try {
@@ -174,9 +146,7 @@ const addProductBuy = () => {
         console.error(error);
       }
     }, 400);
-
     setTimeoutId(id);
-
     return () => clearTimeout(id);
   }, [inputName]);
 
@@ -193,27 +163,9 @@ const addProductBuy = () => {
       ]}
     >
       <Text style={styles.title}>AGREGAR PRODUCTO AL CARRITO</Text>
-      <Text
-        style={{
-          fontSize: 20,
-          textAlign: "center",
-          marginTop: 10,
-          color: myTheme.colors.redForce,
-        }}
-      >
-        {textError}
-      </Text>
 
       <View style={{ marginTop: 40, width: "80%" }}>
-        <View
-          style={{
-            gap: 10,
-            marginBottom: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <View style={styles.nameInputNewProduct}>
           <TextInputComponent
             keyboardType={"default"}
             placeHolder={"Nombre del producto ..."}
@@ -224,20 +176,17 @@ const addProductBuy = () => {
                 ? myTheme.colors.greenLight
                 : myTheme.colors.grayLight,
               width: "80%",
-              marginBottom: 0,
             }}
           />
           <Pressable
-            style={{
-              width: "20%",
-              padding: 8,
-              backgroundColor: !productsScroll
-                ? myTheme.colors.greenForce
-                : myTheme.colors.grayLight,
-              borderRadius: 10,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={[
+              styles.buttonNewProduct,
+              {
+                backgroundColor: !productsScroll
+                  ? myTheme.colors.greenForce
+                  : myTheme.colors.grayLight,
+              },
+            ]}
             onPress={() => {
               // setFindActive(!findActive)
               setProductsScroll(!productsScroll);
@@ -262,18 +211,12 @@ const addProductBuy = () => {
         </View>
         {productsGroupList.length > 0 && inputName && windowScrollShow ? (
           <View
-            style={{
-              height: "70%",
-              width: "100%",
-              backgroundColor: myTheme.colors.grayForce,
-              position: "absolute",
-              top: 50,
-              left: 0,
-              zIndex: 3,
-              borderRadius: 10,
-              justifyContent: "center",
-              padding: 5,
-            }}
+            style={[
+              styles.parentListSearch,
+              {
+                backgroundColor: myTheme.colors.grayForce,
+              },
+            ]}
           >
             <FlatList
               data={productsGroupList}
@@ -285,13 +228,12 @@ const addProductBuy = () => {
                     setWindowScrollShow(false);
                     setInputName(item.nombre);
                   }}
-                  style={{
-                    padding: 10,
-                    backgroundColor: myTheme.colors.grayLight,
-                    borderRadius: 10,
-                    marginBottom: 5,
-                    height: 80,
-                  }}
+                  style={[
+                    styles.flatListStyle,
+                    {
+                      backgroundColor: myTheme.colors.grayLight,
+                    },
+                  ]}
                 >
                   <View>
                     <Text
@@ -341,15 +283,13 @@ const addProductBuy = () => {
             prefix="$"
             delimiter="."
             separator=","
-            precision={2}
-            style={{
-              marginBottom: 10,
-              backgroundColor: myTheme.colors.grayLight,
-              padding: 15,
-              borderRadius: 15,
-              fontSize: 20,
-              width: "60%",
-            }}
+            precision={1}
+            style={[
+              styles.price,
+              {
+                backgroundColor: myTheme.colors.grayLight,
+              },
+            ]}
             placeholder="Precio de costo"
           />
 
@@ -358,7 +298,7 @@ const addProductBuy = () => {
               width: "35%",
             }}
             selectedValue={inputMoney}
-            onValueChange={(itemValue, itemIndex) => setInputMoney(itemValue)}
+            onValueChange={(itemValue) => setInputMoney(itemValue)}
           >
             <Picker.Item label="CUP" value="CUP" />
             <Picker.Item label="USD" value="USD" />
@@ -382,33 +322,40 @@ const addProductBuy = () => {
               color={myTheme.colors.redForce}
             />
           </Pressable>
-          <View
-            style={{
-              backgroundColor: myTheme.colors.grayLight,
-              borderRadius: 10,
-              marginHorizontal: 10,
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
+          <TextInput
+            aria-valuemin={0}
+            aria-valuemax={100000}
+            keyboardType="numeric"
+            value={inputCount.toString()}
+            onChangeText={(text) => {
+              if (text >= 0) {
+                setInputCount(text);
+              } else {
+                setInputCount(0);
+              }
             }}
-          >
-            <Text
-              style={{
-                fontSize: 40,
+            style={[
+              styles.inputCountProducts,
+              {
+                backgroundColor: myTheme.colors.grayLight,
                 color: myTheme.colors.textSecondary,
-                textAlign: "center",
-              }}
-            >
-              {inputCount}
-            </Text>
-          </View>
+              },
+            ]}
+            placeholder="0"
+            placeholderTextColor={myTheme.colors.grayForce}
+            cursorColor={myTheme.colors.greenLight}
+          />
           <Pressable
             style={{
               backgroundColor: myTheme.colors.greenLight,
               padding: 18,
               borderRadius: 10,
             }}
-            onPress={() => setInputCount(inputCount + 1)}
+            onPress={() => {
+              setInputCount(inputCount - 1);
+              setInputCount(inputCount + 1);
+              inputCount >= 0 && setInputCount(inputCount + 1);
+            }}
           >
             <FontAwesome
               name="plus"
@@ -417,14 +364,7 @@ const addProductBuy = () => {
             />
           </Pressable>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 10,
-            marginTop: 10,
-            marginBottom: 30,
-          }}
-        >
+        <View style={styles.priceOfVent}>
           {!productsScroll && (
             <>
               <CurrencyInput
@@ -435,15 +375,13 @@ const addProductBuy = () => {
                 prefix="$"
                 delimiter="."
                 separator=","
-                precision={2}
-                style={{
-                  marginBottom: 10,
-                  backgroundColor: myTheme.colors.grayLight,
-                  padding: 15,
-                  borderRadius: 15,
-                  fontSize: 20,
-                  width: "60%",
-                }}
+                precision={1}
+                style={[
+                  styles.price,
+                  {
+                    backgroundColor: myTheme.colors.grayLight,
+                  },
+                ]}
                 placeholder="Precio de venta"
               />
               <Picker
@@ -451,9 +389,7 @@ const addProductBuy = () => {
                   width: "35%",
                 }}
                 selectedValue={inputMoney}
-                onValueChange={(itemValue, itemIndex) =>
-                  setInputMoney(itemValue)
-                }
+                onValueChange={(itemValue) => setInputMoney(itemValue)}
               >
                 <Picker.Item label="CUP" value="CUP" />
                 <Picker.Item label="USD" value="USD" />
@@ -486,5 +422,57 @@ export const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     fontSize: 20,
+  },
+  nameInputNewProduct: {
+    gap: 10,
+    marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonNewProduct: {
+    width: "20%",
+    padding: 8,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  parentListSearch: {
+    height: "70%",
+    width: "100%",
+    position: "absolute",
+    top: 50,
+    left: 0,
+    zIndex: 3,
+    borderRadius: 10,
+    justifyContent: "center",
+    padding: 5,
+  },
+  flatListStyle: {
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 5,
+    height: 80,
+  },
+  price: {
+    marginBottom: 10,
+    padding: 15,
+    borderRadius: 15,
+    fontSize: 20,
+    width: "60%",
+  },
+  inputCountProducts: {
+    flex: 1,
+    fontSize: 40,
+    borderRadius: 10,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginHorizontal: 10,
+  },
+  priceOfVent: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 10,
+    marginBottom: 30,
   },
 });

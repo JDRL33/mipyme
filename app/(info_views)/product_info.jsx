@@ -18,7 +18,6 @@ const product_info = () => {
   const [providers, setProviders] = useState([]);
 
   // STATE GLOBALES
-  const productsIndis = appStore((state) => state.productsIndis);
   const store = appStore((state) => state.store);
   const getProvidersByIdStore = appStore(
     (state) => state.getProvidersByIdStore,
@@ -92,13 +91,7 @@ const product_info = () => {
       >
         Precio de Venta
       </Text>
-      <View
-        style={{
-          marginTop: 20,
-          flexDirection: "row",
-          gap: 10,
-        }}
-      >
+      <View style={styles.infoParent}>
         <FontAwesome5
           name="money-bill-wave"
           size={24}
@@ -109,13 +102,7 @@ const product_info = () => {
           {params.moneda.toUpperCase()}
         </Text>
       </View>
-      <View
-        style={{
-          marginTop: 5,
-          flexDirection: "row",
-          gap: 10,
-        }}
-      >
+      <View style={styles.infoParent}>
         <FontAwesome5
           name="money-bill-wave"
           size={24}
@@ -186,5 +173,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
     marginTop: 5,
+  },
+  infoParent: {
+    marginTop: 20,
+    flexDirection: "row",
+    gap: 10,
   },
 });

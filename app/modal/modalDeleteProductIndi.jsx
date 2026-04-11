@@ -4,7 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { appStore } from "../../store/appStore";
 import { deleteProductIndiById } from "../../database/database";
-import Toast from "react-native-toast-message";
+import toastShow from "../../tools/toastShow";
+import { useCallback } from "react";
 
 const modalDeleteProvider = () => {
   const params = useLocalSearchParams();
@@ -14,47 +15,33 @@ const modalDeleteProvider = () => {
     (state) => state.getProductsByIdProviderStore,
   );
 
-  const handleEliminar = async () => {
+  const handleEliminar = useCallback(async () => {
     await deleteProductIndiById(params.idProductI);
     await getProductsByIdProviderStore(params.id_provider);
-    Toast.show({
-      type: "success",
-      text1: "Producto eliminado correctamente ✅",
-      position: "top",
-      visibilityTime: 2000,
-    });
-    router.back();
-  };
+    toastShow("Producto eliminado correctamente ✅", "success");
+    router.dismiss(1);
+  }, [params.idProductI, params.id_provider, router]);
 
   return (
     <View
-      style={{
-        paddingTop: insets.top,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: myTheme.colors.primary,
-      }}
+      style={[
+        styles.parent,
+        {
+          backgroundColor: myTheme.colors.primary,
+          paddingTop: insets.top,
+        },
+      ]}
     >
       <Text
         style={{
+          color: myTheme.colors.textSecondary,
           marginBottom: 30,
           fontSize: 30,
-          color: myTheme.colors.textSecondary,
         }}
       >
         {params.name}
       </Text>
-      <Text
-        style={{
-          fontSize: 36,
-          fontWeight: "bold",
-          marginBottom: 10,
-          textAlign: "center",
-        }}
-      >
-        ¿Quieres eliminar este producto?
-      </Text>
+      <Text style={styles.title}>¿Quieres eliminar este producto?</Text>
 
       <View style={{ gap: 5 }}>
         <Pressable
@@ -84,9 +71,7 @@ const modalDeleteProvider = () => {
               backgroundColor: myTheme.colors.redForce,
             },
           ]}
-          onPress={() => {
-            router.back();
-          }}
+          onPress={router.back}
         >
           <Text
             style={[
@@ -107,6 +92,13 @@ const modalDeleteProvider = () => {
 export default modalDeleteProvider;
 
 const styles = StyleSheet.create({
+  parent: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: {
+    fontSize: 36,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
   btnStyle: {
     width: 350,
     padding: 10,

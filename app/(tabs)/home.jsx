@@ -7,7 +7,7 @@ import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import Header from "../../components/Header";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const index = () => {
   const router = useRouter();

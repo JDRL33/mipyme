@@ -59,29 +59,7 @@ const ItemEdit = ({ setText }) => {
         {currentProduct.moneda === "USD" &&
           "Cambio: " + currentProduct.precio_venta * store.tasa_usd + " CUP"}
       </Text>
-      {/* <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 5,
-          marginBottom: 10,
-        }}
-      >
-        <Checkbox />
-        <Text style={{ fontSize: 17 }}>Descuento</Text>
-        <TextInput
-          style={{
-            backgroundColor: "white",
-            paddingVertical: 7,
-            paddingLeft: 10,
-            borderRadius: 10,
-            width: 150,
-          }}
-          placeholder="De 3 a 5 USD"
-          placeholderTextColor={myTheme.colors.grayForce}
-        />
-      </View> */}
+
       {/* Seleccion de moneda */}
       <View></View>
       {/* Seleccion de Cantidad */}

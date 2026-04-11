@@ -269,8 +269,9 @@ export async function updatePagoProvider(count, id) {
 }
 // Actualizar ganancias
 export async function updateGanancia(count) {
+  const id = 1;
   const response = await executeQuery(
-    `UPDATE store SET cGanancia = ${count} WHERE id = 1`,
+    `UPDATE store SET cGanancia = ${count} WHERE id = "1"`,
   );
   return response;
 }
@@ -395,5 +396,6 @@ export async function clearDatabase() {
     DELETE FROM sqlite_sequence;
     VACUUM;
   `);
+  dbInstance = null;
   await initDatabase();
 }

@@ -1,8 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme, ActivityIndicator, Button } from "react-native-paper";
-import * as SplashScreen from "expo-splash-screen";
-import Toast from "react-native-toast-message";
 import { initDatabase } from "../database/database";
 import { useRouter } from "expo-router";
 
@@ -35,14 +33,14 @@ const index = () => {
 
   return (
     <View
-      style={{
-        backgroundColor: myTheme.colors.primary,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      style={[
+        {
+          backgroundColor: myTheme.colors.primary,
+        },
+        styles.parent,
+      ]}
     >
-      <Text style={{ fontSize: 38, marginBottom: 20 }}>InVentas</Text>
+      <Text style={styles.title}>InVentas</Text>
       {start ? (
         <Button
           mode="contained"
@@ -63,4 +61,11 @@ const index = () => {
 
 export default index;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  parent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: { fontSize: 38, marginBottom: 20 },
+});

@@ -1,13 +1,7 @@
-import {
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, useTheme } from "react-native-paper";
-import React, { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import MatchSeach from "../../components/Venta/MatchSeach";
 import ItemInCart from "../../components/Venta/ItemInCart";
@@ -25,6 +19,8 @@ const newVenta = () => {
   const myTheme = useTheme();
   const router = useRouter();
 
+  // GLOBAL STATE OF APP
+  const store = appStore((state) => state.store);
   const updatePagoProviderStore = appStore(
     (state) => state.updatePagoProviderStore,
   );
@@ -50,13 +46,74 @@ const newVenta = () => {
   const updateGanaciaStore = appStore((state) => state.updateGanaciaStore);
   const initStore = appStore((state) => state.initStore);
 
+  // GLOABAL STATE OF VENT
   const currentProductEdit = ventaStore((state) => state.currentProductEdit);
   const cartProductsList = ventaStore((state) => state.cartProductsList);
   const totalPagarUSD = ventaStore((state) => state.totalPagarUSD);
   const totalPagarCUP = ventaStore((state) => state.totalPagarCUP);
 
+  // USESTATES
   const [inputName, setInputName] = useState("");
   const [inputMoney, setInputMoney] = useState("efectivo");
+
+  // FUNCTIONS OF COMPARE
+
+  const equalCompare = useCallback(
+    async (id_proveedor, id_product, precio_venta, precio_costo, count) => {
+      await deleteProductIndiByIdStore(id_product);
+      const provider = await getProvidersByIdStore(id_proveedor);
+      await updatePagoProviderStore(
+        precio_costo * count + provider.pagado,
+        id_proveedor,
+      );
+      const calculo = (precio_venta - precio_costo) * count;
+      await updateGanaciaStore(calculo + store.cGanancia);
+      count = 0;
+    },
+    [store],
+  );
+  const moreProducts = useCallback(
+    async (
+      count_products,
+      count_products_client,
+      id_product,
+      id_provider,
+      precio_costo,
+      precio_venta,
+    ) => {
+      console.log("updateCountProductsIndisStore------------✔");
+      await updateCountProductsIndisStore(
+        count_products - count_products_client,
+        id_product,
+      );
+
+      const provider = await getProvidersByIdStore(id_provider);
+      console.log("updatePagoProviderStore-----------------✔");
+      await updatePagoProviderStore(
+        precio_costo * count_products_client + provider.pagado,
+        id_provider,
+      );
+      console.log("updateGanaciaStore");
+      await updateGanaciaStore(
+        (precio_venta - precio_costo) * count_products_client + store.cGanancia,
+      );
+      count_products_client = 0;
+    },
+    [store],
+  );
+  const allProductsBuy = useCallback(
+    async (id_product, id_provider, precio_costo, count, precio_venta) => {
+      await deleteProductIndiByIdStore(id_product);
+      const provider = await getProvidersByIdStore(id_provider);
+      await updatePagoProviderStore(
+        precio_costo * count + provider.pagado,
+        id_provider,
+      );
+      const calculo = (precio_venta - precio_costo) * count;
+      await updateGanaciaStore(calculo + store.cGanancia);
+    },
+    [store],
+  );
 
   return (
     <View
@@ -68,8 +125,10 @@ const newVenta = () => {
         backgroundColor: myTheme.colors.primary,
       }}
     >
+      {/* TITLE */}
       <Text style={{ fontSize: 40, textAlign: "center" }}>Nueva Venta</Text>
 
+      {/* SEARCHBAR FOR SEARCH PRODUCTS IN THE STOCK */}
       <SearchBar
         productsVentas
         inputText={inputName}
@@ -77,30 +136,23 @@ const newVenta = () => {
         placeHolder="Buscar producto..."
       />
 
-      {/* Esta es los resultados de busquedas de los productos */}
+      {/* RESULTS OF SEARCH THE PRODUCTS */}
       {inputName.length > 0 && !currentProductEdit && <MatchSeach />}
 
-      {/* ITEM EDIT */}
+      {/* PRODUCT EDIT */}
       {currentProductEdit && <ItemEdit setText={setInputName} />}
 
-      {/* ticket */}
+      {/* TICKET */}
       <ScrollView
-        style={{
-          padding: 20,
-          marginTop: 20,
-          shadowRadius: 10,
-          borderRadius: 10,
-          shadowOpacity: 0.3,
-          backgroundColor: myTheme.colors.grayLight,
-        }}
+        style={[
+          styles.ticketScrollView,
+          {
+            backgroundColor: myTheme.colors.grayLight,
+          },
+        ]}
       >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        {/* TICKET HEADER */}
+        <View style={styles.ticketHeader}>
           <Text style={{ fontWeight: "bold", fontSize: 20 }}>
             Recivo de Venta
           </Text>
@@ -117,9 +169,7 @@ const newVenta = () => {
           </View>
         </View>
 
-        <Text style={{ marginTop: 20, marginBottom: 10, fontWeight: "bold" }}>
-          * Productos añadidos al carrito:
-        </Text>
+        <Text style={styles.subTitle}>* Productos añadidos al carrito:</Text>
         <FlatList
           data={cartProductsList}
           renderItem={({ item }) => <ItemInCart product={item} />}
@@ -130,17 +180,9 @@ const newVenta = () => {
           scrollEnabled={false}
         />
 
-        {/* Resumen de Venta */}
-        <View
-          style={{
-            marginTop: 20,
-            padding: 10,
-            borderRadius: 15,
-          }}
-        >
-          <Text style={{ marginBottom: 10, fontWeight: "bold" }}>
-            * Resumen de la venta:
-          </Text>
+        {/* RESUMEN DE VENTA */}
+        <View style={styles.previewVent}>
+          <Text style={styles.subTitle}>* Resumen de la venta:</Text>
           <Text>
             {`    `}- Total de productos: {cartProductsList.length}
           </Text>
@@ -153,22 +195,15 @@ const newVenta = () => {
         </View>
 
         {/* TIPO DE PAGO */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-            marginTop: 20,
-          }}
-        >
-          <Text style={{ fontWeight: "bold" }}>* Tipo de pago:</Text>
+        <View style={styles.actionTypeOfPay}>
+          <Text style={styles.subTitle}>* Tipo de pago:</Text>
           <Picker
-            style={{
-              flex: 1,
-              backgroundColor: myTheme.colors.greenLight,
-              color: "black",
-              paddingHorizontal: 5,
-            }}
+            style={[
+              styles.pickerTypeOfPay,
+              {
+                backgroundColor: myTheme.colors.greenLight,
+              },
+            ]}
             selectedValue={inputMoney}
             onValueChange={(itemValue) => setInputMoney(itemValue)}
           >
@@ -177,30 +212,16 @@ const newVenta = () => {
             <Picker.Item label="Por deuda" value="deuda" />
           </Picker>
         </View>
-        {/* pago por deuda */}
+        {/* PAGO POR DEUDA */}
         {inputMoney === "deuda" && (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-              marginTop: 20,
-            }}
-          >
+          <View style={styles.deudPay}>
             <Text style={{ fontWeight: "bold" }}>Cliente:</Text>
             {clientList.length === 0 ? (
               <Button mode="contained">
                 <Text>Crear Cliente</Text>
               </Button>
             ) : (
-              <Picker
-                style={{
-                  flex: 1,
-                  backgroundColor: "white",
-                  color: "black",
-                  paddingHorizontal: 5,
-                }}
-              >
+              <Picker style={styles.pickerDeudPay}>
                 {clientList.map((client) => (
                   <Picker.Item
                     key={client.id}
@@ -217,173 +238,134 @@ const newVenta = () => {
           </View>
         )}
 
-        <View
-          style={{
-            marginTop: 20,
-            flexDirection: "row",
-            gap: 5,
-            justifyContent: "space-around",
-          }}
-        >
+        <View style={styles.parentButtonsOkAndCancel}>
           <Button
-            style={{
-              borderRadius: 10,
-              backgroundColor: myTheme.colors.greenLight,
-              borderColor: myTheme.colors.greenForce,
-              borderWidth: 2,
-            }}
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: myTheme.colors.greenLight,
+                borderColor: myTheme.colors.greenForce,
+              },
+            ]}
             onPress={async () => {
+              // Verificar tipo de pago
               if (inputMoney === "efectivo" || inputMoney === "transferencia") {
+                // seleccionamos el primer producto
                 for (let product of cartProductsList) {
+                  // buscamos su grupo
                   const groupProduct = await findByNameProductStore(
                     product.nombre,
                   );
-
+                  // seleccionamos todos los del grupo para efectuar FIFO(First In First Out)
                   const productsI = await getProductsByIdProductGroupStore(
                     groupProduct[0].id_grupo,
                   );
+                  // los ordenamos
                   const productsOrder = productsI.sort(
                     (a, b) => parseDMY(a.dateOfBuy) - parseDMY(b.dateOfBuy),
                   );
+                  // definimos la cantidad que quiere el cliente
                   let count = product.cantidad;
 
                   for (let i = 0; i <= productsOrder.length - 1; i++) {
                     if (count > 0) {
-                      // SE VENDE AL SER IGUAL QUE CERO
+                      // SE VENDE AL SER IGUAL QUE CERO------------------------------------------------------------------------IGUAL
                       if (count - productsOrder[i].cantidad === 0) {
                         console.log("__________IGUALES");
-                        await deleteProductIndiByIdStore(productsOrder[i].id);
-                        const provider = await getProvidersByIdStore(
+                        await equalCompare(
                           productsOrder[i].id_proveedor,
+                          productsOrder[i].id,
+                          groupProduct[0].precio_venta,
+                          productsOrder[i].precio_costo,
+                          count,
                         );
-                        console.log(i);
-                        await updatePagoProviderStore(
-                          // SE PAGA AL PROVEEDOR EL PRECIO DE COSTO * LA CANTIDAD DEL PRODUCTO VENDIDO
-                          productsOrder[i].precio_costo * product.cantidad +
-                            provider.pagado,
-                          productsOrder[i].id_proveedor,
-                        );
-                        await updateGanaciaStore(
-                          (groupProduct.precio_venta -
-                            productsOrder[i].precio_costo) *
-                            productsOrder[i].cantidad,
-                        );
-                        count = 0;
                       }
-                      // SE VENDE AL SOBRAR PRODUCTOS
+                      // SE VENDE AL SOBRAR PRODUCTOS--------------------------------------------------------------------------SOBRAN
                       else if (count - productsOrder[i].cantidad < 0) {
                         console.log("____________SOBRAN");
-                        await updateCountProductsIndisStore(
-                          productsOrder[i].cantidad - count,
+                        await moreProducts(
+                          productsOrder[i].cantidad,
+                          count,
                           productsOrder[i].id,
-                        );
-
-                        const provider = await getProvidersByIdStore(
                           productsOrder[i].id_proveedor,
+                          productsOrder[i].precio_costo,
+                          groupProduct[0].precio_venta,
                         );
-                        await updatePagoProviderStore(
-                          productsOrder[i].precio_costo * product.cantidad +
-                            provider.pagado,
-                          productsOrder[i].id_proveedor,
-                        );
-                        await updateGanaciaStore(
-                          (groupProduct.precio_venta -
-                            productsOrder[i].precio_costo) *
-                            count,
-                        );
-                        count = 0;
+                        break;
                       }
-                      // SE VENDE AL TODAVIA FALTANTE
+                      // SE VENDE AL TODAVIA FALTANTE---------------------------------------------------------------------------FALTAN
                       else if (count - productsOrder[i].cantidad > 0) {
                         console.log("___________FALTAN");
                         let cantRest = count - productsOrder[i].cantidad;
-                        await deleteProductIndiByIdStore(productsOrder[i].id);
-                        const provider = await getProvidersByIdStore(
+                        await allProductsBuy(
+                          productsOrder[i].id,
                           productsOrder[i].id_proveedor,
+                          productsOrder[i].precio_costo,
+                          cantRest,
+                          groupProduct[0].precio_venta,
                         );
-                        await updatePagoProviderStore(
-                          productsOrder[i].precio_costo *
-                            productsOrder[i].cantidad +
-                            provider.pagado,
-                          productsOrder[i].id_proveedor,
-                        );
-                        await updateGanaciaStore(
-                          (groupProduct.precio_venta -
-                            productsOrder[i].precio_costo) *
-                            productsOrder[i].cantidad,
-                        );
+
                         let aux = 1;
                         while (cantRest > 0) {
-                          // SE VENDE AL SER IGUAL QUE CERO
+                          // SE VENDE AL SER IGUAL QUE CERO------------------------------------------------IGUAL---------------------------
                           if (
                             cantRest - productsOrder[i + aux].cantidad ===
                             0
                           ) {
                             console.log("__________IGUALES******");
-                            await deleteProductIndiByIdStore(
+                            await equalCompare(
+                              productsOrder[i + aux].id_proveedor,
                               productsOrder[i + aux].id,
+                              groupProduct[0].precio_venta,
+                              productsOrder[i + aux].precio_costo,
+                              cantRest,
                             );
-                            const provider = await getProvidersByIdStore(
-                              productsOrder[i + aux].id_proveedor,
-                            );
-                            await updatePagoProviderStore(
-                              productsOrder[i + aux].precio_costo * cantRest +
-                                provider.pagado,
-                              productsOrder[i + aux].id_proveedor,
-                            );
-                            await updateGanaciaStore(
-                              (groupProduct.precio_venta -
-                                productsOrder[i + aux].precio_costo) *
-                                cantRest,
-                            );
-                            cantRest = 0;
+                            // await deleteProductIndiByIdStore(
+                            //   productsOrder[i + aux].id,
+                            // );
+                            // const provider = await getProvidersByIdStore(
+                            //   productsOrder[i + aux].id_proveedor,
+                            // );
+                            // await updatePagoProviderStore(
+                            //   productsOrder[i + aux].precio_costo * cantRest +
+                            //     provider.pagado,
+                            //   productsOrder[i + aux].id_proveedor,
+                            // );
+                            // await updateGanaciaStore(
+                            //   (groupProduct.precio_venta -
+                            //     productsOrder[i + aux].precio_costo) *
+                            //     cantRest,
+                            // );
+                            // cantRest = 0;
                           }
-                          // SE VENDE AL SOBRAR PRODUCTOS
+                          // SE VENDE AL SOBRAR PRODUCTOS---------------------------------------------------SOBRAN------------------------
                           else if (
                             cantRest - productsOrder[i + aux].cantidad <
                             0
                           ) {
                             console.log("____________SOBRAN***********");
-
-                            await updateCountProductsIndisStore(
-                              productsOrder[i + aux].cantidad - cantRest,
+                            await moreProducts(
+                              productsOrder[i + aux].cantidad,
+                              cantRest,
                               productsOrder[i + aux].id,
+                              productsOrder[i + aux].id_proveedor,
+                              productsOrder[i + aux].precio_costo,
+                              groupProduct[0].precio_venta,
+                            );
+                          } else if (
+                            cantRest - productsOrder[i + aux].cantidad >
+                            0
+                          ) {
+                            console.log("___________FALTAN*********"); //-------------------------------------FALTAN-----------------------
+                            cantRest -= productsOrder[i + aux].cantidad;
+                            await allProductsBuy(
+                              productsOrder[i + aux].id,
+                              productsOrder[i + aux].id_proveedor,
+                              productsOrder[i + aux].precio_costo,
+                              productsOrder[i + aux].cantidad,
+                              groupProduct[0].precio_venta,
                             );
 
-                            const provider = await getProvidersByIdStore(
-                              productsOrder[i + aux].id_proveedor,
-                            );
-                            await updatePagoProviderStore(
-                              productsOrder[i + aux].precio_costo * cantRest +
-                                provider.pagado,
-                              productsOrder[i + aux].id_proveedor,
-                            );
-                            await updateGanaciaStore(
-                              (groupProduct.precio_venta -
-                                productsOrder[i + aux].precio_costo) *
-                                cantRest,
-                            );
-                            cantRest = 0;
-                          } else if (cantRest - productsOrder[i].cantidad > 0) {
-                            console.log("___________FALTAN*********");
-                            cantRest -= productsOrder[i].cantidad;
-                            await deleteProductIndiByIdStore(
-                              productsOrder[i + aux].id,
-                            );
-                            const provider = await getProvidersByIdStore(
-                              productsOrder[i + aux].id_proveedor,
-                            );
-                            await updatePagoProviderStore(
-                              productsOrder[i + aux].precio_costo *
-                                productsOrder[i + aux].cantidad +
-                                provider.pagado,
-                              productsOrder[i + aux].id_proveedor,
-                            );
-                            await updateGanaciaStore(
-                              (groupProduct.precio_venta -
-                                productsOrder[i + aux].precio_costo) *
-                                productsOrder[i + aux].cantidad,
-                            );
                             continue;
                           }
                           aux += 1;
@@ -401,32 +383,35 @@ const newVenta = () => {
             }}
           >
             <Text
-              style={{
-                color: myTheme.colors.greenForce,
-                fontWeight: "bold",
-                fontSize: 15,
-              }}
+              style={[
+                styles.buttonText,
+                {
+                  color: myTheme.colors.greenForce,
+                },
+              ]}
             >
               EFECTUAR VENTA
             </Text>
           </Button>
           <Button
-            style={{
-              borderRadius: 10,
-              backgroundColor: myTheme.colors.redLight,
-              borderColor: myTheme.colors.redForce,
-              borderWidth: 2,
-            }}
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: myTheme.colors.redLight,
+                borderColor: myTheme.colors.redForce,
+              },
+            ]}
             onPress={() => {
-              router.back();
+              router.dismiss(1);
             }}
           >
             <Text
-              style={{
-                color: myTheme.colors.redForce,
-                fontWeight: "bold",
-                fontSize: 15,
-              }}
+              style={[
+                styles.buttonText,
+                {
+                  color: myTheme.colors.redForce,
+                },
+              ]}
             >
               CANCELAR
             </Text>
@@ -440,4 +425,53 @@ const newVenta = () => {
 
 export default newVenta;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  ticketScrollView: {
+    padding: 20,
+    marginTop: 20,
+    shadowRadius: 10,
+    borderRadius: 10,
+    shadowOpacity: 0.3,
+  },
+  ticketHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  subTitle: { marginTop: 20, marginBottom: 10, fontWeight: "bold" },
+  previewVent: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 15,
+  },
+  actionTypeOfPay: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 20,
+  },
+  pickerTypeOfPay: { flex: 1, color: "black", paddingHorizontal: 5 },
+  deudPay: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 20,
+  },
+  pickerDeudPay: {
+    flex: 1,
+    backgroundColor: "white",
+    color: "black",
+    paddingHorizontal: 5,
+  },
+  parentButtonsOkAndCancel: {
+    gap: 5,
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  actionButton: {
+    borderRadius: 10,
+    borderWidth: 2,
+  },
+  buttonText: { fontWeight: "bold", fontSize: 15 },
+});

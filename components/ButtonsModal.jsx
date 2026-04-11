@@ -44,7 +44,7 @@ const ButtonsModal = ({ handleSave }) => {
           },
         ]}
         onPress={() => {
-          router.back();
+          router.dismiss(1);
         }}
       >
         {({ pressed }) => (
