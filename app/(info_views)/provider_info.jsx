@@ -60,13 +60,13 @@ const ProveedorInfo = () => {
   }, [productsIndis, productsGroupList]);
 
   const getProductsStockDown = useCallback(() => {
-    let count = 0;
+    let amount = 0;
     productsIndis.map((product) => {
       if (product.id_proveedor == id) {
-        product.cantidad <= store.limitStockDown && count++;
+        product.cantidad <= store.limitStockDown && amount++;
       }
     });
-    return count;
+    return amount;
   }, [productsIndis, store.limitStockDown]);
 
   useFocusEffect(
@@ -242,7 +242,7 @@ const ProveedorInfo = () => {
         )}
       />
       <FabButton
-        paperIcon="account-cash"
+        paperIcon="acamount-cash"
         onClick={() => {
           router.replace({
             pathname: "compra/buy",

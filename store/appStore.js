@@ -28,7 +28,7 @@ import {
   deleteGroupProductById,
   getProductsByIdProvider,
   getProductsByIdProductGroup,
-  updateCountProductsIndis,
+  updateamountProductsIndis,
   updateGanancia,
 } from "../database/database";
 
@@ -99,12 +99,12 @@ export const appStore = create((set, get) => ({
   },
 
   // METODO PARA ACTUALIZAR LOS PAGOS A PROVEEDORES
-  updatePagoProviderStore: async (count, id) => {
-    const response = await updatePagoProvider(count, id);
+  updatePagoProviderStore: async (amount, id) => {
+    const response = await updatePagoProvider(amount, id);
     return response;
   },
-  updateGanaciaStore: async (count) => {
-    await updateGanancia(count);
+  updateGanaciaStore: async (amount) => {
+    await updateGanancia(amount);
     return true;
   },
 
@@ -113,18 +113,18 @@ export const appStore = create((set, get) => ({
     const productsIndis = get().productsIndis;
     const productsGroupList = get().productsGroupList;
     for (let group of productsGroupList) {
-      let count = 0;
+      let amount = 0;
       let costoTotal = 0;
       let gananciaTotal = 0;
       productsIndis.map((item) => {
         if (item.id_grupo === group.id_grupo) {
-          count += item.cantidad;
+          amount += item.cantidad;
           costoTotal += item.precio_costo * item.cantidad;
           gananciaTotal +=
             (group.precio_venta - item.precio_costo) * item.cantidad;
         }
       });
-      group.cantidad = count;
+      group.cantidad = amount;
       group.cobro_total = costoTotal;
       group.ganancia_total = gananciaTotal;
       await updateProductGroup(group);
@@ -136,15 +136,15 @@ export const appStore = create((set, get) => ({
     const providersList = get().providersList;
     const productsIndis = get().productsIndis;
     for (let provider of providersList) {
-      let count = 0;
+      let amount = 0;
       let a_pagar = 0;
       productsIndis.map((product) => {
         if (product.id_proveedor === provider.id_proveedor) {
-          count += product.cantidad;
+          amount += product.cantidad;
           a_pagar += product.precio_costo * product.cantidad;
         }
       });
-      provider.cantidad_productos = count;
+      provider.cantidad_productos = amount;
       provider.a_pagar = a_pagar;
       provider.pagado = provider.pagado;
       await updateProvider(provider);
@@ -162,8 +162,8 @@ export const appStore = create((set, get) => ({
   },
 
   // METODO PARA ACTUALIZAR CANTIDAD DE PRODUCTOS INDEPENDIENTES
-  updateCountProductsIndisStore: async (count, id) => {
-    await updateCountProductsIndis(count, id);
+  updateamountProductsIndisStore: async (amount, id) => {
+    await updateamountProductsIndis(amount, id);
   },
 
   updateStatusStockDown: async () => {

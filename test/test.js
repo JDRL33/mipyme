@@ -1,37 +1,39 @@
-if (count - productsOrder[i].cantidad === 0) {
+if (amount - productsIndisSort[i].cantidad === 0) {
   //i
   console.log("__________IGUALES");
-  await deleteProductIndiByIdStore(productsOrder[i].id);
-  const provider = await getProvidersByIdStore(productsOrder[i].id_proveedor);
+  await deleteProductIndiByIdStore(productsIndisSort[i].id);
+  const provider = await getProvidersByIdStore(
+    productsIndisSort[i].id_proveedor,
+  );
   console.log(i);
   await updatePagoProviderStore(
     // SE PAGA AL PROVEEDOR EL PRECIO DE COSTO * LA CANTIDAD DEL PRODUCTO VENDIDO
-    productsOrder[i].precio_costo * product.cantidad + provider.pagado,
-    productsOrder[i].id_proveedor,
+    productsIndisSort[i].precio_costo * product.cantidad + provider.pagado,
+    productsIndisSort[i].id_proveedor,
   );
   await updateGanaciaStore(
-    (groupProduct.precio_venta - productsOrder[i].precio_costo) *
-      productsOrder[i].cantidad,
+    (groupProduct.precio_venta - productsIndisSort[i].precio_costo) *
+      productsIndisSort[i].cantidad,
   );
-  count = 0;
+  amount = 0;
 }
 
-if (cantRest - productsOrder[i + aux].cantidad === 0) {
+if (amountRest - productsIndisSort[i + aux].cantidad === 0) {
   //i+aux
   console.log("__________IGUALES******");
-  await deleteProductIndiByIdStore(productsOrder[i + aux].id);
+  await deleteProductIndiByIdStore(productsIndisSort[i + aux].id);
   const provider = await getProvidersByIdStore(
-    productsOrder[i + aux].id_proveedor,
+    productsIndisSort[i + aux].id_proveedor,
   );
   await updatePagoProviderStore(
-    productsOrder[i + aux].precio_costo * cantRest + provider.pagado,
-    productsOrder[i + aux].id_proveedor,
+    productsIndisSort[i + aux].precio_costo * amountRest + provider.pagado,
+    productsIndisSort[i + aux].id_proveedor,
   );
   await updateGanaciaStore(
-    (groupProduct.precio_venta - productsOrder[i + aux].precio_costo) *
-      cantRest,
+    (groupProduct.precio_venta - productsIndisSort[i + aux].precio_costo) *
+      amountRest,
   );
-  cantRest = 0;
+  amountRest = 0;
 }
 
 async function equalCompare(
@@ -39,97 +41,101 @@ async function equalCompare(
   id_product,
   precio_venta,
   precio_costo,
-  count,
+  amount,
 ) {
   await deleteProductIndiByIdStore(id_product);
   const provider = await getProvidersByIdStore(id_proveedor);
   await updatePagoProviderStore(
-    precio_costo * count + provider.pagado,
+    precio_costo * amount + provider.pagado,
     id_proveedor,
   );
-  await updateGanaciaStore((precio_venta - precio_costo) * count);
-  count = 0;
+  await updateGanaciaStore((precio_venta - precio_costo) * amount);
+  amount = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------
-if (count - productsOrder[i].cantidad < 0) {
-  await updateCountProductsIndisStore(
-    productsOrder[i].cantidad - count,
-    productsOrder[i].id,
+if (amount - productsIndisSort[i].cantidad < 0) {
+  await updateamountProductsIndisStore(
+    productsIndisSort[i].cantidad - amount,
+    productsIndisSort[i].id,
   );
 
-  const provider = await getProvidersByIdStore(productsOrder[i].id_proveedor);
+  const provider = await getProvidersByIdStore(
+    productsIndisSort[i].id_proveedor,
+  );
   await updatePagoProviderStore(
-    productsOrder[i].precio_costo * count + provider.pagado,
-    productsOrder[i].id_proveedor,
+    productsIndisSort[i].precio_costo * amount + provider.pagado,
+    productsIndisSort[i].id_proveedor,
   );
   await updateGanaciaStore(
-    (groupProduct.precio_venta - productsOrder[i].precio_costo) * count,
+    (groupProduct.precio_venta - productsIndisSort[i].precio_costo) * amount,
   );
-  count = 0;
+  amount = 0;
 }
 
 async function moreProducts(
-  count_products,
-  count_products_client,
+  amount_products,
+  amount_products_client,
   id_product,
   id_provider,
   precio_costo,
   precio_venta,
 ) {
-  await updateCountProductsIndisStore(
-    count_products - count_products_client,
+  await updateamountProductsIndisStore(
+    amount_products - amount_products_client,
     id_product,
   );
 
   const provider = await getProvidersByIdStore(id_provider);
   await updatePagoProviderStore(
-    precio_costo * count_products_client + provider.pagado,
+    precio_costo * amount_products_client + provider.pagado,
     id_provider,
   );
   await updateGanaciaStore(
-    (precio_venta - precio_costo) * count_products_client,
+    (precio_venta - precio_costo) * amount_products_client,
   );
-  count_products_client = 0;
+  amount_products_client = 0;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 
-await deleteProductIndiByIdStore(productsOrder[i].id);
-const provider = await getProvidersByIdStore(productsOrder[i].id_proveedor);
+await deleteProductIndiByIdStore(productsIndisSort[i].id);
+const provider = await getProvidersByIdStore(productsIndisSort[i].id_proveedor);
 await updatePagoProviderStore(
-  productsOrder[i].precio_costo * productsOrder[i].cantidad + provider.pagado,
-  productsOrder[i].id_proveedor,
+  productsIndisSort[i].precio_costo * productsIndisSort[i].cantidad +
+    provider.pagado,
+  productsIndisSort[i].id_proveedor,
 );
 await updateGanaciaStore(
-  (groupProduct.precio_venta - productsOrder[i].precio_costo) *
-    productsOrder[i].cantidad,
+  (groupProduct.precio_venta - productsIndisSort[i].precio_costo) *
+    productsIndisSort[i].cantidad,
 );
 
-await deleteProductIndiByIdStore(productsOrder[i + aux].id);
-const p = await getProvidersByIdStore(productsOrder[i + aux].id_proveedor);
+await deleteProductIndiByIdStore(productsIndisSort[i + aux].id);
+const p = await getProvidersByIdStore(productsIndisSort[i + aux].id_proveedor);
 await updatePagoProviderStore(
-  productsOrder[i + aux].precio_costo * productsOrder[i + aux].cantidad +
+  productsIndisSort[i + aux].precio_costo *
+    productsIndisSort[i + aux].cantidad +
     p.pagado,
-  productsOrder[i + aux].id_proveedor,
+  productsIndisSort[i + aux].id_proveedor,
 );
 await updateGanaciaStore(
-  (groupProduct.precio_venta - productsOrder[i + aux].precio_costo) *
-    productsOrder[i + aux].cantidad,
+  (groupProduct.precio_venta - productsIndisSort[i + aux].precio_costo) *
+    productsIndisSort[i + aux].cantidad,
 );
 
 async function allProductsBuy(
   id_product,
   id_provider,
   precio_costo,
-  count,
+  amount,
   precio_venta,
 ) {
   await deleteProductIndiByIdStore(id_product);
   const provider = await getProvidersByIdStore(id_provider);
   await updatePagoProviderStore(
-    precio_costo * count + provider.pagado,
+    precio_costo * amount + provider.pagado,
     id_provider,
   );
-  await updateGanaciaStore((precio_venta - precio_costo) * count);
+  await updateGanaciaStore((precio_venta - precio_costo) * amount);
 }

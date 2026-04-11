@@ -6,12 +6,12 @@ const buyStore = create((set, get) => ({
   productsSearch: [],
   par: 1,
 
-  addProduct: (name, pCompra, moneda, count, id_grupo, par, nuevo = false) => {
+  addProduct: (name, pCompra, moneda, amount, id_grupo, par, nuevo = false) => {
     const newProduct = {
       name,
       pCompra,
       moneda,
-      count,
+      amount,
       id_grupo,
       par,
       nuevo,
@@ -22,7 +22,7 @@ const buyStore = create((set, get) => ({
     name,
     moneda,
     pVenta,
-    count,
+    amount,
     cTotal,
     gTotal,
     par,
@@ -32,7 +32,7 @@ const buyStore = create((set, get) => ({
       name,
       moneda,
       pVenta,
-      count,
+      amount,
       cTotal,
       gTotal,
       par,

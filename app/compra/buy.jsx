@@ -66,7 +66,7 @@ const buy = () => {
             product.name,
             product.moneda,
             product.pCompra,
-            product.count,
+            product.amount,
             params.id_provider,
             product.id_grupo,
             0,
@@ -81,7 +81,7 @@ const buy = () => {
                 group.name,
                 group.moneda,
                 group.pVenta,
-                group.count,
+                group.amount,
                 0,
                 0,
               );
@@ -89,7 +89,7 @@ const buy = () => {
                 product.name,
                 product.moneda,
                 product.pCompra,
-                product.count,
+                product.amount,
                 params.id_provider,
                 id_group,
                 0,
@@ -174,7 +174,7 @@ const buy = () => {
         ListFooterComponent={<View style={{ height: 20 }} />}
         renderItem={({ item }) => (
           <CardProviderProduct
-            pCantidad={item.count}
+            pCantidad={item.amount}
             pMoneda={item.moneda}
             pNombre={item.name}
             pPrecio_costo={item.pCompra}

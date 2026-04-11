@@ -36,7 +36,7 @@ const Clients = () => {
         renderItem={({ item }) => (
           <CardClient
             nombre={item.nombre}
-            ci={item.ci}
+            ci={item.carnet_identidad}
             cup={item.cup}
             usd={item.usd}
           />

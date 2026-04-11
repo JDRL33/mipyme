@@ -18,12 +18,12 @@ const Layuot = () => {
           {/* SCREEN DE INFORMACION DEL PROVEEDOR */}
           <Stack.Screen
             name="(info_views)/provider_info"
-            options={screenOptions}
+            options={screenInformationOptions}
           />
           {/* SCREEN DE LA INFORMACION DEL PRODUCTO */}
           <Stack.Screen
             name="(info_views)/product_info"
-            options={screenOptions}
+            options={screenInformationOptions}
           />
           {/* SCREEN DE LA VENTA DE PRODUCTOS */}
           <Stack.Screen name="venta/newVenta" options={screenOptions} />
@@ -61,6 +61,7 @@ const Layuot = () => {
 export default Layuot;
 
 const screenOptions = { animation: "fade", headerShown: false };
+const screenInformationOptions = { animation: "fade", headerShown: true };
 const modalOptions = {
   presentation: "modal",
   animation: "slide_from_bottom",

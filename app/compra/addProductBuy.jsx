@@ -29,7 +29,7 @@ const addProductBuy = () => {
   const router = useRouter();
 
   const [inputName, setInputName] = useState("");
-  const [inputCount, setInputCount] = useState(0);
+  const [inputamount, setInputamount] = useState(0);
   const [inputPriceBuy, setPriceBuy] = useState(0);
   const [timeoutId, setTimeoutId] = useState(null);
   const [inputPriceVent, setPriceVent] = useState(0);
@@ -55,12 +55,12 @@ const addProductBuy = () => {
   const save = useCallback(async () => {
     // COMPROBANDO SI HAY ALGUN PRODUCTO SELECCIONADO
     if (productGroupSelected) {
-      if (inputPriceBuy > 0 && inputCount > 0) {
+      if (inputPriceBuy > 0 && inputamount > 0) {
         addProduct(
           productGroupSelected.nombre,
           inputPriceBuy,
           inputMoney,
-          inputCount,
+          inputamount,
           productGroupSelected.id_grupo,
           0,
           false,
@@ -74,12 +74,12 @@ const addProductBuy = () => {
         if (inputPriceVent > 0) {
           if (inputPriceBuy > 0) {
             if (inputPriceVent > inputPriceBuy) {
-              if (inputCount > 0) {
+              if (inputamount > 0) {
                 addProductGroup(
                   inputName,
                   inputMoney,
                   inputPriceVent,
-                  inputCount,
+                  inputamount,
                   0,
                   0,
                   par,
@@ -89,7 +89,7 @@ const addProductBuy = () => {
                   inputName,
                   inputPriceBuy,
                   inputMoney,
-                  inputCount,
+                  inputamount,
                   null,
                   par,
                   true,
@@ -119,7 +119,7 @@ const addProductBuy = () => {
   }, [
     productGroupSelected,
     inputPriceBuy,
-    inputCount,
+    inputamount,
     inputMoney,
     inputName,
     inputPriceVent,
@@ -313,7 +313,9 @@ const addProductBuy = () => {
               borderRadius: 10,
             }}
             onPress={() => {
-              inputCount > 0 ? setInputCount(inputCount - 1) : setInputCount(0);
+              inputamount > 0
+                ? setInputamount(inputamount - 1)
+                : setInputamount(0);
             }}
           >
             <FontAwesome
@@ -326,16 +328,16 @@ const addProductBuy = () => {
             aria-valuemin={0}
             aria-valuemax={100000}
             keyboardType="numeric"
-            value={inputCount.toString()}
+            value={inputamount.toString()}
             onChangeText={(text) => {
               if (text >= 0) {
-                setInputCount(text);
+                setInputamount(text);
               } else {
-                setInputCount(0);
+                setInputamount(0);
               }
             }}
             style={[
-              styles.inputCountProducts,
+              styles.inputamountProducts,
               {
                 backgroundColor: myTheme.colors.grayLight,
                 color: myTheme.colors.textSecondary,
@@ -352,9 +354,9 @@ const addProductBuy = () => {
               borderRadius: 10,
             }}
             onPress={() => {
-              setInputCount(inputCount - 1);
-              setInputCount(inputCount + 1);
-              inputCount >= 0 && setInputCount(inputCount + 1);
+              setInputamount(inputamount - 1);
+              setInputamount(inputamount + 1);
+              inputamount >= 0 && setInputamount(inputamount + 1);
             }}
           >
             <FontAwesome
@@ -461,7 +463,7 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     width: "60%",
   },
-  inputCountProducts: {
+  inputamountProducts: {
     flex: 1,
     fontSize: 40,
     borderRadius: 10,

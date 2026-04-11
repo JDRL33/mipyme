@@ -16,10 +16,10 @@ export async function initDatabase() {
     PRAGMA foreign_keys = ON;
 
     CREATE TABLE IF NOT EXISTS store (
-      id	INTEGER NOT NULL CHECK (id = 1), 
+      id INTEGER CHECK (id = 1), 
       name	TEXT NOT NULL DEFAULT 'Mi Tienda Pro',
       limitStockDown	INTEGER DEFAULT 5,
-      tasa_usd	REAL DEFAULT 400.0,
+      tasa_usd	REAL DEFAULT 580.0,
       tasa_eur	REAL DEFAULT 500.0,
       nProducts	INTEGER DEFAULT 0,
       nProviders	INTEGER DEFAULT 0,
@@ -30,6 +30,13 @@ export async function initDatabase() {
       cGanancia	REAL DEFAULT 0,
       PRIMARY KEY(id AUTOINCREMENT)
     );
+    -- VALORES CALCULABLES stock
+    -- = nProducts
+    -- = nProviders
+    -- = nProducts_stock_down
+    -- = nClients
+    -- = cDebito
+    -- = cPagado
     
 
     INSERT OR IGNORE INTO store (name) VALUES ('Mi Tienda Pro');
@@ -44,6 +51,9 @@ export async function initDatabase() {
       PRIMARY KEY(id_proveedor AUTOINCREMENT)
     );
 
+    -- VALORES CALCULABLES proveedor
+    -- = cantidad_productos
+
     CREATE TABLE IF NOT EXISTS producto_grupo (
 	    id_grupo	INTEGER NOT NULL,
 	    nombre	TEXT NOT NULL,
@@ -54,6 +64,11 @@ export async function initDatabase() {
 	    ganancia_total	REAL,
 	    PRIMARY KEY(id_grupo AUTOINCREMENT)
     );
+
+    --VALORES CALCULABLES producto_grupo
+    -- = cantidad
+    -- = cobro_total
+    -- = ganancia_total
 
     CREATE TABLE IF NOT EXISTS producto_independiente (
       id	INTEGER NOT NULL,
@@ -69,7 +84,45 @@ export async function initDatabase() {
       FOREIGN KEY(id_grupo) REFERENCES producto_grupo(id_grupo) ON DELETE CASCADE,
       FOREIGN KEY(id_proveedor) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
       );
+
+      --VALORES CALCULABLES producto_independiente
+      -- = ganancia
       
+    
+
+--_________REGISTROS DE LA TIENDA____________
+
+    CREATE TABLE IF NOT EXISTS record_buys (
+      id	INTEGER ,
+      buy_date	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      id_provider	INTEGER NOT NULL,
+      amount_products	INTEGER NOT NULL,
+      import	REAL NOT NULL,
+      PRIMARY KEY (id AUTOINCREMENT),
+      FOREIGN KEY(id_provider) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
+    );
+    CREATE TABLE IF NOT EXISTS record_sales(
+      id_sale INTEGER  ,
+      buy_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      tasa_usd REAL NOT NULL,
+      PRIMARY KEY (id_sale AUTOINCREMENT)
+    );
+    CREATE TABLE IF NOT EXISTS products_in_deuda(
+      id_producto_in_deuda INTEGER ,
+      nombre TEXT NOT NULL,
+      type_money TEXT ,
+      cost_price REAL NOT NULL,
+      sale_price REAL NOT NULL,
+      id_provider INTEGER,
+      id_sale INTEGER,
+      amount INTEGER,
+      PRIMARY KEY (id_producto_in_deuda AUTOINCREMENT),
+      FOREIGN KEY (id_provider) REFERENCES proveedor (id_proveedor) ON DELETE CASCADE
+
+    );
+--___________________END____________________________________________________________
+
+
     CREATE TABLE IF NOT EXISTS clientes_deuda (
       id	INTEGER NOT NULL,
       nombre	TEXT NOT NULL,
@@ -77,23 +130,11 @@ export async function initDatabase() {
       numero	TEXT,
       usd	REAL NOT NULL,
       cup	REAL NOT NULL,
+      id_sale INTEGER ,
+      state TEXT DEFAULT 'PENDIENTE' CHECK (state IN ('PENDIENTE','COMPLETADA')),
       PRIMARY KEY(id AUTOINCREMENT)
     );
-
---_________REGISTROS DE LA TIENDA____________
-
-    CREATE TABLE IF NOT EXISTS record_buys (
-      id	INTEGER,
-      buy_date	TEXT NOT NULL,
-      id_provider	INTEGER NOT NULL,
-      count_products	INTEGER NOT NULL,
-      import	REAL NOT NULL,
-      PRIMARY KEY(id AUTOINCREMENT),
-      FOREIGN KEY(id_provider) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
-    );
     
-
-
 
   `);
 
@@ -122,12 +163,7 @@ export async function getData(sql, params = []) {
   const db = await getDatabase();
   return await db.getAllAsync(sql, params);
 }
-// Obteniendo datos de la tienda
-export async function getStore() {
-  const response = await getData("SELECT * FROM store");
 
-  return response[0];
-}
 // Funcion para actualizar la tienda
 export async function updateStore(store) {
   await executeQuery(
@@ -177,7 +213,14 @@ export async function updateProvider(provider) {
     ],
   );
 }
+
 // Obteniendo TODOS LOS PROVEEDORES, STOCK y CLIENTS
+
+// Obteniendo datos de la tienda
+export async function getStore() {
+  const response = await getData("SELECT * FROM store WHERE id = 1");
+  return response[0];
+}
 export async function getProviders() {
   return await getData("SELECT * FROM proveedor");
 }
@@ -190,7 +233,13 @@ export async function getProductsIndis() {
 export async function getClient() {
   return await getData("SELECT * FROM clientes_deuda");
 }
-
+export async function getClientById(id) {
+  return await getData("SELECT * FROM clientes_deuda WHERE id = ?", [id]);
+}
+export async function getGananciaOfTheStore() {
+  const response = await getData("SELECT cGanancia FROM store WHERE id = 1");
+  return response;
+}
 // Aniadiendo proveedores
 export async function addProvider(
   pNombre,
@@ -259,26 +308,32 @@ export async function addClient(
   );
   return response.lastInsertRowId;
 }
-
 // Incrementar o Decrementar pago a proveedor
-export async function updatePagoProvider(count, id) {
+export async function updatePagoProvider(amount, id) {
   const response = await executeQuery(
-    `UPDATE proveedor SET pagado = ${count} WHERE id_proveedor = ${id}`,
+    `UPDATE proveedor SET pagado = ${amount} WHERE id_proveedor = ${id}`,
+  );
+  return response;
+}
+//Actualizar deuda de los clientes
+export async function updateClientPay(id, id_sale, usd, cup) {
+  const response = await executeQuery(
+    `UPDATE clientes_deuda SET cup = ?, usd = ?, id_sale = ? WHERE id = ?`,
+    [cup, usd, id_sale, id],
   );
   return response;
 }
 // Actualizar ganancias
-export async function updateGanancia(count) {
-  const id = 1;
+export async function updateGanancia(amount) {
   const response = await executeQuery(
-    `UPDATE store SET cGanancia = ${count} WHERE id = "1"`,
+    `UPDATE store SET cGanancia = ${amount} WHERE id = ${1}`,
   );
   return response;
 }
 // Actualizar la cantidad del producto independiente
-export async function updateCountProductsIndis(count, id) {
+export async function updateamountProductsIndis(amount, id) {
   const response = await executeQuery(
-    `UPDATE producto_independiente SET cantidad = ${count} WHERE id = ${id}`,
+    `UPDATE producto_independiente SET cantidad = ${amount} WHERE id = ${id}`,
   );
   return true;
 }
@@ -367,7 +422,6 @@ export async function delProviderById(id) {
   );
   return true;
 }
-
 // Eliminar grupo de product By id ..
 export async function deleteGroupProductById(id) {
   const response = await executeQuery(
@@ -384,6 +438,11 @@ export async function deleteProductIndiById(id) {
   );
   return true;
 }
+//Eliminar cliente By ID
+export async function deleteClientById(id) {
+  await executeQuery(`DELETE FROM clientes_deuda WHERE id = ?`, [id]);
+  return true;
+}
 // Utilidades ..
 export async function clearDatabase() {
   const db = await getDatabase();
@@ -398,4 +457,45 @@ export async function clearDatabase() {
   `);
   dbInstance = null;
   await initDatabase();
+}
+
+// VENTAS-------------------------------------------------------
+//create sale
+export async function createSale(tasa_usd) {
+  const response = await executeQuery(
+    `INSERT INTO record_sales (tasa_usd) VALUES (?);`,
+    [tasa_usd],
+  );
+  return response.lastInsertRowId;
+}
+// add a product in sale
+export async function addProductInDeuda(
+  nombre,
+  typeMoney,
+  amount,
+  costPrice,
+  salePrice,
+  idProvider,
+  idSale,
+) {
+  try {
+    const response = await executeQuery(
+      `INSERT INTO products_in_deuda (nombre, type_money, amount, cost_price, sale_price, id_provider, id_sale) VALUES (?,?,?,?,?,?,?);`,
+      [nombre, typeMoney, amount, costPrice, salePrice, idProvider, idSale],
+    ).finally(() => {
+      return true;
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+//get products in dued
+export async function getProductsInDeuda() {
+  const response = await getData("SELECT * FROM products_in_deuda");
+  return response;
+}
+//get sales
+export async function getSales() {
+  const response = await getData("SELECT * FROM record_sales");
+  return response;
 }

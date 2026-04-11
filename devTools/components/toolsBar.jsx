@@ -6,33 +6,34 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { appStore } from "../../store/appStore";
 import {
-  addProduct,
-  addProductIndi,
-  addProvider,
+  getClient,
+  getGananciaOfTheStore,
+  getProductsInDeuda,
+  getSales,
   getStore,
   isInitialized,
-  updatePagoProvider,
+  updateGanancia,
 } from "../../database/database";
 import { useRouter } from "expo-router";
+import { appStore } from "../../store/appStore";
 
 export const ToolsBar = ({ show = false }) => {
   const productsIndis = appStore((state) => state.productsIndis);
+  const store = appStore((state) => state.store);
   const resetDB = appStore((state) => state.resetDB);
-  const initStore = appStore((state) => state.initStore);
+  const getDataStore = appStore((state) => state.getDataStore);
   const updateGanaciaStore = appStore((state) => state.updateGanaciaStore);
   const router = useRouter();
 
   const ACCION1 = async () => {
-    await addProvider("Carlos", 0, 0, 0);
+    console.log(await getClient());
   };
   const ACCION2 = async () => {
-    await updateGanaciaStore(0);
-    console.log(await getStore());
+    console.log(await getProductsInDeuda());
   };
   const ACCION3 = async () => {
-    console.log(isInitialized);
+    console.log(await getSales());
   };
   const ACCION4 = async () => {
     await resetDB();
