@@ -40,6 +40,7 @@ export const appStore = create((set, get) => ({
   productsIndis: [],
   providersList: [],
   productsGroupList: [],
+  productsInDeuda: [],
   clientList: [],
   productsWithStockDown: [],
   store: {},
@@ -71,6 +72,7 @@ export const appStore = create((set, get) => ({
     const products = get().productsGroupList;
     const providers = get().providersList;
     const clients = get().clientList;
+    const productsInDeuda = get().productsInDeuda;
 
     let cDebito_CUP = 0;
     let cDebito_USD = 0;
@@ -84,6 +86,15 @@ export const appStore = create((set, get) => ({
       providers.map((p) => {
         cPagado_CUP += p.pagado_CUP;
         cPagado_USD += p.pagado_USD;
+        productsInDeuda.map((pd) => {
+          if (p.id_proveedor == pd.id_provider) {
+            if (pd.moneda_CP.toLowerCase() === "cup") {
+              cDebito_CUP += pd.cost_price * pd.amount;
+            } else if (pd.moneda_CP.toLowerCase() === "usd") {
+              cDebito_USD += pd.cost_price * pd.amount;
+            }
+          }
+        });
       });
     }
 
@@ -101,10 +112,10 @@ export const appStore = create((set, get) => ({
       cDebito_USD: parseFloat(cDebito_USD).toFixed(2),
       cPagado_CUP: parseFloat(cPagado_CUP).toFixed(2),
       cPagado_USD: parseFloat(cPagado_USD).toFixed(2),
-      cGanancia_CUP: store.cGanancia_CUP,
-      cGanancia_USD: store.cGanancia_USD,
+      cGanancia_CUP: parseFloat(store.cGanancia_CUP).toFixed(2),
+      cGanancia_USD: parseFloat(store.cGanancia_USD).toFixed(2),
     };
-
+    console.log("store", store);
     await updateStore(newStore);
     set({ store: newStore });
   },
@@ -113,9 +124,9 @@ export const appStore = create((set, get) => ({
   updatePagoProviderStore: async (amount, id, isUSD = false) => {
     let response = false;
     if (isUSD) {
-      response = await updatePagoCupProvider(amount, id);
-    } else {
       response = await updatePagoUsdProvider(amount, id);
+    } else {
+      response = await updatePagoCupProvider(amount, id);
     }
     return response;
   },
@@ -188,9 +199,6 @@ export const appStore = create((set, get) => ({
     const productsIndis = get().productsIndis;
     const productsInDeuda = await getProductsInDeuda();
     for (let provider of providersList) {
-      const ProductsInDeudaFilter = productsInDeuda.filter((item) => {
-        item.id_provider === provider.id_proveedor;
-      });
       let amount = 0;
       let a_pagar_CUP = 0;
       let a_pagar_USD = 0;
@@ -199,18 +207,20 @@ export const appStore = create((set, get) => ({
       productsIndis.map((product) => {
         if (product.id_proveedor === provider.id_proveedor) {
           amount += product.cantidad;
-          if (product.moneda.toLowerCase === "cup") {
+          if (product.moneda.toLowerCase() === "cup") {
             a_pagar_CUP += product.precio_costo * product.cantidad;
-          } else if (product.moneda.toLowerCase === "usd") {
+          } else if (product.moneda.toLowerCase() === "usd") {
             a_pagar_USD += product.precio_costo * product.cantidad;
           }
         }
       });
-      ProductsInDeudaFilter.map((item) => {
-        if (item.moneda_CP.toLowerCase() === "cup") {
-          inDeuda_CUP += item.cost_price;
-        } else if (item.moneda_CP.toLowerCase() === "usd") {
-          inDeuda_USD += item.cost_price;
+      productsInDeuda.map((item) => {
+        if (item.id_provider == provider.id_proveedor) {
+          if (item.moneda_CP.toLowerCase() === "cup") {
+            inDeuda_CUP += item.cost_price * item.amount;
+          } else if (item.moneda_CP.toLowerCase() === "usd") {
+            inDeuda_USD += item.cost_price * item.amount;
+          }
         }
       });
       provider.cantidad_productos = amount;
@@ -259,12 +269,14 @@ export const appStore = create((set, get) => ({
     const productsGroup = await getProductsGroup();
     const productIndi = await getProductsIndis();
     const client = await getClient();
+    const productsInDeuda = await getProductsInDeuda();
 
     set({
       providersList: providers,
       productsGroupList: productsGroup,
       productsIndis: productIndi,
       clientList: client,
+      productsInDeuda: productsInDeuda,
     });
     return { providers, productsGroup, client };
   },

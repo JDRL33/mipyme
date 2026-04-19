@@ -106,8 +106,7 @@ export async function initDatabase() {
       id_provider	INTEGER NOT NULL,
       amount_products	INTEGER NOT NULL,
       import	REAL NOT NULL,
-      PRIMARY KEY (id AUTOINCREMENT),
-      FOREIGN KEY(id_provider) REFERENCES proveedor(id_proveedor) ON DELETE CASCADE
+      PRIMARY KEY (id AUTOINCREMENT)
     );
     CREATE TABLE IF NOT EXISTS record_sales(
       id_sale INTEGER  ,
@@ -118,7 +117,6 @@ export async function initDatabase() {
     CREATE TABLE IF NOT EXISTS products_in_deuda(
       id_producto_in_deuda INTEGER ,
       nombre TEXT NOT NULL,
-      type_money TEXT ,
       cost_price REAL NOT NULL,
       sale_price REAL NOT NULL,
       moneda_CP TEXT,
@@ -126,8 +124,7 @@ export async function initDatabase() {
       id_provider INTEGER,
       id_sale INTEGER,
       amount INTEGER,
-      PRIMARY KEY (id_producto_in_deuda AUTOINCREMENT),
-      FOREIGN KEY (id_provider) REFERENCES proveedor (id_proveedor) ON DELETE CASCADE
+      PRIMARY KEY (id_producto_in_deuda AUTOINCREMENT)
 
     );
 --___________________END____________________________________________________________
@@ -353,14 +350,16 @@ export async function addClient(
 // Incrementar o Decrementar pago en CUP a proveedor
 export async function updatePagoCupProvider(amount, id) {
   const response = await executeQuery(
-    `UPDATE proveedor SET pagado_CUP = ${amount} WHERE id_proveedor = ${id}`,
+    `UPDATE proveedor SET pagado_CUP = ? WHERE id_proveedor = ?`,
+    [amount, id],
   );
   return response;
 }
 // Incrementar o Decrementar pago en USD a proveedor
 export async function updatePagoUsdProvider(amount, id) {
   const response = await executeQuery(
-    `UPDATE proveedor SET pagado_USD = ${amount} WHERE id_proveedor = ${id}`,
+    `UPDATE proveedor SET pagado_USD = ? WHERE id_proveedor = ?`,
+    [amount, id],
   );
   return response;
 }
@@ -375,14 +374,16 @@ export async function updateClientPay(id, id_sale, usd, cup) {
 // Actualizar ganancias
 export async function updateGanancia(amountCUP, amountUSD) {
   const response = await executeQuery(
-    `UPDATE store SET cGanancia_CUP = ${amountCUP}, cGanancia_USD = ${amountUSD} WHERE id = ${1}`,
+    `UPDATE store SET cGanancia_CUP = ?, cGanancia_USD = ? WHERE id = ${1}`,
+    [amountCUP, amountUSD],
   );
   return response;
 }
 // Actualizar la cantidad del producto independiente
 export async function updateAmountProductsIndis(amount, id) {
   const response = await executeQuery(
-    `UPDATE producto_independiente SET cantidad = ${amount} WHERE id = ${id}`,
+    `UPDATE producto_independiente SET cantidad = ? WHERE id = ?`,
+    [amount, id],
   );
   return true;
 }
@@ -520,7 +521,6 @@ export async function createSale(tasa_usd) {
 // add a product in sale
 export async function addProductInDeuda(
   nombre,
-  typeMoney,
   amount,
   costPrice,
   salePrice,
@@ -531,10 +531,9 @@ export async function addProductInDeuda(
 ) {
   try {
     const response = await executeQuery(
-      `INSERT INTO products_in_deuda (nombre, type_money, amount, cost_price, sale_price, moneda_CP, moneda_SP, id_provider, id_sale) VALUES (?,?,?,?,?,?,?,?,?);`,
+      `INSERT INTO products_in_deuda (nombre ,amount, cost_price, sale_price, moneda_CP, moneda_SP, id_provider, id_sale) VALUES (?,?,?,?,?,?,?,?);`,
       [
         nombre,
-        typeMoney,
         amount,
         costPrice,
         salePrice,

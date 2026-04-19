@@ -14,7 +14,6 @@ import EmptyList from "../../components/EmptyList";
 import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import parseDMY from "../../tools/parseDMY";
-import { getProductsInDeuda } from "../../database/database";
 
 const ProveedorInfo = () => {
   // NAVEGATION
@@ -26,13 +25,14 @@ const ProveedorInfo = () => {
   const myTheme = useTheme();
 
   // USE STATES
-  const [productsInDeuda, setProductsInDeuda] = useState();
+
   const [timeoutId, setTimeoutId] = useState(null);
   const [provider, setProvider] = useState({});
   const [text, setText] = useState("");
 
   // GLOBAL STATES
   const store = appStore((state) => state.store);
+  const productsInDeuda = appStore((state) => state.productsInDeuda);
   const productsGroupList = appStore((state) => state.productsGroupList);
   const productsIndis = appStore((state) => state.productsIndis);
   const getProductsByIdProviderStore = appStore(
@@ -44,45 +44,40 @@ const ProveedorInfo = () => {
   const findByNameProductIndiStore = appStore(
     (state) => state.findByNameProductIndiStore,
   );
-  useEffect(() => {
-    const start = async () => {
-      setProductsInDeuda(await getProductsInDeuda());
-    };
-    start();
-  }, []);
 
   const getGanancia = useCallback(() => {
     let ganancia_CUP = 0;
     let ganancia_USD = 0;
     let inDeuda_CUP = 0;
     let inDeuda_USD = 0;
-    const productsInDeudaFilter = productsInDeuda.filter((item) => {
-      item.id_provider === id;
-    });
-    productsInDeudaFilter.length > 0 &&
-      productsInDeudaFilter.map((item) => {
-        if (
-          item.moneda_CP.toLowerCase() === "cup" &&
-          item.moneda_SP.toLowerCase() === "cup"
-        ) {
-          inDeuda_CUP += (item.sale_price - item.cost_price) * item.amount;
-        } else if (
-          item.moneda_CP.toLowerCase() === "usd" &&
-          item.moneda_SP.toLowerCase() === "cup"
-        ) {
-          inDeuda_CUP +=
-            (item.sale_price * store.tasa_usd - item.cost_price) * item.amount;
-        } else if (
-          item.moneda_CP.toLowerCase() === "cup" &&
-          item.moneda_SP.toLowerCase() === "usd"
-        ) {
-          inDeuda_CUP +=
-            (item.sale_price - item.cost_price * store.tasa_usd) * item.amount;
-        } else if (
-          item.moneda_CP.toLowerCase() === "usd" &&
-          item.moneda_SP.toLowerCase() === "usd"
-        ) {
-          inDeuda_USD += (item.sale_price - item.cost_price) * item.amount;
+    productsInDeuda.length > 0 &&
+      productsInDeuda.map((item) => {
+        if (item.id_provider == id) {
+          if (
+            item.moneda_CP.toLowerCase() === "cup" &&
+            item.moneda_SP.toLowerCase() === "cup"
+          ) {
+            inDeuda_CUP += (item.sale_price - item.cost_price) * item.amount;
+          } else if (
+            item.moneda_CP.toLowerCase() === "usd" &&
+            item.moneda_SP.toLowerCase() === "cup"
+          ) {
+            inDeuda_CUP +=
+              (item.sale_price * store.tasa_usd - item.cost_price) *
+              item.amount;
+          } else if (
+            item.moneda_CP.toLowerCase() === "cup" &&
+            item.moneda_SP.toLowerCase() === "usd"
+          ) {
+            inDeuda_CUP +=
+              (item.sale_price - item.cost_price * store.tasa_usd) *
+              item.amount;
+          } else if (
+            item.moneda_CP.toLowerCase() === "usd" &&
+            item.moneda_SP.toLowerCase() === "usd"
+          ) {
+            inDeuda_USD += (item.sale_price - item.cost_price) * item.amount;
+          }
         }
       });
     productsIndis.map((product) => {
@@ -128,7 +123,7 @@ const ProveedorInfo = () => {
       ganancia_CUP: (ganancia_CUP + inDeuda_CUP).toFixed(2),
       ganancia_USD: (ganancia_USD + inDeuda_USD).toFixed(2),
     };
-  }, [productsIndis, productsGroupList]);
+  }, [productsInDeuda, store.tasa_usd, id]);
 
   const getProductsStockDown = useCallback(() => {
     let amount = 0;

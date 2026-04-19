@@ -33,13 +33,13 @@ export const index = () => {
       <ScrollView style={{ paddingBottom: 10 }}>
         <CardsGridInfo />
         {/* Bloque de las tasas de cambio */}
-        <CambioCard />
+        {/* <CambioCard />
         <Text
           style={[styles.textSubtitle, { color: myTheme.colors.textPrimary }]}
         >
           Acciones Rápidas
         </Text>
-        <CardsGridActions />
+        <CardsGridActions /> */}
         <View style={{ height: 30 }} />
       </ScrollView>
       {/* Button de faboritos */}

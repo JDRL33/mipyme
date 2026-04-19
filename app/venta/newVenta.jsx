@@ -142,10 +142,9 @@ const newVenta = () => {
       ) {
         ganancia_USD = ganancia_USD + (precio_venta - precio_costo) * amount;
       }
-    } else {
+    } else if (DEUDA === true) {
       await addProductInDeuda(
         extra.nombre,
-        extra.moneda,
         extra.amount,
         precio_costo,
         precio_venta,
@@ -235,10 +234,9 @@ const newVenta = () => {
         ganancia_USD =
           ganancia_USD + (precio_venta - precio_costo) * amount_products_client;
       }
-    } else {
+    } else if (DEUDA === true) {
       await addProductInDeuda(
         extra.nombre,
-        extra.moneda,
         extra.amount,
         precio_costo,
         precio_venta,
@@ -321,7 +319,6 @@ const newVenta = () => {
     } else {
       await addProductInDeuda(
         extra.nombre,
-        extra.moneda,
         extra.amount,
         precio_costo,
         precio_venta,
@@ -514,6 +511,7 @@ const newVenta = () => {
                   const groupProduct = await findByNameProductStore(
                     product.nombre,
                   );
+                  console.log("group", groupProduct);
                   // seleccionamos todos los del grupo para efectuar FIFO(First In First Out)
                   const productsI = await getProductsByIdProductGroupStore(
                     groupProduct[0].id_grupo,
@@ -522,6 +520,7 @@ const newVenta = () => {
                   const productsIndisSort = productsI.sort(
                     (a, b) => parseDMY(a.dateOfBuy) - parseDMY(b.dateOfBuy),
                   );
+                  console.log("indi", productsIndisSort);
                   // definimos la cantidad que quiere el cliente
                   let amount = product.cantidad;
                   console.log("PEDIDO:", amount);
@@ -556,7 +555,7 @@ const newVenta = () => {
                           productsIndisSort[i].id_proveedor,
                           productsIndisSort[i].precio_costo,
                           groupProduct[0].precio_venta,
-                          productsIndisSort[1].moneda,
+                          productsIndisSort[0].moneda,
                           groupProduct[0].moneda,
                         );
                         amount = 0;
@@ -573,7 +572,7 @@ const newVenta = () => {
                           productsIndisSort[i].precio_costo,
                           productsIndisSort[i].cantidad,
                           groupProduct[0].precio_venta,
-                          productsIndisSort[1].moneda,
+                          productsIndisSort[0].moneda,
                           groupProduct[0].moneda,
                         );
 
@@ -616,7 +615,7 @@ const newVenta = () => {
                               productsIndisSort[i + aux].id_proveedor,
                               productsIndisSort[i + aux].precio_costo,
                               groupProduct[0].precio_venta,
-                              productsIndisSort[1 + aux].moneda,
+                              productsIndisSort[i + aux].moneda,
                               groupProduct[0].moneda,
                             );
                             amountRest = 0;
@@ -634,7 +633,7 @@ const newVenta = () => {
                               productsIndisSort[i + aux].precio_costo,
                               productsIndisSort[i + aux].cantidad,
                               groupProduct[0].precio_venta,
-                              productsIndisSort[1].moneda,
+                              productsIndisSort[i].moneda,
                               groupProduct[0].moneda,
                             );
 
@@ -677,7 +676,6 @@ const newVenta = () => {
                           true,
                           {
                             nombre: productsIndisSort[i].nombre,
-                            moneda: productsIndisSort[i].moneda,
                             amount: amount,
                           },
                           productsIndisSort[i].id_proveedor,
@@ -697,7 +695,6 @@ const newVenta = () => {
                           true,
                           {
                             nombre: productsIndisSort[i].nombre,
-                            moneda: productsIndisSort[i].moneda,
                             amount: amount,
                           },
                           productsIndisSort[i].cantidad,
@@ -706,7 +703,7 @@ const newVenta = () => {
                           productsIndisSort[i].id_proveedor,
                           productsIndisSort[i].precio_costo,
                           groupProduct[0].precio_venta,
-                          productsIndisSort[1].moneda,
+                          productsIndisSort[i].moneda,
                           groupProduct[0].moneda,
                         );
                         amount = 0;
@@ -719,7 +716,6 @@ const newVenta = () => {
                           true,
                           {
                             nombre: productsIndisSort[i].nombre,
-                            moneda: productsIndisSort[i].moneda,
                             amount: productsIndisSort[i].cantidad,
                           },
                           productsIndisSort[i].id,
@@ -727,7 +723,7 @@ const newVenta = () => {
                           productsIndisSort[i].precio_costo,
                           productsIndisSort[i].cantidad,
                           groupProduct[0].precio_venta,
-                          productsIndisSort[1].moneda,
+                          productsIndisSort[i].moneda,
                           groupProduct[0].moneda,
                         );
 
@@ -746,7 +742,6 @@ const newVenta = () => {
                               true,
                               {
                                 nombre: productsIndisSort[i + aux].nombre,
-                                moneda: productsIndisSort[i + aux].moneda,
                                 amount: amountRest,
                               },
                               productsIndisSort[i + aux].id_proveedor,
@@ -769,7 +764,6 @@ const newVenta = () => {
                               true,
                               {
                                 nombre: productsIndisSort[i + aux].nombre,
-                                moneda: productsIndisSort[i + aux].moneda,
                                 amount: amountRest,
                               },
                               productsIndisSort[i + aux].cantidad,
@@ -778,7 +772,7 @@ const newVenta = () => {
                               productsIndisSort[i + aux].id_proveedor,
                               productsIndisSort[i + aux].precio_costo,
                               groupProduct[0].precio_venta,
-                              productsIndisSort[1 + aux].moneda,
+                              productsIndisSort[i + aux].moneda,
                               groupProduct[0].moneda,
                             );
                             amountRest = 0;
@@ -792,7 +786,6 @@ const newVenta = () => {
                               true,
                               {
                                 nombre: productsIndisSort[i + aux].nombre,
-                                moneda: productsIndisSort[i + aux].moneda,
                                 amount: productsIndisSort[i + aux].cantidad,
                               },
                               productsIndisSort[i + aux].id,
@@ -800,7 +793,7 @@ const newVenta = () => {
                               productsIndisSort[i + aux].precio_costo,
                               productsIndisSort[i + aux].cantidad,
                               groupProduct[0].precio_venta,
-                              productsIndisSort[1].moneda,
+                              productsIndisSort[0].moneda,
                               groupProduct[0].moneda,
                             );
 
