@@ -14,6 +14,7 @@ import EmptyList from "../../components/EmptyList";
 import { appStore } from "../../store/appStore";
 import { useTheme } from "react-native-paper";
 import parseDMY from "../../tools/parseDMY";
+import { getProductsInDeuda } from "../../database/database";
 
 const ProveedorInfo = () => {
   // NAVEGATION
@@ -25,14 +26,15 @@ const ProveedorInfo = () => {
   const myTheme = useTheme();
 
   // USE STATES
+  const [productsInDeuda, setProductsInDeuda] = useState();
   const [timeoutId, setTimeoutId] = useState(null);
   const [provider, setProvider] = useState({});
   const [text, setText] = useState("");
 
   // GLOBAL STATES
+  const store = appStore((state) => state.store);
   const productsGroupList = appStore((state) => state.productsGroupList);
   const productsIndis = appStore((state) => state.productsIndis);
-  const store = appStore((state) => state.store);
   const getProductsByIdProviderStore = appStore(
     (state) => state.getProductsByIdProviderStore,
   );
@@ -42,21 +44,90 @@ const ProveedorInfo = () => {
   const findByNameProductIndiStore = appStore(
     (state) => state.findByNameProductIndiStore,
   );
+  useEffect(() => {
+    const start = async () => {
+      setProductsInDeuda(await getProductsInDeuda());
+    };
+    start();
+  }, []);
 
   const getGanancia = useCallback(() => {
-    let ganancia = 0;
+    let ganancia_CUP = 0;
+    let ganancia_USD = 0;
+    let inDeuda_CUP = 0;
+    let inDeuda_USD = 0;
+    const productsInDeudaFilter = productsInDeuda.filter((item) => {
+      item.id_provider === id;
+    });
+    productsInDeudaFilter.length > 0 &&
+      productsInDeudaFilter.map((item) => {
+        if (
+          item.moneda_CP.toLowerCase() === "cup" &&
+          item.moneda_SP.toLowerCase() === "cup"
+        ) {
+          inDeuda_CUP += (item.sale_price - item.cost_price) * item.amount;
+        } else if (
+          item.moneda_CP.toLowerCase() === "usd" &&
+          item.moneda_SP.toLowerCase() === "cup"
+        ) {
+          inDeuda_CUP +=
+            (item.sale_price * store.tasa_usd - item.cost_price) * item.amount;
+        } else if (
+          item.moneda_CP.toLowerCase() === "cup" &&
+          item.moneda_SP.toLowerCase() === "usd"
+        ) {
+          inDeuda_CUP +=
+            (item.sale_price - item.cost_price * store.tasa_usd) * item.amount;
+        } else if (
+          item.moneda_CP.toLowerCase() === "usd" &&
+          item.moneda_SP.toLowerCase() === "usd"
+        ) {
+          inDeuda_USD += (item.sale_price - item.cost_price) * item.amount;
+        }
+      });
     productsIndis.map((product) => {
       if (product.id_proveedor == id) {
         productsGroupList.map((productGroup) => {
           if (productGroup.id_grupo === product.id_grupo) {
-            ganancia +=
-              (productGroup.precio_venta - product.precio_costo) *
-              product.cantidad;
+            if (
+              productGroup.moneda.toLowerCase() === "cup" &&
+              product.moneda.toLowerCase() === "cup"
+            ) {
+              ganancia_CUP +=
+                (productGroup.precio_venta - product.precio_costo) *
+                product.cantidad;
+            } else if (
+              productGroup.moneda.toLowerCase() === "usd" &&
+              product.moneda.toLowerCase() === "cup"
+            ) {
+              ganancia_CUP +=
+                (productGroup.precio_venta * store.tasa_usd -
+                  product.precio_costo) *
+                product.cantidad;
+            } else if (
+              productGroup.moneda.toLowerCase() === "cup" &&
+              product.moneda.toLowerCase() === "usd"
+            ) {
+              ganancia_CUP +=
+                (productGroup.precio_venta -
+                  product.precio_costo * store.tasa_usd) *
+                product.cantidad;
+            } else if (
+              productGroup.moneda.toLowerCase() === "usd" &&
+              product.moneda.toLowerCase() === "usd"
+            ) {
+              ganancia_USD +=
+                (productGroup.precio_venta - product.precio_costo) *
+                product.cantidad;
+            }
           }
         });
       }
     });
-    return ganancia.toFixed(2);
+    return {
+      ganancia_CUP: (ganancia_CUP + inDeuda_CUP).toFixed(2),
+      ganancia_USD: (ganancia_USD + inDeuda_USD).toFixed(2),
+    };
   }, [productsIndis, productsGroupList]);
 
   const getProductsStockDown = useCallback(() => {
@@ -132,16 +203,30 @@ const ProveedorInfo = () => {
             styles.infoCard,
           ]}
         >
-          <Text
-            style={[
-              {
-                color: myTheme.colors.redForce,
-              },
-              styles.infoCardTextPrimary,
-            ]}
-          >
-            ${parseFloat(provider.a_pagar).toFixed(2)}
-          </Text>
+          <View style={{ flexDirection: "column" }}>
+            <Text
+              style={[
+                {
+                  color: myTheme.colors.redForce,
+                },
+                styles.infoCardTextPrimary,
+              ]}
+            >
+              ${parseFloat(provider.a_pagar_CUP).toFixed(2)}
+              {" CUP"}
+            </Text>
+            <Text
+              style={[
+                {
+                  color: myTheme.colors.redForce,
+                },
+                styles.infoCardTextPrimary,
+              ]}
+            >
+              ${parseFloat(provider.a_pagar_USD).toFixed(2)}
+              {" USD"}
+            </Text>
+          </View>
           <Text
             style={[
               {
@@ -161,16 +246,30 @@ const ProveedorInfo = () => {
             styles.infoCard,
           ]}
         >
-          <Text
-            style={[
-              {
-                color: myTheme.colors.greenForce,
-              },
-              styles.infoCardTextPrimary,
-            ]}
-          >
-            ${parseFloat(provider.pagado).toFixed(2)}
-          </Text>
+          <View style={{ flexDirection: "column" }}>
+            <Text
+              style={[
+                {
+                  color: myTheme.colors.greenForce,
+                },
+                styles.infoCardTextPrimary,
+              ]}
+            >
+              ${parseFloat(provider.pagado_CUP).toFixed(2)}
+              {" CUP"}
+            </Text>
+            <Text
+              style={[
+                {
+                  color: myTheme.colors.greenForce,
+                },
+                styles.infoCardTextPrimary,
+              ]}
+            >
+              ${parseFloat(provider.pagado_USD).toFixed(2)}
+              {" USD"}
+            </Text>
+          </View>
           <Text
             style={[
               {
@@ -190,7 +289,7 @@ const ProveedorInfo = () => {
         />
         <InfoProviderText
           textPrimary="Ganancias:"
-          textSecondary={`$${getGanancia()}`}
+          textSecondary={`$${getGanancia().ganancia_CUP} CUP - $${getGanancia().ganancia_USD} USD`}
         />
         <InfoProviderText
           textPrimary="Productos en bajo Stock:"
@@ -273,6 +372,7 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+    gap: 10,
   },
   infoCardTextPrimary: {
     fontWeight: "bold",

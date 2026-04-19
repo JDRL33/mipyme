@@ -43,8 +43,8 @@ const Proveedor = () => {
             id={item.id_proveedor}
             name={item.nombre}
             numProducts={item.cantidad_productos}
-            a_pagar={item.a_pagar}
-            pagado={item.pagado}
+            a_pagar_CUP={item.a_pagar_CUP}
+            a_pagar_USD={item.a_pagar_USD}
           />
         )}
         keyExtractor={(item) => item.id_proveedor}

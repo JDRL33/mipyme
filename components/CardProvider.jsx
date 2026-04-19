@@ -7,8 +7,8 @@ const CardProvider = ({
   id,
   name,
   numProducts,
-  a_pagar,
-  pagado,
+  a_pagar_CUP,
+  a_pagar_USD,
   onPressValidate = true,
   onLongPressValidate = true,
 }) => {
@@ -61,12 +61,15 @@ const CardProvider = ({
           <Text
             style={[styles.textPricing, { color: myTheme.colors.redForce }]}
           >
-            ${parseFloat(a_pagar).toFixed(2)} -
+            ${parseFloat(a_pagar_CUP).toFixed(2)}
+            {" CUP"}
+            {" - "}
           </Text>
           <Text
-            style={[styles.textPricing, { color: myTheme.colors.greenForce }]}
+            style={[styles.textPricing, { color: myTheme.colors.redForce }]}
           >
-            {` $${parseFloat(pagado).toFixed(2)}`}
+            ${parseFloat(a_pagar_USD).toFixed(2)}
+            {" USD"}
           </Text>
         </View>
       </View>

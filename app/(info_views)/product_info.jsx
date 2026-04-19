@@ -60,16 +60,23 @@ const product_info = () => {
         }}
       />
       {params.moneda === "USD" && (
-        <Text
-          style={[
-            {
-              color: myTheme.colors.greenForce,
-            },
-            styles.cambio,
-          ]}
-        >
-          ${params.precioVenta * store.tasa_usd} {"CUP"}
-        </Text>
+        <View style={{ flexDirection: "column" }}>
+          <Text
+            style={[
+              {
+                color: myTheme.colors.greenForce,
+              },
+              styles.cambio,
+            ]}
+          >
+            ${params.precioVenta * store.tasa_usd} {"CUP"}
+          </Text>
+          <Text
+            style={{ color: myTheme.colors.textSecondary, textAlign: "center" }}
+          >
+            {`Cambio según la tasa de cambio actual ($${store.tasa_usd} CUP)`}
+          </Text>
+        </View>
       )}
       <Text
         style={[
@@ -91,34 +98,58 @@ const product_info = () => {
       >
         Precio de Venta
       </Text>
-      <View style={styles.infoParent}>
-        <FontAwesome5
-          name="money-bill-wave"
-          size={24}
-          color={myTheme.colors.greenForce}
-        />
-        <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
-          Cobro total: ${parseFloat(params.cTotal).toFixed(2)}{" "}
-          {params.moneda.toUpperCase()}
-        </Text>
-      </View>
-      <View style={styles.infoParent}>
-        <FontAwesome5
-          name="money-bill-wave"
-          size={24}
-          color={myTheme.colors.greenForce}
-        />
-        <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
-          Ganancia total: ${parseFloat(params.gTotal).toFixed(2)}{" "}
-          {params.moneda.toUpperCase()}
-        </Text>
-      </View>
+      {params.cTotal_CUP > 0 && (
+        <View style={styles.infoParent}>
+          <FontAwesome5
+            name="money-bill-wave"
+            size={24}
+            color={myTheme.colors.greenForce}
+          />
+          <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
+            Cobro total en CUP: ${parseFloat(params.cTotal_CUP).toFixed(2)}
+          </Text>
+        </View>
+      )}
+      {params.cTotal_USD > 0 && (
+        <View style={styles.infoParent}>
+          <FontAwesome5
+            name="money-bill-wave"
+            size={24}
+            color={myTheme.colors.greenForce}
+          />
+          <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
+            Cobro total en USD: ${parseFloat(params.cTotal_USD).toFixed(2)}
+          </Text>
+        </View>
+      )}
+      {params.gTotal_CUP > 0 && (
+        <View style={styles.infoParent}>
+          <FontAwesome5
+            name="money-bill-wave"
+            size={24}
+            color={myTheme.colors.greenForce}
+          />
+          <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
+            Ganancia total en CUP: ${parseFloat(params.gTotal_CUP).toFixed(2)}
+          </Text>
+        </View>
+      )}
+      {params.gTotal_USD > 0 && (
+        <View style={styles.infoParent}>
+          <FontAwesome5
+            name="money-bill-wave"
+            size={24}
+            color={myTheme.colors.greenForce}
+          />
+          <Text style={{ color: myTheme.colors.textPrimary, fontSize: 20 }}>
+            Ganancia total en USD: ${parseFloat(params.gTotal_USD).toFixed(2)}
+          </Text>
+        </View>
+      )}
       <Text
         style={[
           {
             color: myTheme.colors.textSecondary,
-
-            marginTop: 50,
           },
           styles.label,
         ]}
@@ -172,7 +203,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     textAlign: "center",
-    marginTop: 5,
+    marginTop: 20,
   },
   infoParent: {
     marginTop: 20,

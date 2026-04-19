@@ -35,6 +35,7 @@ const Clients = () => {
         ListFooterComponent={<View style={{ height: 20 }} />}
         renderItem={({ item }) => (
           <CardClient
+            id={item.id}
             nombre={item.nombre}
             ci={item.carnet_identidad}
             cup={item.cup}

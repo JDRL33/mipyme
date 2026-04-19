@@ -11,8 +11,10 @@ const CardProduct = ({
   pMoneda,
   pPrecio_venta,
   pCantidad,
-  pCTotal,
-  pGTotal,
+  pCTotal_CUP,
+  pCTotal_USD,
+  pGTotal_CUP,
+  pGTotal_USD,
 }) => {
   const myTheme = useTheme();
   const store = appStore((state) => state.store);
@@ -35,8 +37,10 @@ const CardProduct = ({
               precioVenta: pPrecio_venta,
               moneda: pMoneda,
               cantidad: pCantidad,
-              cTotal: pCTotal,
-              gTotal: pGTotal,
+              cTotal_CUP: pCTotal_CUP,
+              cTotal_USD: pCTotal_USD,
+              gTotal_CUP: pGTotal_CUP,
+              gTotal_USD: pGTotal_USD,
             },
           });
         }}

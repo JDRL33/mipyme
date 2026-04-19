@@ -39,8 +39,10 @@ const Products = () => {
             pMoneda={item.moneda}
             pPrecio_venta={item.precio_venta}
             pCantidad={item.cantidad}
-            pCTotal={item.cobro_total}
-            pGTotal={item.ganancia_total}
+            pCTotal_CUP={item.cobro_total_CUP}
+            pCTotal_USD={item.cobro_total_USD}
+            pGTotal_CUP={item.ganancia_total_CUP}
+            pGTotal_USD={item.ganancia_total_USD}
           />
         )}
       />

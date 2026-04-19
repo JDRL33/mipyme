@@ -28,8 +28,12 @@ import {
   deleteGroupProductById,
   getProductsByIdProvider,
   getProductsByIdProductGroup,
-  updateamountProductsIndis,
+  updateAmountProductsIndis,
   updateGanancia,
+  updatePagoCupProvider,
+  updatePagoUsdProvider,
+  getProductsInDeudaByIdProvider,
+  getProductsInDeuda,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -68,14 +72,18 @@ export const appStore = create((set, get) => ({
     const providers = get().providersList;
     const clients = get().clientList;
 
-    let cDebito = 0;
-    let cPagado = 0;
+    let cDebito_CUP = 0;
+    let cDebito_USD = 0;
+    let cPagado_CUP = 0;
+    let cPagado_USD = 0;
     if (providers.length > 0) {
       products.map((product) => {
-        cDebito += product.cobro_total;
+        cDebito_CUP += product.cobro_total_CUP;
+        cDebito_USD += product.cobro_total_USD;
       });
       providers.map((p) => {
-        cPagado += p.pagado;
+        cPagado_CUP += p.pagado_CUP;
+        cPagado_USD += p.pagado_USD;
       });
     }
 
@@ -89,9 +97,12 @@ export const appStore = create((set, get) => ({
       nProducts_stock_down: productsStockBajo.length,
       nProviders: providers.length,
       nClients: clients.length,
-      cDebito: parseFloat(cDebito).toFixed(2),
-      cPagado: parseFloat(cPagado).toFixed(2),
-      cGanancia: store.cGanancia,
+      cDebito_CUP: parseFloat(cDebito_CUP).toFixed(2),
+      cDebito_USD: parseFloat(cDebito_USD).toFixed(2),
+      cPagado_CUP: parseFloat(cPagado_CUP).toFixed(2),
+      cPagado_USD: parseFloat(cPagado_USD).toFixed(2),
+      cGanancia_CUP: store.cGanancia_CUP,
+      cGanancia_USD: store.cGanancia_USD,
     };
 
     await updateStore(newStore);
@@ -99,12 +110,17 @@ export const appStore = create((set, get) => ({
   },
 
   // METODO PARA ACTUALIZAR LOS PAGOS A PROVEEDORES
-  updatePagoProviderStore: async (amount, id) => {
-    const response = await updatePagoProvider(amount, id);
+  updatePagoProviderStore: async (amount, id, isUSD = false) => {
+    let response = false;
+    if (isUSD) {
+      response = await updatePagoCupProvider(amount, id);
+    } else {
+      response = await updatePagoUsdProvider(amount, id);
+    }
     return response;
   },
-  updateGanaciaStore: async (amount) => {
-    await updateGanancia(amount);
+  updateGanaciaStore: async (amountCUP, amountUSD) => {
+    await updateGanancia(amountCUP, amountUSD);
     return true;
   },
 
@@ -114,19 +130,54 @@ export const appStore = create((set, get) => ({
     const productsGroupList = get().productsGroupList;
     for (let group of productsGroupList) {
       let amount = 0;
-      let costoTotal = 0;
-      let gananciaTotal = 0;
+      let costoTotal_CUP = 0;
+      let costoTotal_USD = 0;
+      let gananciaTotal_CUP = 0;
+      let gananciaTotal_USD = 0;
+      const tasa_usd = get().store.tasa_usd;
       productsIndis.map((item) => {
         if (item.id_grupo === group.id_grupo) {
           amount += item.cantidad;
-          costoTotal += item.precio_costo * item.cantidad;
-          gananciaTotal +=
-            (group.precio_venta - item.precio_costo) * item.cantidad;
+          if (item.moneda.toLowerCase() === "cup") {
+            costoTotal_CUP += item.precio_costo * item.cantidad;
+          } else if (item.moneda.toLowerCase() === "usd") {
+            costoTotal_USD += item.precio_costo * item.cantidad;
+          }
+          if (
+            item.moneda.toLowerCase() === "cup" &&
+            group.moneda.toLowerCase() === "cup"
+          ) {
+            gananciaTotal_CUP +=
+              (group.precio_venta - item.precio_costo) * item.cantidad;
+          } else if (
+            item.moneda.toLowerCase() === "usd" &&
+            group.moneda.toLowerCase() === "cup"
+          ) {
+            gananciaTotal_CUP +=
+              (group.precio_venta - item.precio_costo * tasa_usd) *
+              item.cantidad;
+          } else if (
+            item.moneda.toLowerCase() === "cup" &&
+            group.moneda.toLowerCase() === "usd"
+          ) {
+            gananciaTotal_CUP +=
+              (group.precio_venta * tasa_usd - item.precio_costo) *
+              item.cantidad;
+          } else if (
+            item.moneda.toLowerCase() === "usd" &&
+            group.moneda.toLowerCase() === "usd"
+          ) {
+            gananciaTotal_USD +=
+              (group.precio_venta - item.precio_costo) * item.cantidad;
+          }
         }
       });
       group.cantidad = amount;
-      group.cobro_total = costoTotal;
-      group.ganancia_total = gananciaTotal;
+      group.cobro_total_CUP = costoTotal_CUP;
+      group.cobro_total_USD = costoTotal_USD;
+      group.ganancia_total_CUP = gananciaTotal_CUP;
+      group.ganancia_total_USD = gananciaTotal_USD;
+
       await updateProductGroup(group);
       set({ productsGroupList: productsGroupList });
     }
@@ -135,18 +186,38 @@ export const appStore = create((set, get) => ({
   updateProvidersStatsStore: async () => {
     const providersList = get().providersList;
     const productsIndis = get().productsIndis;
+    const productsInDeuda = await getProductsInDeuda();
     for (let provider of providersList) {
+      const ProductsInDeudaFilter = productsInDeuda.filter((item) => {
+        item.id_provider === provider.id_proveedor;
+      });
       let amount = 0;
-      let a_pagar = 0;
+      let a_pagar_CUP = 0;
+      let a_pagar_USD = 0;
+      let inDeuda_CUP = 0;
+      let inDeuda_USD = 0;
       productsIndis.map((product) => {
         if (product.id_proveedor === provider.id_proveedor) {
           amount += product.cantidad;
-          a_pagar += product.precio_costo * product.cantidad;
+          if (product.moneda.toLowerCase === "cup") {
+            a_pagar_CUP += product.precio_costo * product.cantidad;
+          } else if (product.moneda.toLowerCase === "usd") {
+            a_pagar_USD += product.precio_costo * product.cantidad;
+          }
+        }
+      });
+      ProductsInDeudaFilter.map((item) => {
+        if (item.moneda_CP.toLowerCase() === "cup") {
+          inDeuda_CUP += item.cost_price;
+        } else if (item.moneda_CP.toLowerCase() === "usd") {
+          inDeuda_USD += item.cost_price;
         }
       });
       provider.cantidad_productos = amount;
-      provider.a_pagar = a_pagar;
-      provider.pagado = provider.pagado;
+      provider.a_pagar_CUP = a_pagar_CUP + inDeuda_CUP;
+      provider.a_pagar_USD = a_pagar_USD + inDeuda_USD;
+      provider.pagado_CUP = provider.pagado_CUP;
+      provider.pagado_USD = provider.pagado_USD;
       await updateProvider(provider);
       const providers = await getProviders();
       set({ providersList: providers });
@@ -162,8 +233,8 @@ export const appStore = create((set, get) => ({
   },
 
   // METODO PARA ACTUALIZAR CANTIDAD DE PRODUCTOS INDEPENDIENTES
-  updateamountProductsIndisStore: async (amount, id) => {
-    await updateamountProductsIndis(amount, id);
+  updateAmountProductsIndisStore: async (amount, id) => {
+    await updateAmountProductsIndis(amount, id);
   },
 
   updateStatusStockDown: async () => {
@@ -276,19 +347,30 @@ export const appStore = create((set, get) => ({
   // Metodos para aniadir_________________________________________________________
 
   // METODO PARA ANIADIR PROVEEDORES
-  addProviderStore: async (pNombre, pCantidad_productos, pA_pagar, pPagado) => {
+  addProviderStore: async (
+    pNombre,
+    pCantidad_productos,
+    pA_pagar_USD,
+    pA_pagar_CUP,
+    pPagado_CUP,
+    pPagado_USD,
+  ) => {
     const userId = await addProvider(
       pNombre,
       pCantidad_productos,
-      pA_pagar,
-      pPagado,
+      pA_pagar_CUP,
+      pA_pagar_USD,
+      pPagado_CUP,
+      pPagado_USD,
     );
     const newProvider = {
       id_proveedor: userId,
       nombre: pNombre,
       cantidad_productos: pCantidad_productos,
-      a_pagar: pA_pagar,
-      pagado: pPagado,
+      a_pagar_CUP: pA_pagar_CUP,
+      a_pagar_USD: pA_pagar_USD,
+      pagado_CUP: pPagado_CUP,
+      pagado_USD: pPagado_USD,
     };
 
     set((state) => ({ providersList: [...state.providersList, newProvider] }));
@@ -300,16 +382,20 @@ export const appStore = create((set, get) => ({
     pMoneda,
     pPrecio_venta,
     pCantidad,
-    pGanancia,
-    pCobroTotal,
+    pGanancia_CUP,
+    pGanancia_USD,
+    pCobroTotal_CUP,
+    pCobroTotal_USD,
   ) => {
     const productId = await addProduct(
       pNombre,
       pMoneda,
       pPrecio_venta,
       pCantidad,
-      pGanancia,
-      pCobroTotal,
+      pGanancia_CUP,
+      pGanancia_USD,
+      pCobroTotal_CUP,
+      pCobroTotal_USD,
     );
     const newProduct = {
       id: productId,
@@ -317,8 +403,10 @@ export const appStore = create((set, get) => ({
       moneda: pMoneda,
       precio_venta: pPrecio_venta,
       cantidad: pCantidad,
-      ganancia: pGanancia,
-      cobro_total: pCobroTotal,
+      ganancia_total_CUP: pGanancia_CUP,
+      ganancia_total_USD: pGanancia_USD,
+      cobro_total_CUP: pCobroTotal_USD,
+      cobro_total_USD: pCobroTotal_USD,
     };
     set((state) => ({
       productsGroupList: [...state.productsGroupList, newProduct],
@@ -333,7 +421,8 @@ export const appStore = create((set, get) => ({
     pCantidad,
     pIdProveedor,
     pIdGrupo,
-    pGanancia,
+    pGanancia_CUP,
+    pGanancia_USD,
     pDateOfBuy,
   ) => {
     const productId = await addProductIndi(
@@ -343,7 +432,8 @@ export const appStore = create((set, get) => ({
       pCantidad,
       pIdProveedor,
       pIdGrupo,
-      pGanancia,
+      pGanancia_CUP,
+      pGanancia_USD,
       pDateOfBuy,
     );
 
@@ -355,7 +445,8 @@ export const appStore = create((set, get) => ({
       cantidad: pCantidad,
       id_proveedor: pIdProveedor,
       id_grupo: pIdGrupo,
-      ganancia: pGanancia,
+      ganancia_CUP: pGanancia_CUP,
+      ganancia_USD: pGanancia_USD,
       dateOfBuy: pDateOfBuy,
     };
     set((state) => ({

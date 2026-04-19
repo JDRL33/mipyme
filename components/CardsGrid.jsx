@@ -20,21 +20,24 @@ export const CardsGridInfo = () => {
       />
       <CardInfo
         textHeader={"A Depositar"}
-        textBody={store.cDebito}
+        textBodyCup={store.cDebito_CUP}
+        textBodyUsd={store.cDebito_USD}
         color={0}
         icon={1}
         money
       />
       <CardInfo
         textHeader={"Depositado"}
-        textBody={store.cPagado}
+        textBodyCup={store.cPagado_CUP}
+        textBodyUsd={store.cPagado_USD}
         color={1}
         icon={2}
         money
       />
       <CardInfo
         textHeader={"Ganancia"}
-        textBody={store.cGanancia}
+        textBodyCup={store.cGanancia_CUP}
+        textBodyUsd={store.cGanancia_USD}
         color={0}
         icon={3}
         money

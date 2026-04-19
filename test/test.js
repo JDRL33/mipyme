@@ -55,7 +55,7 @@ async function equalCompare(
 
 // ----------------------------------------------------------------------------------------------------
 if (amount - productsIndisSort[i].cantidad < 0) {
-  await updateamountProductsIndisStore(
+  await updateAmountProductsIndisStore(
     productsIndisSort[i].cantidad - amount,
     productsIndisSort[i].id,
   );
@@ -81,7 +81,7 @@ async function moreProducts(
   precio_costo,
   precio_venta,
 ) {
-  await updateamountProductsIndisStore(
+  await updateAmountProductsIndisStore(
     amount_products - amount_products_client,
     id_product,
   );

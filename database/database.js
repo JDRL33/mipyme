@@ -25,9 +25,12 @@ export async function initDatabase() {
       nProviders	INTEGER DEFAULT 0,
       nProducts_stock_down INTEGER DEFAULT 0,
       nClients	INTEGER DEFAULT 0,
-      cDebito	REAL DEFAULT 0,
-      cPagado	REAL DEFAULT 0,
-      cGanancia	REAL DEFAULT 0,
+      cDebito_CUP	REAL DEFAULT 0,
+      cDebito_USD	REAL DEFAULT 0,
+      cPagado_CUP	REAL DEFAULT 0,
+      cPagado_USD	REAL DEFAULT 0,
+      cGanancia_CUP	REAL DEFAULT 0,
+      cGanancia_USD	REAL DEFAULT 0,
       PRIMARY KEY(id AUTOINCREMENT)
     );
     -- VALORES CALCULABLES stock
@@ -45,8 +48,10 @@ export async function initDatabase() {
       id_proveedor	INTEGER NOT NULL,
       nombre	TEXT NOT NULL,
       cantidad_productos	INTEGER,
-      a_pagar	REAL, 
-      pagado	REAL,
+      a_pagar_CUP	REAL, 
+      a_pagar_USD	REAL, 
+      pagado_CUP	REAL,
+      pagado_USD	REAL,
       ultimaFechaEntrada TEXT,
       PRIMARY KEY(id_proveedor AUTOINCREMENT)
     );
@@ -60,8 +65,10 @@ export async function initDatabase() {
       moneda	TEXT NOT NULL,
 	    precio_venta	REAL NOT NULL,
 	    cantidad	INTEGER,
-	    cobro_total	REAL,
-	    ganancia_total	REAL,
+	    cobro_total_CUP	REAL,
+	    cobro_total_USD	REAL,
+	    ganancia_total_CUP	REAL,
+	    ganancia_total_USD	REAL,
 	    PRIMARY KEY(id_grupo AUTOINCREMENT)
     );
 
@@ -78,7 +85,8 @@ export async function initDatabase() {
       cantidad	INTEGER,
       id_proveedor	INTEGER NOT NULL,
       id_grupo	INTEGER,
-      ganancia	REAL,
+      ganancia_CUP	REAL,
+      ganancia_USD	REAL,
       dateOfBuy TEXT NOT NULL,
       PRIMARY KEY(id AUTOINCREMENT),
       FOREIGN KEY(id_grupo) REFERENCES producto_grupo(id_grupo) ON DELETE CASCADE,
@@ -113,6 +121,8 @@ export async function initDatabase() {
       type_money TEXT ,
       cost_price REAL NOT NULL,
       sale_price REAL NOT NULL,
+      moneda_CP TEXT,
+      moneda_SP TEXT, 
       id_provider INTEGER,
       id_sale INTEGER,
       amount INTEGER,
@@ -167,7 +177,7 @@ export async function getData(sql, params = []) {
 // Funcion para actualizar la tienda
 export async function updateStore(store) {
   await executeQuery(
-    "UPDATE store SET name=?, limitStockDown = ?, tasa_usd = ?, tasa_eur = ?, nProducts = ?, nProducts_stock_down = ?, nProviders = ?, nClients = ?, cDebito = ?, cPagado = ?, cGanancia = ? WHERE id = ?",
+    "UPDATE store SET name=?, limitStockDown = ?, tasa_usd = ?, tasa_eur = ?, nProducts = ?, nProducts_stock_down = ?, nProviders = ?, nClients = ?, cDebito_CUP = ?, cDebito_USD = ?, cPagado_CUP = ?, cPagado_USD = ?, cGanancia_CUP = ?, cGanancia_USD = ? WHERE id = ?",
     [
       store.name,
       store.limitStockDown,
@@ -177,9 +187,12 @@ export async function updateStore(store) {
       store.nProducts_stock_down,
       store.nProviders,
       store.nClients,
-      store.cDebito,
-      store.cPagado,
-      store.cGanancia,
+      store.cDebito_CUP,
+      store.cDebito_USD,
+      store.cPagado_CUP,
+      store.cPagado_USD,
+      store.cGanancia_CUP,
+      store.cGanancia_USD,
       store.id,
     ],
   );
@@ -187,14 +200,16 @@ export async function updateStore(store) {
 //Funcion para actualizar un grupo de productos
 export async function updateProductGroup(group) {
   await executeQuery(
-    "UPDATE producto_grupo SET nombre = ?, moneda = ?, precio_venta = ?, cantidad = ?, cobro_total = ?, ganancia_total = ? WHERE id_grupo = ?",
+    "UPDATE producto_grupo SET nombre = ?, moneda = ?, precio_venta = ?, cantidad = ?, cobro_total_CUP = ?, cobro_total_USD = ?, ganancia_total_CUP = ?, ganancia_total_USD = ?  WHERE id_grupo = ?",
     [
       group.nombre,
       group.moneda,
       group.precio_venta,
       group.cantidad,
-      group.cobro_total,
-      group.ganancia_total,
+      group.cobro_total_CUP,
+      group.cobro_total_USD,
+      group.ganancia_total_CUP,
+      group.ganancia_total_USD,
       group.id_grupo,
     ],
   );
@@ -202,12 +217,14 @@ export async function updateProductGroup(group) {
 //Funcion para actualizar un proveedor
 export async function updateProvider(provider) {
   await executeQuery(
-    "UPDATE proveedor SET nombre = ?, cantidad_productos = ?, a_pagar = ?, pagado = ?, ultimaFechaEntrada = ? WHERE id_proveedor = ?",
+    "UPDATE proveedor SET nombre = ?, cantidad_productos = ?, a_pagar_CUP = ?, a_pagar_USD = ?, pagado_CUP = ?, pagado_USD = ?, ultimaFechaEntrada = ? WHERE id_proveedor = ?",
     [
       provider.nombre,
       provider.cantidad_productos,
-      provider.a_pagar,
-      provider.pagado,
+      provider.a_pagar_CUP,
+      provider.a_pagar_USD,
+      provider.pagado_CUP,
+      provider.pagado_USD,
       provider.ultimaFechaEntrada,
       provider.id_proveedor,
     ],
@@ -237,19 +254,31 @@ export async function getClientById(id) {
   return await getData("SELECT * FROM clientes_deuda WHERE id = ?", [id]);
 }
 export async function getGananciaOfTheStore() {
-  const response = await getData("SELECT cGanancia FROM store WHERE id = 1");
+  const response = await getData(
+    "SELECT cGanancia_CUP, cGanancia_USD  FROM store WHERE id = 1",
+  );
+  console.log(response[0]);
   return response;
 }
 // Aniadiendo proveedores
 export async function addProvider(
   pNombre,
   pCantidad_productos,
-  pA_pagar,
-  pPagado,
+  pA_pagar_CUP,
+  pA_pagar_USD,
+  pPagado_CUP,
+  pPagado_USD,
 ) {
   const response = await executeQuery(
-    "INSERT INTO proveedor ( nombre, cantidad_productos, a_pagar, pagado ) VALUES (?,?,?,?);",
-    [pNombre, pCantidad_productos, pA_pagar, pPagado],
+    "INSERT INTO proveedor ( nombre, cantidad_productos, a_pagar_CUP, a_pagar_USD, pagado_CUP, pagado_USD ) VALUES (?,?,?,?,?,?);",
+    [
+      pNombre,
+      pCantidad_productos,
+      pA_pagar_CUP,
+      pA_pagar_USD,
+      pPagado_CUP,
+      pPagado_USD,
+    ],
   );
   return response.lastInsertRowId;
 }
@@ -259,12 +288,23 @@ export async function addProduct(
   pMoneda,
   pPrecio_venta,
   pCantidad,
-  pCobroTotal,
-  pGanancia,
+  pCobroTotal_CUP,
+  pCobroTotal_USD,
+  pGanancia_CUP,
+  pGanancia_USD,
 ) {
   const response = await executeQuery(
-    "INSERT INTO producto_grupo ( nombre, moneda, precio_venta, cantidad, ganancia_total, cobro_total ) VALUES (?,?,?,?,?,?);",
-    [pNombre, pMoneda, pPrecio_venta, pCantidad, pGanancia, pCobroTotal],
+    "INSERT INTO producto_grupo ( nombre, moneda, precio_venta, cantidad, ganancia_total_CUP, ganancia_total_USD,  cobro_total_CUP, cobro_total_USD ) VALUES (?,?,?,?,?,?,?,?);",
+    [
+      pNombre,
+      pMoneda,
+      pPrecio_venta,
+      pCantidad,
+      pGanancia_CUP,
+      pGanancia_USD,
+      pCobroTotal_CUP,
+      pCobroTotal_USD,
+    ],
   );
   return response.lastInsertRowId;
 }
@@ -276,11 +316,12 @@ export async function addProductIndi(
   pCantidad,
   pIdProveedor,
   pIdGrupo,
-  pGanancia,
+  pGanancia_CUP,
+  pGanancia_USD,
   pDateOfBuy,
 ) {
   const response = await executeQuery(
-    "INSERT INTO producto_independiente ( nombre, moneda, precio_costo, cantidad, id_proveedor, id_grupo, ganancia, dateOfBuy ) VALUES (?,?,?,?,?,?,?,?);",
+    "INSERT INTO producto_independiente ( nombre, moneda, precio_costo, cantidad, id_proveedor, id_grupo, ganancia_CUP, ganancia_USD, dateOfBuy ) VALUES (?,?,?,?,?,?,?,?,?);",
     [
       pNombre,
       pMoneda,
@@ -288,7 +329,8 @@ export async function addProductIndi(
       pCantidad,
       pIdProveedor,
       pIdGrupo,
-      pGanancia,
+      pGanancia_CUP,
+      pGanancia_USD,
       pDateOfBuy,
     ],
   );
@@ -308,10 +350,17 @@ export async function addClient(
   );
   return response.lastInsertRowId;
 }
-// Incrementar o Decrementar pago a proveedor
-export async function updatePagoProvider(amount, id) {
+// Incrementar o Decrementar pago en CUP a proveedor
+export async function updatePagoCupProvider(amount, id) {
   const response = await executeQuery(
-    `UPDATE proveedor SET pagado = ${amount} WHERE id_proveedor = ${id}`,
+    `UPDATE proveedor SET pagado_CUP = ${amount} WHERE id_proveedor = ${id}`,
+  );
+  return response;
+}
+// Incrementar o Decrementar pago en USD a proveedor
+export async function updatePagoUsdProvider(amount, id) {
+  const response = await executeQuery(
+    `UPDATE proveedor SET pagado_USD = ${amount} WHERE id_proveedor = ${id}`,
   );
   return response;
 }
@@ -324,14 +373,14 @@ export async function updateClientPay(id, id_sale, usd, cup) {
   return response;
 }
 // Actualizar ganancias
-export async function updateGanancia(amount) {
+export async function updateGanancia(amountCUP, amountUSD) {
   const response = await executeQuery(
-    `UPDATE store SET cGanancia = ${amount} WHERE id = ${1}`,
+    `UPDATE store SET cGanancia_CUP = ${amountCUP}, cGanancia_USD = ${amountUSD} WHERE id = ${1}`,
   );
   return response;
 }
 // Actualizar la cantidad del producto independiente
-export async function updateamountProductsIndis(amount, id) {
+export async function updateAmountProductsIndis(amount, id) {
   const response = await executeQuery(
     `UPDATE producto_independiente SET cantidad = ${amount} WHERE id = ${id}`,
   );
@@ -475,13 +524,25 @@ export async function addProductInDeuda(
   amount,
   costPrice,
   salePrice,
+  moneda_PC,
+  moneda_PV,
   idProvider,
   idSale,
 ) {
   try {
     const response = await executeQuery(
-      `INSERT INTO products_in_deuda (nombre, type_money, amount, cost_price, sale_price, id_provider, id_sale) VALUES (?,?,?,?,?,?,?);`,
-      [nombre, typeMoney, amount, costPrice, salePrice, idProvider, idSale],
+      `INSERT INTO products_in_deuda (nombre, type_money, amount, cost_price, sale_price, moneda_CP, moneda_SP, id_provider, id_sale) VALUES (?,?,?,?,?,?,?,?,?);`,
+      [
+        nombre,
+        typeMoney,
+        amount,
+        costPrice,
+        salePrice,
+        moneda_PC,
+        moneda_PV,
+        idProvider,
+        idSale,
+      ],
     ).finally(() => {
       return true;
     });
@@ -493,6 +554,14 @@ export async function addProductInDeuda(
 export async function getProductsInDeuda() {
   const response = await getData("SELECT * FROM products_in_deuda");
   return response;
+}
+//get products in dued by Id provider
+export async function getProductsInDeudaByIdProvider(id_provider) {
+  const response = await getData(
+    "SELECT * FROM products_in_deuda WHERE id_provider = ?",
+    [id_provider],
+  );
+  return response[0];
 }
 //get sales
 export async function getSales() {

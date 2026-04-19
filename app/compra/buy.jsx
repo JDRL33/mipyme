@@ -70,6 +70,7 @@ const buy = () => {
             params.id_provider,
             product.id_grupo,
             0,
+            0,
             date.toLocaleDateString("en-US"),
           );
           newGroup = false;
@@ -84,6 +85,8 @@ const buy = () => {
                 group.amount,
                 0,
                 0,
+                0,
+                0,
               );
               await addProductsIndiStore(
                 product.name,
@@ -92,6 +95,7 @@ const buy = () => {
                 product.amount,
                 params.id_provider,
                 id_group,
+                0,
                 0,
                 date.toLocaleDateString("en-US"),
               );

@@ -33,8 +33,8 @@ const newVenta = () => {
   const updatePagoProviderStore = appStore(
     (state) => state.updatePagoProviderStore,
   );
-  const updateamountProductsIndisStore = appStore(
-    (state) => state.updateamountProductsIndisStore,
+  const updateAmountProductsIndisStore = appStore(
+    (state) => state.updateAmountProductsIndisStore,
   );
   const deleteProductGroupWithEmptyStock = appStore(
     (state) => state.deleteProductGroupWithEmptyStock,
@@ -69,7 +69,8 @@ const newVenta = () => {
   //Datos de la nueva venta
   const [idSale, setIdSale] = useState("");
 
-  let ganancia = 0;
+  let ganancia_CUP = 0;
+  let ganancia_USD = 0;
   const [gananciaActual, setGananciaActual] = useState(null);
   const [currentClient, setCurrentClient] = useState(null);
 
@@ -97,16 +98,50 @@ const newVenta = () => {
     precio_venta,
     precio_costo,
     amount,
+    moneda_PC,
+    moneda_PV,
   ) => {
     const provider = await getProvidersByIdStore(id_proveedor);
 
     if (DEUDA == false) {
       await deleteProductIndiByIdStore(id_product);
-      await updatePagoProviderStore(
-        precio_costo * amount + provider.pagado,
-        id_proveedor,
-      );
-      ganancia = ganancia + (precio_venta - precio_costo) * amount;
+      if (moneda_PC.toLowerCase() === "cup") {
+        await updatePagoProviderStore(
+          precio_costo * amount + provider.pagado_CUP,
+          id_proveedor,
+        );
+      } else {
+        await updatePagoProviderStore(
+          precio_costo * amount + provider.pagado_USD,
+          id_proveedor,
+          true,
+        );
+      }
+      if (
+        moneda_PC.toLowerCase() === "cup" &&
+        moneda_PV.toLowerCase() === "cup"
+      ) {
+        ganancia_CUP = ganancia_CUP + (precio_venta - precio_costo) * amount;
+      } else if (
+        moneda_PC.toLowerCase() === "usd" &&
+        moneda_PV.toLowerCase() === "cup"
+      ) {
+        ganancia_CUP =
+          ganancia_CUP +
+          (precio_venta - precio_costo * store.tasa_usd) * amount;
+      } else if (
+        moneda_PC.toLowerCase() === "cup" &&
+        moneda_PV.toLowerCase() === "usd"
+      ) {
+        ganancia_CUP =
+          ganancia_CUP +
+          (precio_venta * store.tasa_usd - precio_costo) * amount;
+      } else if (
+        moneda_PC.toLowerCase() === "usd" &&
+        moneda_PV.toLowerCase() === "usd"
+      ) {
+        ganancia_USD = ganancia_USD + (precio_venta - precio_costo) * amount;
+      }
     } else {
       await addProductInDeuda(
         extra.nombre,
@@ -114,11 +149,13 @@ const newVenta = () => {
         extra.amount,
         precio_costo,
         precio_venta,
+        moneda_PC,
+        moneda_PV,
         id_proveedor,
         idSale,
       );
-      switch (extra.moneda) {
-        case "CUP":
+      switch (moneda_PV.toLowerCase()) {
+        case "cup":
           await updateClientPay(
             clientDeudaId,
             idSale,
@@ -126,7 +163,7 @@ const newVenta = () => {
             precio_venta * extra.amount + currentClient[0].cup,
           );
           break;
-        case "USD":
+        case "usd":
           await updateClientPay(
             clientDeudaId,
             idSale,
@@ -148,37 +185,70 @@ const newVenta = () => {
     id_provider,
     precio_costo,
     precio_venta,
+    moneda_PC,
+    moneda_PV,
   ) => {
-    await updateamountProductsIndisStore(
+    await updateAmountProductsIndisStore(
       amount_products - amount_products_client,
       id_product,
     );
-
     const provider = await getProvidersByIdStore(id_provider);
     if (DEUDA == false) {
-      await updatePagoProviderStore(
-        precio_costo * amount_products_client + provider.pagado,
-        id_provider,
-      );
-      ganancia =
-        ganancia + (precio_venta - precio_costo) * amount_products_client;
+      if (moneda_PC.toLowerCase() === "cup") {
+        await updatePagoProviderStore(
+          precio_costo * amount_products_client + provider.pagado_CUP,
+          id_provider,
+        );
+      } else {
+        await updatePagoProviderStore(
+          precio_costo * amount_products_client + provider.pagado_USD,
+          id_provider,
+          true,
+        );
+      }
+      if (
+        moneda_PC.toLowerCase() === "cup" &&
+        moneda_PV.toLowerCase() === "cup"
+      ) {
+        ganancia_CUP =
+          ganancia_CUP + (precio_venta - precio_costo) * amount_products_client;
+      } else if (
+        moneda_PC.toLowerCase() === "usd" &&
+        moneda_PV.toLowerCase() === "cup"
+      ) {
+        ganancia_CUP =
+          ganancia_CUP +
+          (precio_venta - precio_costo * store.tasa_usd) *
+            amount_products_client;
+      } else if (
+        moneda_PC.toLowerCase() === "cup" &&
+        moneda_PV.toLowerCase() === "usd"
+      ) {
+        ganancia_CUP =
+          ganancia_CUP +
+          (precio_venta * store.tasa_usd - precio_costo) *
+            amount_products_client;
+      } else if (
+        moneda_PC.toLowerCase() === "usd" &&
+        moneda_PV.toLowerCase() === "usd"
+      ) {
+        ganancia_USD =
+          ganancia_USD + (precio_venta - precio_costo) * amount_products_client;
+      }
     } else {
-      console.log("ID_SALE", idSale);
       await addProductInDeuda(
         extra.nombre,
         extra.moneda,
         extra.amount,
         precio_costo,
         precio_venta,
+        moneda_PC,
+        moneda_PV,
         id_provider,
         idSale,
       );
-      // console.log("moneda", extra.moneda);
-      // console.log("idClient", clientDeudaId);
-      // console.log("idSale", idSale);
-      // console.log(currentClient);
-      switch (extra.moneda) {
-        case "CUP":
+      switch (moneda_PV.toLowerCase()) {
+        case "cup":
           await updateClientPay(
             clientDeudaId,
             idSale,
@@ -186,7 +256,7 @@ const newVenta = () => {
             precio_venta * extra.amount + currentClient[0].cup,
           );
           break;
-        case "USD":
+        case "usd":
           await updateClientPay(
             clientDeudaId,
             idSale,
@@ -205,14 +275,49 @@ const newVenta = () => {
     precio_costo,
     amount,
     precio_venta,
+    moneda_PC,
+    moneda_PV,
   ) => {
     const provider = await getProvidersByIdStore(id_provider);
     if (DEUDA == false) {
-      await updatePagoProviderStore(
-        precio_costo * amount + provider.pagado,
-        id_provider,
-      );
-      ganancia = ganancia + (precio_venta - precio_costo) * amount;
+      await deleteProductIndiByIdStore(id_product);
+      if (moneda_PC.toLowerCase() === "cup") {
+        await updatePagoProviderStore(
+          precio_costo * amount + provider.pagado_CUP,
+          id_provider,
+        );
+      } else {
+        await updatePagoProviderStore(
+          precio_costo * amount + provider.pagado_USD,
+          id_provider,
+          true,
+        );
+      }
+      if (
+        moneda_PC.toLowerCase() === "cup" &&
+        moneda_PV.toLowerCase() === "cup"
+      ) {
+        ganancia_CUP = ganancia_CUP + (precio_venta - precio_costo) * amount;
+      } else if (
+        moneda_PC.toLowerCase() === "usd" &&
+        moneda_PV.toLowerCase() === "cup"
+      ) {
+        ganancia_CUP =
+          ganancia_CUP +
+          (precio_venta - precio_costo * store.tasa_usd) * amount;
+      } else if (
+        moneda_PC.toLowerCase() === "cup" &&
+        moneda_PV.toLowerCase() === "usd"
+      ) {
+        ganancia_CUP =
+          ganancia_CUP +
+          (precio_venta * store.tasa_usd - precio_costo) * amount;
+      } else if (
+        moneda_PC.toLowerCase() === "usd" &&
+        moneda_PV.toLowerCase() === "usd"
+      ) {
+        ganancia_USD = ganancia_USD + (precio_venta - precio_costo) * amount;
+      }
     } else {
       await addProductInDeuda(
         extra.nombre,
@@ -220,12 +325,13 @@ const newVenta = () => {
         extra.amount,
         precio_costo,
         precio_venta,
+        moneda_PC,
+        moneda_PV,
         id_provider,
         idSale,
       );
-      console.log("ok");
-      switch (extra.moneda.toLowerCase().trim()) {
-        case "CUP":
+      switch (moneda_PV.toLowerCase()) {
+        case "cup":
           await updateClientPay(
             clientDeudaId,
             idSale,
@@ -233,7 +339,7 @@ const newVenta = () => {
             precio_venta * extra.amount + currentClient[0].cup,
           );
           break;
-        case "USD":
+        case "usd":
           await updateClientPay(
             clientDeudaId,
             idSale,
@@ -433,6 +539,8 @@ const newVenta = () => {
                           groupProduct[0].precio_venta,
                           productsIndisSort[i].precio_costo,
                           amount,
+                          productsIndisSort[i].moneda,
+                          groupProduct[0].moneda,
                         );
                         amount = 0;
                       }
@@ -448,6 +556,8 @@ const newVenta = () => {
                           productsIndisSort[i].id_proveedor,
                           productsIndisSort[i].precio_costo,
                           groupProduct[0].precio_venta,
+                          productsIndisSort[1].moneda,
+                          groupProduct[0].moneda,
                         );
                         amount = 0;
                       }
@@ -463,6 +573,8 @@ const newVenta = () => {
                           productsIndisSort[i].precio_costo,
                           productsIndisSort[i].cantidad,
                           groupProduct[0].precio_venta,
+                          productsIndisSort[1].moneda,
+                          groupProduct[0].moneda,
                         );
 
                         let aux = 1;
@@ -484,6 +596,8 @@ const newVenta = () => {
                               groupProduct[0].precio_venta,
                               productsIndisSort[i + aux].precio_costo,
                               amountRest,
+                              productsIndisSort[i + aux].moneda,
+                              groupProduct[0].moneda,
                             );
                             amountRest = 0;
                           }
@@ -502,6 +616,8 @@ const newVenta = () => {
                               productsIndisSort[i + aux].id_proveedor,
                               productsIndisSort[i + aux].precio_costo,
                               groupProduct[0].precio_venta,
+                              productsIndisSort[1 + aux].moneda,
+                              groupProduct[0].moneda,
                             );
                             amountRest = 0;
                           } else if (
@@ -518,6 +634,8 @@ const newVenta = () => {
                               productsIndisSort[i + aux].precio_costo,
                               productsIndisSort[i + aux].cantidad,
                               groupProduct[0].precio_venta,
+                              productsIndisSort[1].moneda,
+                              groupProduct[0].moneda,
                             );
 
                             continue;
@@ -567,6 +685,8 @@ const newVenta = () => {
                           groupProduct[0].precio_venta,
                           productsIndisSort[i].precio_costo,
                           amount,
+                          productsIndisSort[i].moneda,
+                          groupProduct[0].moneda,
                         );
                         amount = 0;
                       }
@@ -586,6 +706,8 @@ const newVenta = () => {
                           productsIndisSort[i].id_proveedor,
                           productsIndisSort[i].precio_costo,
                           groupProduct[0].precio_venta,
+                          productsIndisSort[1].moneda,
+                          groupProduct[0].moneda,
                         );
                         amount = 0;
                       }
@@ -605,6 +727,8 @@ const newVenta = () => {
                           productsIndisSort[i].precio_costo,
                           productsIndisSort[i].cantidad,
                           groupProduct[0].precio_venta,
+                          productsIndisSort[1].moneda,
+                          groupProduct[0].moneda,
                         );
 
                         let aux = 1;
@@ -630,6 +754,8 @@ const newVenta = () => {
                               groupProduct[0].precio_venta,
                               productsIndisSort[i + aux].precio_costo,
                               amountRest,
+                              productsIndisSort[i + aux].moneda,
+                              groupProduct[0].moneda,
                             );
                             amountRest = 0;
                           }
@@ -652,6 +778,8 @@ const newVenta = () => {
                               productsIndisSort[i + aux].id_proveedor,
                               productsIndisSort[i + aux].precio_costo,
                               groupProduct[0].precio_venta,
+                              productsIndisSort[1 + aux].moneda,
+                              groupProduct[0].moneda,
                             );
                             amountRest = 0;
                           } else if (
@@ -672,6 +800,8 @@ const newVenta = () => {
                               productsIndisSort[i + aux].precio_costo,
                               productsIndisSort[i + aux].cantidad,
                               groupProduct[0].precio_venta,
+                              productsIndisSort[1].moneda,
+                              groupProduct[0].moneda,
                             );
 
                             continue;
@@ -684,7 +814,10 @@ const newVenta = () => {
                   }
                 }
               }
-              await updateGanaciaStore(gananciaActual[0].cGanancia + ganancia);
+              await updateGanaciaStore(
+                gananciaActual.cGanancia_CUP + ganancia_CUP,
+                gananciaActual.cGanancia_USD + ganancia_USD,
+              );
               await deleteProductGroupWithEmptyStock();
               await initStore();
               console.log("Vendido con exito");

@@ -7,6 +7,8 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 export const CardInfo = ({
   textHeader,
   textBody,
+  textBodyCup = 0,
+  textBodyUsd = 0,
   money = false,
   icon,
   color,
@@ -47,9 +49,20 @@ export const CardInfo = ({
       <Text
         style={[stylesCards.textBody, { color: myTheme.colors.textPrimary }]}
       >
-        {money ? "$" : ""}
-        {textBody}
+        {!money && textBody}
+        {money && "$"}
+        {money && textBodyCup}
+        {money && " CUP"}
       </Text>
+      {money && (
+        <Text
+          style={[stylesCards.textBody, { color: myTheme.colors.textPrimary }]}
+        >
+          {money && "$"}
+          {money && textBodyUsd}
+          {money && " USD"}
+        </Text>
+      )}
       <Text
         style={[
           stylesCards.textHeader,
@@ -100,10 +113,10 @@ const stylesCards = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     paddingHorizontal: 10,
-    paddingVertical: 40,
+    paddingVertical: 50,
     width: "48%",
     marginBottom: 15,
-    height: 140,
+    height: 150,
     justifyContent: "center",
   },
   textHeader: {
@@ -111,6 +124,6 @@ const stylesCards = StyleSheet.create({
   },
   textBody: {
     fontWeight: "bold",
-    fontSize: 35,
+    fontSize: 24,
   },
 });

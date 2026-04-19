@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View, Modal } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTheme } from "react-native-paper";
+import { useRouter } from "expo-router";
 
-const CardClient = ({ nombre, ci, cup, usd }) => {
+const CardClient = ({ id, nombre, ci, cup, usd }) => {
   const myTheme = useTheme();
-  const [visible, setVisible] = useState(false);
+  const router = useRouter();
   return (
     <>
       <Pressable
@@ -13,10 +14,13 @@ const CardClient = ({ nombre, ci, cup, usd }) => {
           styles.cardClient,
           { backgroundColor: myTheme.colors.greenLight },
         ]}
-        onPress={() => {}}
-        onLongPress={() => {
-          setVisible(true);
+        onPress={() => {
+          router.push({
+            pathname: "client_info",
+            params: { id_client: id, name: nombre },
+          });
         }}
+        onLongPress={() => {}}
       >
         <View
           style={[styles.box, { backgroundColor: myTheme.colors.greenForce }]}

@@ -24,7 +24,7 @@ const modalCreateProvider = () => {
 
   const handleSave = useCallback(async () => {
     if (nombre.trim()) {
-      await addProviderStore(nombre.trim(), 0, 0, 0);
+      await addProviderStore(nombre.trim(), 0, 0, 0, 0, 0);
       toastShow("Proveedor creado con éxito 🥳✔", "success");
       router.dismiss(1);
     }

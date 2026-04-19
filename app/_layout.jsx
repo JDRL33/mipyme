@@ -25,6 +25,11 @@ const Layuot = () => {
             name="(info_views)/product_info"
             options={screenInformationOptions}
           />
+          {/* SCREEN DE LA INFORMACION DEL CLIENTE */}
+          <Stack.Screen
+            name="(info_views)/client_info"
+            options={[screenInformationOptions, { presentation: "formSheet" }]}
+          />
           {/* SCREEN DE LA VENTA DE PRODUCTOS */}
           <Stack.Screen name="venta/newVenta" options={screenOptions} />
           {/* SCREEN DE LA COMPRA DE PRODUCTOS A LOS PROVEEDORES */}
