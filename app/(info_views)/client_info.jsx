@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { getClientById } from "../../database/database";
+import Title from "../../components/Title";
 
 const client_info = () => {
   const params = useLocalSearchParams();
@@ -15,8 +16,8 @@ const client_info = () => {
   }, []);
   return (
     <View>
-      <Stack.Screen options={{ title: params.name }} />
-      <Text>client_info</Text>
+      <Stack.Screen options={{ title: "Deudas de " + params.name }} />
+      {/* <Title>Deudas de params</Title> */}
     </View>
   );
 };

@@ -336,7 +336,6 @@ const ProveedorInfo = () => {
         )}
       />
       <FabButton
-        paperIcon="acamount-cash"
         onClick={() => {
           router.replace({
             pathname: "compra/buy",

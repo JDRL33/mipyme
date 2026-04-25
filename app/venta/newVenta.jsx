@@ -2,6 +2,7 @@ import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, useTheme } from "react-native-paper";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { styles } from "./sale_style";
 
 import MatchSeach from "../../components/Venta/MatchSeach";
 import ItemInCart from "../../components/Venta/ItemInCart";
@@ -121,26 +122,22 @@ const newVenta = () => {
         moneda_PC.toLowerCase() === "cup" &&
         moneda_PV.toLowerCase() === "cup"
       ) {
-        ganancia_CUP = ganancia_CUP + (precio_venta - precio_costo) * amount;
+        ganancia_CUP += (precio_venta - precio_costo) * amount;
       } else if (
         moneda_PC.toLowerCase() === "usd" &&
         moneda_PV.toLowerCase() === "cup"
       ) {
-        ganancia_CUP =
-          ganancia_CUP +
-          (precio_venta - precio_costo * store.tasa_usd) * amount;
+        ganancia_CUP += (precio_venta - precio_costo * store.tasa_usd) * amount;
       } else if (
         moneda_PC.toLowerCase() === "cup" &&
         moneda_PV.toLowerCase() === "usd"
       ) {
-        ganancia_CUP =
-          ganancia_CUP +
-          (precio_venta * store.tasa_usd - precio_costo) * amount;
+        ganancia_CUP += (precio_venta * store.tasa_usd - precio_costo) * amount;
       } else if (
         moneda_PC.toLowerCase() === "usd" &&
         moneda_PV.toLowerCase() === "usd"
       ) {
-        ganancia_USD = ganancia_USD + (precio_venta - precio_costo) * amount;
+        ganancia_USD += (precio_venta - precio_costo) * amount;
       }
     } else if (DEUDA === true) {
       await addProductInDeuda(
@@ -161,6 +158,11 @@ const newVenta = () => {
             0 + currentClient[0].usd,
             precio_venta * extra.amount + currentClient[0].cup,
           );
+          currentClient &&
+            setCurrentClient(
+              ...currentClient,
+              (currentClient[0].cup += precio_venta * extra.amount),
+            );
           break;
         case "usd":
           await updateClientPay(
@@ -169,6 +171,11 @@ const newVenta = () => {
             precio_venta * extra.amount + currentClient[0].usd,
             0 + currentClient[0].cup,
           );
+          currentClient &&
+            setCurrentClient(
+              ...currentClient,
+              (currentClient[0].usd += precio_venta * extra.amount),
+            );
           break;
       }
 
@@ -253,6 +260,12 @@ const newVenta = () => {
             0 + currentClient[0].usd,
             precio_venta * extra.amount + currentClient[0].cup,
           );
+          currentClient &&
+            setCurrentClient(
+              ...currentClient,
+              (currentClient[0].cup += precio_venta * extra.amount),
+            );
+
           break;
         case "usd":
           await updateClientPay(
@@ -261,6 +274,11 @@ const newVenta = () => {
             precio_venta * extra.amount + currentClient[0].usd,
             0 + currentClient[0].cup,
           );
+          currentClient &&
+            setCurrentClient(
+              ...currentClient,
+              (currentClient[0].usd += precio_venta * extra.amount),
+            );
           break;
       }
     }
@@ -335,6 +353,11 @@ const newVenta = () => {
             0 + currentClient[0].usd,
             precio_venta * extra.amount + currentClient[0].cup,
           );
+          currentClient &&
+            setCurrentClient(
+              ...currentClient,
+              (currentClient[0].cup += precio_venta * extra.amount),
+            );
           break;
         case "usd":
           await updateClientPay(
@@ -343,6 +366,11 @@ const newVenta = () => {
             precio_venta * extra.amount + currentClient[0].usd,
             0 + currentClient[0].cup,
           );
+          currentClient &&
+            setCurrentClient(
+              ...currentClient,
+              (currentClient[0].usd += precio_venta * extra.amount),
+            );
           break;
       }
     }
@@ -807,6 +835,11 @@ const newVenta = () => {
                   }
                 }
               }
+              console.log(
+                "GANANCIAS:",
+                gananciaActual.cGanancia_CUP,
+                gananciaActual.cGanancia_USD,
+              );
               await updateGanaciaStore(
                 gananciaActual.cGanancia_CUP + ganancia_CUP,
                 gananciaActual.cGanancia_USD + ganancia_USD,
@@ -864,62 +897,3 @@ const newVenta = () => {
 };
 
 export default newVenta;
-
-const styles = StyleSheet.create({
-  ticketScrollView: {
-    padding: 20,
-    marginTop: 20,
-    shadowRadius: 10,
-    borderRadius: 10,
-    shadowOpacity: 0.3,
-  },
-  ticketHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  subTitle: { marginTop: 20, marginBottom: 10, fontWeight: "bold" },
-  previewVent: {
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 15,
-  },
-  actionTypeOfPay: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 20,
-  },
-  pickerTypeOfPay: { flex: 1, color: "black", paddingHorizontal: 5 },
-  deudPay: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 20,
-  },
-  pickerDeudPay: {
-    flex: 1,
-    backgroundColor: "white",
-    color: "black",
-    paddingHorizontal: 5,
-    borderRadius: 30,
-  },
-  parentButtonsOkAndCancel: {
-    gap: 5,
-    marginTop: 20,
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  actionButton: {
-    borderRadius: 10,
-    borderWidth: 2,
-  },
-  buttonText: { fontWeight: "bold", fontSize: 15 },
-  pickerCreateClient: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 5,
-  },
-});

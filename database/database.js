@@ -252,10 +252,9 @@ export async function getClientById(id) {
 }
 export async function getGananciaOfTheStore() {
   const response = await getData(
-    "SELECT cGanancia_CUP, cGanancia_USD  FROM store WHERE id = 1",
+    "SELECT cGanancia_CUP, cGanancia_USD FROM store WHERE id = 1",
   );
-  console.log(response[0]);
-  return response;
+  return response[0];
 }
 // Aniadiendo proveedores
 export async function addProvider(
@@ -502,6 +501,9 @@ export async function clearDatabase() {
     DELETE FROM producto_independiente;
     DELETE FROM producto_grupo;
     DELETE FROM clientes_deuda;
+    DELETE FROM record_buys;
+    DELETE FROM record_sales;
+    DELETE FROM products_in_deuda;
     DELETE FROM sqlite_sequence;
     VACUUM;
   `);

@@ -9,6 +9,7 @@ import {
   addProvider,
   getProviders,
   clearDatabase,
+  updateGanancia,
   addProductIndi,
   updateProvider,
   getProviderById,
@@ -18,22 +19,17 @@ import {
   getProductsIndis,
   findByNameProduct,
   findByNameProvider,
-  updatePagoProvider,
   updateProductGroup,
-  getProductsIndiById,
-  getProductsStockDown,
-  deleteProductIndiById,
+  getProductsInDeuda,
   findByNameProductIndi,
+  deleteProductIndiById,
+  updatePagoCupProvider,
+  updatePagoUsdProvider,
   findByNameProductGroup,
   deleteGroupProductById,
   getProductsByIdProvider,
-  getProductsByIdProductGroup,
   updateAmountProductsIndis,
-  updateGanancia,
-  updatePagoCupProvider,
-  updatePagoUsdProvider,
-  getProductsInDeudaByIdProvider,
-  getProductsInDeuda,
+  getProductsByIdProductGroup,
 } from "../database/database";
 
 export const appStore = create((set, get) => ({
@@ -115,7 +111,7 @@ export const appStore = create((set, get) => ({
       cGanancia_CUP: parseFloat(store.cGanancia_CUP).toFixed(2),
       cGanancia_USD: parseFloat(store.cGanancia_USD).toFixed(2),
     };
-    console.log("store", store);
+    // console.log("store", store);
     await updateStore(newStore);
     set({ store: newStore });
   },

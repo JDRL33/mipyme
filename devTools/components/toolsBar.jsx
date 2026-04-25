@@ -11,9 +11,6 @@ import {
   getGananciaOfTheStore,
   getProductsInDeuda,
   getSales,
-  getStore,
-  isInitialized,
-  updateGanancia,
 } from "../../database/database";
 import { useRouter } from "expo-router";
 import { appStore } from "../../store/appStore";
@@ -27,7 +24,7 @@ export const ToolsBar = ({ show = false }) => {
   const router = useRouter();
 
   const ACCION1 = async () => {
-    console.log(await getClient());
+    console.log(await getGananciaOfTheStore());
   };
   const ACCION2 = async () => {
     console.log(await getProductsInDeuda());
